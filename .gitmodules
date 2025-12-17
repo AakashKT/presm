@@ -1,0 +1,9 @@
+[submodule "extern/openFPGALoader"]
+	path = extern/openFPGALoader
+	url = https://github.com/trabucayre/openFPGALoader
+[submodule "extern/nextpnr"]
+	path = extern/nextpnr
+	url = https://github.com/YosysHQ/nextpnr
+[submodule "extern/yosys"]
+	path = extern/yosys
+	url = https://github.com/YosysHQ/yosys
