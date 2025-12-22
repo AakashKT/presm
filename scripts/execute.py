@@ -9,5 +9,7 @@ if __name__ == '__main__':
     parser.add_argument('--args', nargs='+', type=str)
     args = parser.parse_args()
 
+    utils.init()
+
     source = utils.presm_execute(args.working_directory, args.executable, args.args, args.driver)
     print(source)

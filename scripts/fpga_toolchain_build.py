@@ -4,6 +4,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     args = parser.parse_args()
 
+    utils.init()
+
     if len(os.listdir('extern')) == 0:
         utils.print_red('No submodules found. Did you reun git clone --recursive-submodules?')
         exit()

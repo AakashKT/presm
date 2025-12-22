@@ -2,11 +2,8 @@
 
 void run_sanity()
 {
-    CUresult res = cuInit(0);
-    std::cout << res << std::endl;
+    CUdevice device;
+    CUcontext context;
 
-    int temp = 0;
-    cuDeviceGetCount(&temp);
-
-    std::cout << temp << std::endl;
+    initCUDA(&device, &context, true);
 }

@@ -4,6 +4,20 @@ def print_red(s): print("\033[91m{}\033[00m".format('++ ' + s))
 def print_green(s): print("\033[92m{}\033[00m".format('++ ' + s))
 def print_white(s): print('++ ' + s)
 
+def init():
+    os.chdir('../')
+
+def get_working_directory_and_executable(driver):
+    if driver == 'cuda':
+        working_directory = os.getcwd() + '/build/verification/cuda/'
+        executable = 'verification'
+    
+    else:
+        utils.print_red('Verification apps for driver ' + driver + 'do not exist.')
+        exit(-1)
+    
+    return working_directory, executable
+
 def get_driver_shared_lib(driver_name):
     return os.getcwd() + '/build/driver/' + driver_name + '/libdriver.so'
 
