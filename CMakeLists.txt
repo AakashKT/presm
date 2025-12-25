@@ -7,6 +7,9 @@ project(presm VERSION 0.1
 # Configuration variables
 set(DRIVER "cuda" CACHE STRING "Which driver to use? (default: cuda)")
 
+include_directories(device/include)
+add_subdirectory(device/)
+
 if(${DRIVER} MATCHES "cuda")
     message(STATUS "PRESM: Compiling with CUDA driver")
 

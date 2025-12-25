@@ -43,11 +43,6 @@ void initCUDA(CUdevice *device, CUcontext *context, bool print_debug_info)
     if(print_debug_info)
         printf("> Using device 0: %s\n", name);
 
-    // get compute capabilities and the devicename
-    checkCudaErrors( cuDeviceComputeCapability(&major, &minor, *device) );
-    if(print_debug_info)
-        printf("> GPU Device has SM %d.%d compute capability\n", major, minor);
-
     size_t totalGlobalMem = 0;
     checkCudaErrors( cuDeviceTotalMem(&totalGlobalMem, *device) );
     if(print_debug_info)
@@ -62,7 +57,6 @@ void initCUDA(CUdevice *device, CUcontext *context, bool print_debug_info)
     if (err != CUDA_SUCCESS) {
         if(print_debug_info)
             fprintf(stderr, "* Error initializing the CUDA context.\n");
-        cuCtxDetach(*context);
         exit(-1);
     }
 }
@@ -73,7 +67,6 @@ CUmodule loadModule(CUcontext context, std::string module_file)
     CUresult err = cuModuleLoad(&module, module_file.c_str());
     if (err != CUDA_SUCCESS) {
         fprintf(stderr, "* Error loading the module %s\n", module_file);
-        cuCtxDetach(context);
         exit(-1);
     }
 
@@ -87,7 +80,6 @@ CUfunction loadFunctionFromModule(CUcontext context, CUmodule module, std::strin
 
     if (err != CUDA_SUCCESS) {
         fprintf(stderr, "* Error getting kernel function %s\n", function_name);
-        cuCtxDetach(context);
         exit(-1);
     }
 

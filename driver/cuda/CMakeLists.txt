@@ -5,4 +5,5 @@ include_directories(include/)
 add_library(driver SHARED
             cuda_api.cpp
             driver_entrypoint.cpp
+            $<TARGET_OBJECTS:device>
         )
