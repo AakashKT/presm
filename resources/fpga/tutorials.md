@@ -1,0 +1,2 @@
+- Tang Nano 9K / 20K FPGA: https://learn.lushaylabs.com/getting-setup-with-the-tang-nano-9k/
+    - This is a series, to go from setting up the FPGA to running RTL, debugging, gathering data etc.

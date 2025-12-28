@@ -1,0 +1,2 @@
+- Writing your own assembler for Intel 8080 CPU: https://briancallahan.net/blog/20210408.html
+    - Useful barebones
