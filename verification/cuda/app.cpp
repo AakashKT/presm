@@ -66,7 +66,7 @@ CUmodule loadModule(CUcontext context, std::string module_file)
     CUmodule module;
     CUresult err = cuModuleLoad(&module, module_file.c_str());
     if (err != CUDA_SUCCESS) {
-        fprintf(stderr, "* Error loading the module %s\n", module_file);
+        fprintf(stderr, "* Error loading the module %s\n", module_file.c_str());
         exit(-1);
     }
 
@@ -79,7 +79,7 @@ CUfunction loadFunctionFromModule(CUcontext context, CUmodule module, std::strin
     CUresult err = cuModuleGetFunction(&function, module, function_name.c_str());
 
     if (err != CUDA_SUCCESS) {
-        fprintf(stderr, "* Error getting kernel function %s\n", function_name);
+        fprintf(stderr, "* Error getting kernel function %s\n", function_name.c_str());
         exit(-1);
     }
 

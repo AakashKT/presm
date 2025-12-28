@@ -4,7 +4,7 @@ PRESMDevice *presm_device = nullptr;
 
 CUresult presm_cuInit(unsigned int flags)
 {
-    presm_device = new PRESMDevice();
+    presm_device = initialize_device();
     return CUDA_SUCCESS;
 }
 
@@ -32,7 +32,10 @@ CUresult presm_cuDeviceGet(CUdevice* device, int ordinal)
 
 CUresult presm_cuDeviceGetName(char* name, int len, CUdevice dev)
 {
-    if(presm_device == nullptr || (reinterpret_cast<int64_t>(presm_device) >> 32) != dev)
+    if(presm_device == nullptr)
+        return CUDA_ERROR_NOT_INITIALIZED;
+
+    if((reinterpret_cast<int64_t>(presm_device) >> 32) != dev)
         return CUDA_ERROR_INVALID_DEVICE;
     
     std::string device_name = presm_device->get_name();
@@ -45,10 +48,18 @@ CUresult presm_cuDeviceGetName(char* name, int len, CUdevice dev)
 
 CUresult presm_cuDeviceTotalMem(size_t* bytes, CUdevice dev)
 {
+    if(presm_device == nullptr)
+        return CUDA_ERROR_NOT_INITIALIZED;
 
+    if((reinterpret_cast<int64_t>(presm_device) >> 32) != dev)
+        return CUDA_ERROR_INVALID_DEVICE;
+
+    *bytes = (size_t) presm_device->get_device_memory()->get_size();
+
+    return CUDA_SUCCESS;
 }
 
 CUresult presm_cuCtxCreate(CUcontext* pctx, unsigned int  flags, CUdevice dev)
 {
-    
+    return CUDA_ERROR_NOT_INITIALIZED;
 }

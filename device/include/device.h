@@ -2,15 +2,15 @@
 #define DEVICE_H
 
 #include <string>
+#include "memory.h"
 
 class PRESMDevice {
 public:
-    PRESMDevice();
+    virtual std::string get_name() = 0;
 
-    std::string get_name() { return name; };
-
-private:
-    std::string name;
+    virtual DeviceMemory* get_device_memory() = 0;
 };
+
+PRESMDevice* initialize_device();
 
 #endif
