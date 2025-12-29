@@ -3,7 +3,7 @@
 void run_vector_add()
 {
     int N = 100;
-    int a[N], b[N], c[N];
+    std::vector<int> a(N), b(N), c(N);
 
     CUdevice device;
     CUcontext context;
@@ -28,8 +28,8 @@ void run_vector_add()
     checkCudaErrors( cuMemAlloc(&d_c, sizeof(int) * N) );
 
     // copy arrays to device
-    checkCudaErrors( cuMemcpyHtoD(d_a, a, sizeof(int) * N) );
-    checkCudaErrors( cuMemcpyHtoD(d_b, b, sizeof(int) * N) );
+    checkCudaErrors( cuMemcpyHtoD(d_a, a.data(), sizeof(int) * N) );
+    checkCudaErrors( cuMemcpyHtoD(d_b, b.data(), sizeof(int) * N) );
 
     // run
     printf("# Running the kernel...\n");
@@ -44,7 +44,7 @@ void run_vector_add()
     printf("# Kernel complete.\n");
 
     // copy results to host and report
-    checkCudaErrors( cuMemcpyDtoH(c, d_c, sizeof(int) * N) );
+    checkCudaErrors( cuMemcpyDtoH(c.data(), d_c, sizeof(int) * N) );
     for (int i = 0; i < N; ++i) {
         printf("%d\n", c[i]);
     }
