@@ -26,5 +26,7 @@ add_library(device OBJECT
             ${DEVICE_SOURCE_FILES}
         )
 target_compile_definitions(device PRIVATE DEVICE_ID=DEVICE_ID)
-set_property(TARGET device PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+if(PRESM_SHARED_LIB)
+    set_property(TARGET device PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
