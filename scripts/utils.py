@@ -46,7 +46,7 @@ def get_driver_lib(driver_name):
             return shared_lib_path, False
         
         elif os.path.isfile(static_lib_path):
-            return shared_lib_path, True
+            return static_lib_path, True
         
         else:
             print_red('Cannot find static or shared library of PRESM.')

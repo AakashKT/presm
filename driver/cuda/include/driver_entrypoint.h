@@ -3,7 +3,6 @@
 #ifndef CUDA_DRIVER_ENTRYPOINT_H
 #define CUDA_DRIVER_ENTRYPOINT_H
 
-#include <iostream>
 #include <cuda.h>
 
 #include "device.h"
