@@ -19,6 +19,6 @@ if __name__ == '__main__':
     os.chdir('build')
 
     if args.clean.lower() == 'yes':
-        os.system('cmake .. -DDRIVER=%s -DDEVICE=%s' % (args.driver.lower(), args.device.lower()))
+        os.system('cmake .. -DDRIVER=%s -DDEVICE=%s -DCMAKE_BUILD_TYPE=Release' % (args.driver.lower(), args.device.lower()))
         
-    os.system('cmake --build . --target install')
+    os.system('cmake --build . --config Release --target install')
