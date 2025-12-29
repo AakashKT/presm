@@ -16,9 +16,9 @@ The general goals of PRESM are:
 
 Some notes about the methodology:
 - Functional Model: The intent of the C++ code is to provide only a functional verification of the hardware accelerator. It will not give any cycle-level measurements.
-- Bit-accurate model: RTL verification, atleast for now, is done by loading the RTL on a FPGA and running the test on it (either directly or through memory dumps). The can be considered a </i>bit-accurate</i> simulation, since it works on the bit-level.
+- Bit-accurate model: RTL verification, atleast for now, will be done by loading the RTL on a FPGA and running the test on it (either directly or through memory dumps). This can be considered a </i>bit-accurate</i> simulation, since it works on the bit-level on actual hardware logic.
     - This model will also provide cycle-level stats, but will not be "cycle-accurate" since the FPGA clocks and mem clocks are bound to be different to actual hardware
-- Cycle-accurate model: Not sure how this can be accomplished yet! This is outside the scope of the first release.
+- Cycle-accurate model: Not sure how this can be accomplished yet! Will need this for performance comparisons / estimates, before a silicon tape-out.
 
 ## Goals for the first release (v1.0)
 
@@ -34,7 +34,16 @@ Finally, once we can have a complete GPU model that passes all functional tests 
 
 This makes our first release end-to-end: from modelling to tape-out.
 
-## v1.0 Progress
+### Intermediate release (v0.5)
+v1.0 involves a lot of moving components: device, device memory, cuda driver API, PTX assembler and PTX decoder in device. Aside from being complicated, this is extensive too, since PTX itself is a big ISA and the cuda driver API is huge too.
+
+Its easier to start with a simple accelerator, like a AI model inference accelerator. Just inference - so no complicated driver API, no complicated ISA (almost non-existent ISA, since all we really need are matmuls!). 
+
+So, here is the plan:
+- The hardware accelerator will be for inference of AI models.
+- The interface to it will be the <a href="https://onnxruntime.ai/docs/">ONNX API</a> - which is to say, ONNX is the driver of the hardware accelerator.
+
+### v1.0 (and v0.5) Progress Tracker
 - [x] Code skeleton, with C++ and RTL sources
 - [x] Automate building on FPGA toolchain
 - [x] Automate RTL load on Tang Nano 20K FPGA
