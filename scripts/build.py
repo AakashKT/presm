@@ -10,6 +10,10 @@ if __name__ == '__main__':
 
     utils.init()
 
+    if args.static_lib:
+        utils.print_red('Building a static library of PRESM is currently not supported.')
+        exit()
+
     if args.clean:
         shutil.rmtree('build')
         os.mkdir('build')
@@ -23,8 +27,11 @@ if __name__ == '__main__':
     if args.clean or (not path_exists):
 
         if args.static_lib:
-            os.system('cmake .. -DPRESM_SHARED_LIB=FALSE -DDRIVER=%s -DDEVICE=%s -DCMAKE_BUILD_TYPE=Release' % (args.driver.lower(), args.device.lower()))
+            os.system('cmake .. -DPRESM_SHARED_LIB=FALSE -DDRIVER=%s -DDEVICE=%s' % (args.driver.lower(), args.device.lower()))
         else:
-            os.system('cmake .. -DPRESM_SHARED_LIB=TRUE -DDRIVER=%s -DDEVICE=%s -DCMAKE_BUILD_TYPE=Release' % (args.driver.lower(), args.device.lower()))
+            os.system('cmake .. -DPRESM_SHARED_LIB=TRUE -DDRIVER=%s -DDEVICE=%s' % (args.driver.lower(), args.device.lower()))
 
-    os.system('cmake --build . --config Release --target install')
+    os.system('cmake --build . --config Release')
+
+    if args.driver.lower() == 'cuda':
+        os.system('cmake --build . --config Release --target install')

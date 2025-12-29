@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15...4.0)
 
 project(presm VERSION 0.1
-        DESCRIPTION "GPU PRE-Silicon Modelling"
+        DESCRIPTION "PRE-Silicon Modelling"
         LANGUAGES C CXX CUDA)
 
 # Configuration variables
@@ -32,6 +32,14 @@ if(${DRIVER} MATCHES "cuda")
 
     # Verification tests
     add_subdirectory(verification/cuda)
+elseif(${DRIVER} MATCHES "onnx")
+    message(STATUS "PRESM: Compiling with ONNX driver")
+
+    # The actual driver
+    add_subdirectory(driver/onnx)
+
+    # Verification tests
+    add_subdirectory(verification/onnx)
 else()
     message(FATAL_ERROR "PRESM: Driver named ${DRIVER} not found!")
     return()
