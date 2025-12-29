@@ -1,10 +1,10 @@
 #include "device.h"
 
 #if DEIVCE_ID==0
-#include "ptx_gpu_1.h"
+#include "ptx_gpu.h"
 #endif
 
-PRESMDevice* initialize_device()
+Device* initialize_device()
 {
 #if DEIVCE_ID==0
     return new PTXGPU1();

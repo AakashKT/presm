@@ -5,6 +5,7 @@ include_directories(include/)
 SET(DEVICE_SOURCE_FILES
     device.cpp
     memory.cpp
+    assembler.cpp
 )
 
 if(${DEVICE} MATCHES "ptx_gpu_1")
@@ -14,7 +15,7 @@ if(${DEVICE} MATCHES "ptx_gpu_1")
     include_directories(ptx_gpu_1/include)
 
     list(APPEND DEVICE_SOURCE_FILES
-        ptx_gpu_1/ptx_gpu_1.cpp
+        ptx_gpu_1/ptx_gpu.cpp
     )
 else()
     message(FATAL_ERROR "PRESM: Device ${DEVICE} not found!")

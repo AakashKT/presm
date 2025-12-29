@@ -1,6 +1,8 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
+#include "common.h"
+
 class DeviceMemory {
 public:
     DeviceMemory(unsigned long long size_in_bytes);

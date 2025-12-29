@@ -1,6 +1,6 @@
 #include "driver_entrypoint.h"
 
-PRESMDevice *presm_device = nullptr;
+Device *presm_device = nullptr;
 
 CUresult presm_cuInit(unsigned int flags)
 {

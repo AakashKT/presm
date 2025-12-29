@@ -1,9 +1,9 @@
-#ifndef PTX_GPU_1
-#define PTX_GPU_1
+#ifndef PTX_GPU_1_H
+#define PTX_GPU_1_H
 
 #include "device.h"
 
-class PTXGPU1 : public PRESMDevice {
+class PTXGPU1 : public Device {
 public:
     PTXGPU1();
 

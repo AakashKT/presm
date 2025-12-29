@@ -8,7 +8,7 @@
 
 #include "device.h"
 
-extern PRESMDevice *presm_device;
+extern Device *presm_device;
 
 CUresult presm_cuInit(unsigned int flags);
 CUresult presm_cuDeviceGetCount(int *count);

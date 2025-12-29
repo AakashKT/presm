@@ -1,4 +1,4 @@
-#include "ptx_gpu_1.h"
+#include "ptx_gpu.h"
 
 PTXGPU1::PTXGPU1()
 {

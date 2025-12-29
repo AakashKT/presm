@@ -1,16 +1,16 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include <string>
+#include "common.h"
 #include "memory.h"
 
-class PRESMDevice {
+class Device {
 public:
     virtual std::string get_name() = 0;
 
     virtual DeviceMemory* get_device_memory() = 0;
 };
 
-PRESMDevice* initialize_device();
+Device* initialize_device();
 
 #endif

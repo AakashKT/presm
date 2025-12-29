@@ -14,7 +14,7 @@ The general goals of PRESM are:
 - Enable any app to run on on RTL of the hardware accelerator
     - Example: Continuing the above example, PRESM should enable any CUDA app to run on the RTL, and gather its output.
 
-Some notes about the moethodology:
+Some notes about the methodology:
 - Functional Model: The intent of the C++ code is to provide only a functional verification of the hardware accelerator. It will not give any cycle-level measurements.
 - Bit-accurate model: RTL verification, atleast for now, is done by loading the RTL on a FPGA and running the test on it (either directly or through memory dumps). The can be considered a </i>bit-accurate</i> simulation, since it works on the bit-level.
     - This model will also provide cycle-level stats, but will not be "cycle-accurate" since the FPGA clocks and mem clocks are bound to be different to actual hardware

@@ -9,6 +9,7 @@ set(DEVICE "ptx_gpu_1" CACHE STRING "Which device to use? (default: ptx_gpu_1, s
 set(DRIVER "cuda" CACHE STRING "Which driver to use? (default: cuda, see driver/ folder)")
 
 # General includes
+include_directories(include)
 include_directories(device/include)
 
 # Add device directory
