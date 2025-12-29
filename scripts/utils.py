@@ -1,4 +1,4 @@
-import os, argparse, shutil, subprocess
+import os, argparse, shutil, subprocess, platform
 
 def print_red(s): print("\033[91m{}\033[00m".format('++ ' + s))
 def print_green(s): print("\033[92m{}\033[00m".format('++ ' + s))
@@ -8,9 +8,17 @@ def init():
     os.chdir('../')
 
 def get_working_directory_and_executable(driver):
+    system_name = platform.system()
+
     if driver == 'cuda':
-        working_directory = os.getcwd() + '/build/verification/cuda/'
-        executable = 'verification'
+
+        if system_name == 'Windows':
+            working_directory = os.getcwd() + '/build/verification/cuda/Release/'
+            executable = 'verification.exe'
+        
+        elif system_name == 'Linux':
+            working_directory = os.getcwd() + '/build/verification/cuda/'
+            executable = 'verification'
     
     else:
         utils.print_red('Verification apps for driver ' + driver + 'do not exist.')
@@ -18,8 +26,31 @@ def get_working_directory_and_executable(driver):
     
     return working_directory, executable
 
-def get_driver_shared_lib(driver_name):
-    return os.getcwd() + '/build/driver/' + driver_name + '/libdriver.so'
+def get_driver_lib(driver_name):
+    system_name = platform.system()
+
+    if system_name == 'Windows':
+        static_lib_path = os.getcwd() + '/build/driver/' + driver_name + '/Release/driver.lib'
+
+        if not os.path.isfile(static_lib_path):
+            print_red('Cannot find static library of PRESM. On windows, PRESM can be only run if built as a static library.')
+            exit()
+        
+        return static_lib_path, True
+    
+    elif system_name == 'Linux':
+        shared_lib_path = os.getcwd() + '/build/driver/' + driver_name + '/libdriver.so'
+        static_lib_path = os.getcwd() + '/build/driver/' + driver_name + '/libdriver.a'
+
+        if os.path.isfile(shared_lib_path):
+            return shared_lib_path, False
+        
+        elif os.path.isfile(static_lib_path):
+            return shared_lib_path, True
+        
+        else:
+            print_red('Cannot find static or shared library of PRESM.')
+            exit()
 
 def _chdir(directory):
     os.chdir(directory)
@@ -49,7 +80,7 @@ def presm_execute(working_directory, executable, args, driver_name):
     print_white('======================')
 
     current_directory = os.getcwd()
-    library_path = get_driver_shared_lib(driver_name)
+    library_path, is_static = get_driver_lib(driver_name)
 
     _chdir(working_directory)
     op = _execute(

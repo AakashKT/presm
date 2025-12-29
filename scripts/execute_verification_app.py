@@ -4,14 +4,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--driver', required=True)
     parser.add_argument('--app', required=True)
-    parser.add_argument('--on_presm', default="no")
+    parser.add_argument('--on_presm', action='store_true')
     args = parser.parse_args()
 
     utils.init()
 
     working_directory, executable = utils.get_working_directory_and_executable(args.driver)
 
-    if not args.on_presm == 'no':
+    if args.on_presm:
         op = utils.presm_execute(working_directory, executable, [args.app], args.driver)
     else:
         op = utils.execute(working_directory, executable, [args.app])
