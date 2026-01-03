@@ -19,15 +19,6 @@ if(${DEVICE} MATCHES "ptx_gpu_1")
     list(APPEND DEVICE_SOURCE_FILES
         ptx_gpu_1/ptx_gpu.cpp
     )
-elseif(${DEVICE} MATCHES "npu_onnx")
-    message(STATUS "PRESM: Using device npu_onnx")
-    SET(DEVICE_ID 1)
-        
-    include_directories(npu_onnx/include)
-
-    list(APPEND DEVICE_SOURCE_FILES
-        npu_onnx/npu_onnx.cpp
-    )
 else()
     message(FATAL_ERROR "PRESM: Device ${DEVICE} not found!")
     return()
