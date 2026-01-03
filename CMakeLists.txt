@@ -32,14 +32,6 @@ if(${DRIVER} MATCHES "cuda")
 
     # Verification tests
     add_subdirectory(verification/cuda)
-elseif(${DRIVER} MATCHES "onnx")
-    message(STATUS "PRESM: Compiling with ONNX driver")
-
-    # The actual driver
-    add_subdirectory(driver/onnx)
-
-    # Verification tests
-    add_subdirectory(verification/onnx)
 else()
     message(FATAL_ERROR "PRESM: Driver named ${DRIVER} not found!")
     return()

@@ -1,2 +1,3 @@
 - Tang Nano 9K / 20K FPGA: https://learn.lushaylabs.com/getting-setup-with-the-tang-nano-9k/
     - This is a series, to go from setting up the FPGA to running RTL, debugging, gathering data etc.
+- Bruno Levy's amazing series: https://github.com/BrunoLevy/learn-fpga/blob/master/FemtoRV/TUTORIALS/FROM_BLINKER_TO_RISCV/README.md
