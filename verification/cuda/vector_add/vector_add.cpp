@@ -1,4 +1,4 @@
-#include "app.h"
+#include "cuda_verification.h"
 
 void run_vector_add()
 {

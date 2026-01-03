@@ -1,10 +1,7 @@
-#ifndef VERIFICATION_APP_H
-#define VERIFICATION_APP_H
+#ifndef CUDA_VERIFICATION_APP_H
+#define CUDA_VERIFICATION_APP_H
 
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
+#include "app.h"
 
 #include <cuda.h>
 #include <builtin_types.h>
@@ -24,6 +21,13 @@ inline void __checkCudaErrors( CUresult err, const char *file, const int line )
 void initCUDA(CUdevice *device, CUcontext *context, bool print_debug_info = false);
 CUmodule loadModule(CUcontext context, std::string module_file);
 CUfunction loadFunctionFromModule(CUcontext context, CUmodule module, std::string function_name);
+
+class CudaTestHandler : public TestHandler {
+public:
+    CudaTestHandler() {};
+
+    bool run_test(std::string test_name) override;
+};
 
 void run_sanity();
 void run_vector_add();

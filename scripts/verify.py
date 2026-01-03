@@ -8,7 +8,7 @@ if __name__ == '__main__':
 
     utils.init()
 
-    working_directory, executable = utils.get_working_directory_and_executable(args.driver)
+    working_directory, executable = utils.get_working_directory_and_executable()
 
     target = utils.execute(working_directory, executable, [args.app])
     source = utils.presm_execute(working_directory, executable, [args.app], args.driver)

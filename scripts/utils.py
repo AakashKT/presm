@@ -7,20 +7,16 @@ def print_white(s): print('++ ' + s)
 def init():
     os.chdir('../')
 
-def get_working_directory_and_executable(driver):
+def get_working_directory_and_executable():
     system_name = platform.system()
 
     if system_name == 'Windows':
-        working_directory = os.getcwd() + '/build/verification/' + driver + '/Release/'
+        working_directory = os.getcwd() + '/build/verification/Release/'
         executable = 'verification.exe'
     
     elif system_name == 'Linux':
-        working_directory = os.getcwd() + '/build/verification/' + driver + '/'
+        working_directory = os.getcwd() + '/build/verification/'
         executable = 'verification'
-    
-    if not os.path.exists(working_directory):
-        print_red('Verification apps for driver ' + driver + 'do not exist.')
-        exit()
     
     return working_directory, executable
 

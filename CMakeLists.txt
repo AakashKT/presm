@@ -17,6 +17,9 @@ include_directories(device/include)
 # Add device directory
 add_subdirectory(device/)
 
+# Verification tests
+add_subdirectory(verification/)
+
 if(PRESM_SHARED_LIB)
     message(STATUS "PRESM: Building as shared library")
 else()
@@ -29,9 +32,6 @@ if(${DRIVER} MATCHES "cuda")
 
     # The actual driver
     add_subdirectory(driver/cuda)
-
-    # Verification tests
-    add_subdirectory(verification/cuda)
 else()
     message(FATAL_ERROR "PRESM: Driver named ${DRIVER} not found!")
     return()

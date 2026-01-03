@@ -2,10 +2,8 @@ cmake_minimum_required(VERSION 3.15...4.0)
 
 find_package(CUDAToolkit REQUIRED)
 
-include_directories(include/)
-
 set(HOST_CODE
-    app.cpp
+    cuda_verification.cpp
     sanity/sanity.cpp
     vector_add/vector_add.cpp
 )
@@ -23,9 +21,10 @@ install(TARGETS ptx
     OBJECTS DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
 )
 
-add_executable(verification
+target_sources(verification PUBLIC
     ${HOST_CODE}
 )
+target_include_directories(verification PUBLIC include/)
 target_link_libraries(verification PRIVATE 
     CUDA::cuda_driver
 )

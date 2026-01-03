@@ -1,24 +1,20 @@
-#include "app.h"
+#include "cuda_verification.h"
 
-int main(int argc, char *argv[])
+bool CudaTestHandler::run_test(std::string test_name)
 {
-    if(argc == 1) {
-        std::cout << "Please provide test name." << std::endl;
-        return -1;
-    }
-
-    std::string test_name(argv[1]);
-
     if(test_name == "sanity")
         run_sanity();
     else if(test_name == "vector_add")
         run_vector_add();
-    else {
-        std::cout << "Test with name '" << test_name << "' does not exist." << std::endl;
-        return -1;
-    }
+    else 
+        return false;
 
-    return 0;
+    return true;
+}
+
+TestHandler* get_test_handler()
+{
+    return new CudaTestHandler();
 }
 
 void initCUDA(CUdevice *device, CUcontext *context, bool print_debug_info)
