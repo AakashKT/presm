@@ -1,5 +1,10 @@
 #include "ptx_gpu_asm.h"
 
+Assembler* get_assembler()
+{
+    return new PTXGPUAssembler("NULL");
+}
+
 PTXGPUAssembler::PTXGPUAssembler(std::string source_isa_file)
 {
     std::ifstream file(source_isa_file);
@@ -22,7 +27,7 @@ void PTXGPUAssembler::preprocess()
     }
 }
 
-void PTXGPUAssembler::assemble() override
+void PTXGPUAssembler::assemble()
 {
     this->preprocess();
 }

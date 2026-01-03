@@ -7,13 +7,13 @@ set(HOST_CODE
     sanity/sanity.cpp
     vector_add/vector_add.cpp
 )
-set(DEVICE_CODE
+set(CUDA_CODE
     sanity/sanity.cu    
     vector_add/vector_add.cu
 )
 
 add_library(ptx OBJECT
-    ${DEVICE_CODE}
+    ${CUDA_CODE}
 )
 set_property(TARGET ptx PROPERTY CUDA_PTX_COMPILATION ON)
 set_property(TARGET ptx PROPERTY CMAKE_CUDA_FLAGS O0)

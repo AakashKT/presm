@@ -11,6 +11,6 @@ public:
     virtual DeviceMemory* get_device_memory() = 0;
 };
 
-Device* initialize_device();
+Device* get_device();
 
 #endif

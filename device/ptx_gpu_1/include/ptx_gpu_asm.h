@@ -7,12 +7,13 @@ class PTXGPUAssembler : public Assembler {
 public:
     PTXGPUAssembler(std::string source_isa_file);
 
+    void assemble() override;
     void preprocess();
 
 private:
-    std::vector<string> source;
+    std::vector<std::string> source;
     
-    std::vector<string> disassembly;
+    std::vector<std::string> disassembly;
     std::vector<uint32_t> bin;
 };
 

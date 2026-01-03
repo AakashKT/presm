@@ -4,7 +4,7 @@ Device *presm_device = nullptr;
 
 CUresult presm_cuInit(unsigned int flags)
 {
-    presm_device = initialize_device();
+    presm_device = get_device();
     return CUDA_SUCCESS;
 }
 

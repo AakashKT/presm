@@ -1,34 +1,19 @@
 cmake_minimum_required(VERSION 3.15...4.0)
 
-include_directories(include/)
-
-SET(DEVICE_SOURCE_FILES
-    device.cpp
-    memory.cpp
-    assembler.cpp
-)
-
-SET(DEVICE_ID -1)
-
-if(${DEVICE} MATCHES "ptx_gpu_1")
-    message(STATUS "PRESM: Using device ptx_gpu_1")
-    SET(DEVICE_ID 0)
-        
-    include_directories(ptx_gpu_1/include)
-
-    list(APPEND DEVICE_SOURCE_FILES
-        ptx_gpu_1/ptx_gpu.cpp
-    )
-else()
-    message(FATAL_ERROR "PRESM: Device ${DEVICE} not found!")
-    return()
-endif()
-
 add_library(device OBJECT
-            ${DEVICE_SOURCE_FILES}
+            memory.cpp
         )
-target_compile_definitions(device PRIVATE DEVICE_ID=${DEVICE_ID})
+target_include_directories(device PUBLIC include/)
 
 if(PRESM_SHARED_LIB)
     set_property(TARGET device PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
+
+if(${DEVICE} MATCHES "ptx_gpu_1")
+    message(STATUS "PRESM: Using device ptx_gpu_1")
+        
+    add_subdirectory(ptx_gpu_1/)
+else()
+    message(FATAL_ERROR "PRESM: Device ${DEVICE} not found!")
+    return()
 endif()
