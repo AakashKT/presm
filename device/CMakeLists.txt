@@ -8,6 +8,8 @@ SET(DEVICE_SOURCE_FILES
     assembler.cpp
 )
 
+SET(DEVICE_ID -1)
+
 if(${DEVICE} MATCHES "ptx_gpu_1")
     message(STATUS "PRESM: Using device ptx_gpu_1")
     SET(DEVICE_ID 0)
@@ -17,6 +19,15 @@ if(${DEVICE} MATCHES "ptx_gpu_1")
     list(APPEND DEVICE_SOURCE_FILES
         ptx_gpu_1/ptx_gpu.cpp
     )
+elseif(${DEVICE} MATCHES "npu_onnx")
+    message(STATUS "PRESM: Using device npu_onnx")
+    SET(DEVICE_ID 1)
+        
+    include_directories(npu_onnx/include)
+
+    list(APPEND DEVICE_SOURCE_FILES
+        npu_onnx/npu_onnx.cpp
+    )
 else()
     message(FATAL_ERROR "PRESM: Device ${DEVICE} not found!")
     return()
@@ -25,7 +36,7 @@ endif()
 add_library(device OBJECT
             ${DEVICE_SOURCE_FILES}
         )
-target_compile_definitions(device PRIVATE DEVICE_ID=DEVICE_ID)
+target_compile_definitions(device PRIVATE DEVICE_ID=${DEVICE_ID})
 
 if(PRESM_SHARED_LIB)
     set_property(TARGET device PROPERTY POSITION_INDEPENDENT_CODE ON)

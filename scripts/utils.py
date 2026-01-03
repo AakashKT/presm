@@ -10,19 +10,17 @@ def init():
 def get_working_directory_and_executable(driver):
     system_name = platform.system()
 
-    if driver == 'cuda':
-
-        if system_name == 'Windows':
-            working_directory = os.getcwd() + '/build/verification/cuda/Release/'
-            executable = 'verification.exe'
-        
-        elif system_name == 'Linux':
-            working_directory = os.getcwd() + '/build/verification/cuda/'
-            executable = 'verification'
+    if system_name == 'Windows':
+        working_directory = os.getcwd() + '/build/verification/' + driver + '/Release/'
+        executable = 'verification.exe'
     
-    else:
-        utils.print_red('Verification apps for driver ' + driver + 'do not exist.')
-        exit(-1)
+    elif system_name == 'Linux':
+        working_directory = os.getcwd() + '/build/verification/' + driver + '/'
+        executable = 'verification'
+    
+    if not os.path.exists(working_directory):
+        print_red('Verification apps for driver ' + driver + 'do not exist.')
+        exit()
     
     return working_directory, executable
 

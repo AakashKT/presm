@@ -1,14 +1,22 @@
 #include "device.h"
 
-#if DEIVCE_ID==0
+#if DEVICE_ID==0
 #include "ptx_gpu.h"
+#endif
+
+#if DEVICE_ID==1
+#include "npu_onnx.h"
 #endif
 
 Device* initialize_device()
 {
-#if DEIVCE_ID==0
+#if DEVICE_ID==0
     return new PTXGPU1();
-#else
-    return nullptr;
 #endif
+
+#if DEVICE_ID==1
+    return new NPUONNX();
+#endif
+
+    return nullptr;
 }
