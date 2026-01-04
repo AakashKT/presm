@@ -32,6 +32,11 @@ if(${DRIVER} MATCHES "cuda")
 
     # The actual driver
     add_subdirectory(driver/cuda)
+elseif(${DRIVER} MATCHES "c_accel")
+    message(STATUS "PRESM: Compiling with COMPUTE ACCELERATOR driver")
+
+    # The actual driver
+    add_subdirectory(driver/c_accel)
 else()
     message(FATAL_ERROR "PRESM: Driver named ${DRIVER} not found!")
     return()

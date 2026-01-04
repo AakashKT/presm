@@ -26,7 +26,7 @@ class CudaTestHandler : public TestHandler {
 public:
     CudaTestHandler() {};
 
-    bool run_test(std::string test_name) override;
+    bool run_test(std::string test_name, std::vector<std::string> args) override;
 };
 
 void run_sanity();
