@@ -7,5 +7,4 @@
 
 extern Device *presm_device;
 
-
 #endif

@@ -1,1 +1,1 @@
-int fma_func(int a, int b, int c);
+int fsa_func(int a, int b, int c);

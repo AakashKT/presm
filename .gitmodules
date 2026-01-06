@@ -7,3 +7,6 @@
 [submodule "extern/yosys"]
 	path = extern/yosys
 	url = https://github.com/YosysHQ/yosys
+[submodule "extern/riscv-gnu-toolchain"]
+	path = extern/riscv-gnu-toolchain
+	url = https://github.com/riscv-collab/riscv-gnu-toolchain
