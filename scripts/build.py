@@ -43,20 +43,24 @@ if __name__ == '__main__':
         if platform.system() != 'Linux':
             utils.print_red('riscv_accel device requires a linux system')
             exit()
+        
+        os.chdir('../')
+
+        path_exists = os.path.exists('build_riscv_compiler')
+        if not path_exists:
+            os.mkdir('build_riscv_compiler')
+        
+        os.chdir('build_riscv_compiler')
 
         current_directory = os.getcwd()
 
         os.system('sudo apt-get install autoconf automake autotools-dev curl python3 python3-pip python3-tomli libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake libglib2.0-dev libslirp-dev libncurses-dev')
 
-        path_exists = os.path.exists('riscv-compiler')
-        if not path_exists:
-            os.mkdir('riscv-compiler')
-
         os.chdir('../extern/riscv-gnu-toolchain/')
         os.system('make clean')
 
         os.system('./configure --prefix=' 
-                + current_directory + '/riscv-compiler --with-arch=rv32im')
+                + current_directory + ' --with-arch=rv32im')
         os.system('make -j8')
         
     

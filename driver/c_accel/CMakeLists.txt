@@ -4,7 +4,6 @@ include_directories(include/)
 
 SET(DRIVER_SOURCE
     c_accel.cpp
-    driver_entrypoint.cpp
     $<TARGET_OBJECTS:device>
 )
 

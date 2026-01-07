@@ -5,5 +5,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
+#include <map>
+#include <algorithm>
 
 #endif
