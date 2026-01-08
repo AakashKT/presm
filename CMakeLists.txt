@@ -4,6 +4,8 @@ project(presm VERSION 0.1
         DESCRIPTION "PRE-Silicon Modelling"
         LANGUAGES C CXX CUDA)
 
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 # Configuration variables
 set(PRESM_SHARED_LIB TRUE CACHE STRING "PRESM as a shared or a static library?")
 
