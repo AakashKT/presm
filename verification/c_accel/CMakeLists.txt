@@ -1,14 +1,27 @@
 cmake_minimum_required(VERSION 3.15...4.0)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    SET(RISC_V_COMPILER_BIN "${PROJECT_SOURCE_DIR}/build_riscv_compiler/windows/xpack/bin/riscv-none-elf-g++.exe")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    SET(RISC_V_COMPILER_BIN "${PROJECT_SOURCE_DIR}/build_riscv_compiler/linux/bin/riscv32-unknown-elf-g++")
+endif()
+
 SET(VERIFICATION_KERNELS
     sanity/sanity_kernel.cpp
     vector_add/vector_add_kernel.cpp
 )
 
-SET(VERIFICATION_KERNELS_COMPILED_OUTPUTS
-    sanity_kernel.s
-    vector_add_kernel.s
-)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    SET(VERIFICATION_KERNELS_COMPILED_OUTPUTS
+        ${PROJECT_SOURCE_DIR}/build/verification/Release/sanity_kernel.s
+        ${PROJECT_SOURCE_DIR}/build/verification/Release/vector_add_kernel.s
+    )
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    SET(VERIFICATION_KERNELS_COMPILED_OUTPUTS
+        ${PROJECT_SOURCE_DIR}/build/verification/sanity_kernel.s
+        ${PROJECT_SOURCE_DIR}/build/verification/vector_add_kernel.s
+    )
+endif()
 
 SET(VERIFICATION_SOURCES
     c_accel_app.cpp
@@ -29,9 +42,9 @@ target_link_libraries(verification PUBLIC driver)
 foreach(item IN ZIP_LISTS VERIFICATION_KERNELS VERIFICATION_KERNELS_COMPILED_OUTPUTS)
     add_custom_command(
         OUTPUT ${item_1}
-        COMMAND ${PROJECT_SOURCE_DIR}/build_riscv_compiler/bin/riscv32-unknown-elf-g++ 
+        COMMAND ${RISC_V_COMPILER_BIN} 
                 -S ${PROJECT_SOURCE_DIR}/verification/c_accel/${item_0} 
-                -o ${PROJECT_SOURCE_DIR}/build/verification/${item_1}
+                -o ${item_1}
     )
 endforeach()
 
