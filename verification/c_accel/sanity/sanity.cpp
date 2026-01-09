@@ -16,24 +16,24 @@ void run_sanity(std::vector<std::string> args)
         int c = rand() % 100000;
 
         if(args[0] == "device") {
-            // caDeviceBuffer a_device(1 * sizeof(int));
-            // caCopyHtoD((void*)&a, a_device, 1 * sizeof(int));
+            caDeviceBuffer a_device(1 * sizeof(int));
+            caCopyHtoD((void*)&a, a_device, 1 * sizeof(int));
 
-            // caDeviceBuffer b_device(1 * sizeof(int));
-            // caCopyHtoD((void*)&b, b_device, 1 * sizeof(int));
+            caDeviceBuffer b_device(1 * sizeof(int));
+            caCopyHtoD((void*)&b, b_device, 1 * sizeof(int));
 
-            // caDeviceBuffer c_device(1 * sizeof(int));
-            // caCopyHtoD((void*)&c, c_device, 1 * sizeof(int));
+            caDeviceBuffer c_device(1 * sizeof(int));
+            caCopyHtoD((void*)&c, c_device, 1 * sizeof(int));
 
-            // caDeviceBuffer d_device(1 * sizeof(int));
+            caDeviceBuffer d_device(1 * sizeof(int));
 
-            // caSetKernelParams(0, a_device);
-            // caSetKernelParams(1, b_device);
-            // caSetKernelParams(2, c_device);
-            // caSetKernelParams(3, d_device);
+            caSetKernelParams(0, a_device);
+            caSetKernelParams(1, b_device);
+            caSetKernelParams(2, c_device);
+            caSetKernelParams(3, d_device);
 
-            // caKernelRun();
-            // caSync();
+            caKernelRun();
+            caSync();
 
             // int* kernelOutput = (int*)caGetKernelOutput();
             // int d[1] = {0};
@@ -47,6 +47,6 @@ void run_sanity(std::vector<std::string> args)
         else
             fsa_func(&a, &b, &c, &output);
 
-        std::cout << output << std::endl;
+        // std::cout << output << std::endl;
     }
 }

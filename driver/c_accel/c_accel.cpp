@@ -1,19 +1,22 @@
 #include "c_accel.h"
 #include "driver_entrypoint.h"
+#include "riscv_asm.h"
 
 Device *presm_device = nullptr;
-Assembler *caAsm = nullptr;
+CaAssembler *caAsm = nullptr;
 
 void caDeviceInit()
 {
     presm_device = get_device();
-    caAsm = get_assembler();
+    caAsm = new CaAssembler();
 }
 
 void caSetKernel(std::string kernel_file)
 {
     caAsm->set_source_file(kernel_file);
+
     caAsm->assemble();
+    caAsm->print_instructions();
 }
 
 void caCopyHtoD(void* src, caDeviceBuffer& dest, size_t size_in_bytes)

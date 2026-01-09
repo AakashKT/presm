@@ -4,6 +4,7 @@ include_directories(include/)
 
 SET(DRIVER_SOURCE
     c_accel.cpp
+    riscv_asm.cpp
     $<TARGET_OBJECTS:device>
 )
 

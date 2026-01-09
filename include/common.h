@@ -8,5 +8,6 @@
 #include <stdexcept>
 #include <map>
 #include <algorithm>
+#include <bitset>
 
 #endif

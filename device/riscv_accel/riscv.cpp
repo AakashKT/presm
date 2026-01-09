@@ -1,4 +1,5 @@
 #include "riscv.h"
+#include "isa_defs/riscv_defs.h"
 
 Device* get_device()
 {

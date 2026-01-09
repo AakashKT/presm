@@ -15,7 +15,7 @@ if(${DEVICE} MATCHES "ptx_gpu_1")
     add_subdirectory(ptx_gpu_1/)
 elseif(${DEVICE} MATCHES "riscv_accel")
     message(STATUS "PRESM: Using device RISC-V accelerator")
-        
+    
     add_subdirectory(riscv_accel/)
 else()
     message(FATAL_ERROR "PRESM: Device ${DEVICE} not found!")
