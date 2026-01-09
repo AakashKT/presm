@@ -122,13 +122,13 @@ void RiscvInstr::process_operand(uint32_t op_idx, std::string operand)
 
 
 
-void CaAssembler::set_source_file(std::string file_name)
+void RiscvAssembler::set_source_file(std::string file_name)
 {
     this->source_file = file_name;
     this->source_file_stream = std::ifstream(this->source_file);
 }
 
-void CaAssembler::assemble()
+void RiscvAssembler::assemble()
 {
     if(this->source_file == "")
         asm_runtime_error("Souce file is empty!");
@@ -159,7 +159,7 @@ void CaAssembler::assemble()
     }
 }
 
-uint32_t CaAssembler::estimated_binary_size_in_bytes()
+uint32_t RiscvAssembler::estimated_binary_size_in_bytes()
 {
     uint32_t sz = 0;
 
@@ -170,7 +170,7 @@ uint32_t CaAssembler::estimated_binary_size_in_bytes()
     return sz * 4;
 }
 
-void CaAssembler::print_instructions()
+void RiscvAssembler::print_instructions()
 {
     std::map<std::string, std::vector<RiscvInstr>>::iterator it;  
     for (it = asm_instr.begin(); it != asm_instr.end(); it++) {

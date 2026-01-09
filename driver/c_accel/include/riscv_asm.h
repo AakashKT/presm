@@ -72,9 +72,9 @@ private:
     RISCV_INSTR instr_bin;
 };
 
-class CaAssembler {
+class RiscvAssembler {
 public:
-    CaAssembler() {};
+    RiscvAssembler() {};
 
     void set_source_file(std::string file_name);
     void assemble();

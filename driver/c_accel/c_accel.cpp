@@ -3,12 +3,12 @@
 #include "riscv_asm.h"
 
 Device *presm_device = nullptr;
-CaAssembler *caAsm = nullptr;
+RiscvAssembler *caAsm = nullptr;
 
 void caDeviceInit()
 {
     presm_device = get_device();
-    caAsm = new CaAssembler();
+    caAsm = new RiscvAssembler();
 }
 
 void caSetKernel(std::string kernel_file)
