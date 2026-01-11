@@ -4,72 +4,31 @@
 #include "common.h"
 #include "isa_defs/riscv_defs.h"
 
-enum INSTR_TYPE {
-    NONE_TYPE=0, R_TYPE, I_TYPE, S_TYPE, U_TYPE
-};
-
-union RISCV_INSTR {
-
-    struct {
-        uint32_t const_bits : 2;
-        uint32_t opcode : 5;
-        uint32_t rd : 5;
-        uint32_t funct3 : 3;
-        uint32_t rs1 : 5;
-        uint32_t rs2 : 5;
-        uint32_t funct7 : 7;
-    } r_type;
-
-    struct {
-        uint32_t const_bits : 2;
-        uint32_t opcode : 5;
-        uint32_t rd : 5;
-        uint32_t funct3 : 3;
-        uint32_t rs1 : 5;
-        uint32_t imm : 12;
-    } i_type;
-
-    struct {
-        uint32_t const_bits : 2;
-        uint32_t opcode : 5;
-        uint32_t imm_low : 5;
-        uint32_t funct3 : 3;
-        uint32_t rs1 : 5;
-        uint32_t rs2 : 5;
-        uint32_t imm_hi : 7;
-    } s_type;
-
-    struct {
-        uint32_t const_bits : 2;
-        uint32_t opcode : 5;
-        uint32_t rd : 5;
-        uint32_t imm : 20;
-    } u_type;
-
-    uint32_t bits = 0;
-
-    void init_r_type() { r_type.const_bits = 0x3; r_type.opcode = R_OPCODE; };
-    void init_i_type() { i_type.const_bits = 0x3; i_type.opcode = I_OPCODE; };
-    void init_s_type() { s_type.const_bits = 0x3; s_type.opcode = S_OPCODE; };
-    void init_u_type() { u_type.const_bits = 0x3; };
-};
-
 class RiscvInstr {
 public:
-    RiscvInstr(std::string instr);
+    RiscvInstr(std::string instr, uint32_t instr_address, std::map<std::string, uint32_t>* label_addresses_ptr);
 
-    void process_op(std::string opcode);
-    void process_operand(uint32_t op_idx, std::string operand);
+    void assemble_binary();
 
-    std::string get_instr_string() { return this->instr; };
+    void assemble_op();
+    void assemble_operand(uint32_t op_idx, std::string operand);
+
+    std::string& get_instr_string() { return this->instr; };
+    std::vector<std::string>& get_operand_strings() { return this->operands; };
     uint32_t get_instr_binary() { return this->instr_bin.bits; };
     INSTR_TYPE get_instr_type() { return this->type; };
 
 private:
     std::string instr;
+    std::vector<std::string> operands, operands_;
 
+    uint32_t instr_address;
     INSTR_TYPE type = NONE_TYPE;
-    RISCV_INSTR instr_bin;
+    RISCV_INSTR_BIN instr_bin;
+    
+    std::map<std::string, uint32_t>* label_addresses_ptr;
+
+    std::regex operands_reg_offset_regex = std::regex(R"~((.*)\((.*)\))~");
 };
 
 class RiscvAssembler {
@@ -77,6 +36,9 @@ public:
     RiscvAssembler() {};
 
     void set_source_file(std::string file_name);
+    bool is_label(std::string line);
+    bool is_instruction(std::string line);
+    void preprocess();
     void assemble();
     uint32_t estimated_binary_size_in_bytes();
 
@@ -86,7 +48,9 @@ private:
     std::string source_file = "";
     std::ifstream source_file_stream;
 
+    std::vector<std::pair<std::string, uint32_t>> asm_clean;
     std::map<std::string, std::vector<RiscvInstr>> asm_instr;
+    std::map<std::string, uint32_t> label_addresses;
 };
 
 #endif

@@ -10,12 +10,17 @@ int subtract(int a, int b)
     return a - b;
 }
 
-int fsa_func(int *a, int *b, int *c, int *d)
+int cond_func(int *a, int *b, int *c, int *d)
 {
-    int i = subtract(a[0], b[0]);
-    int z = add(i, c[0]);
+    int z = 0;
+    if(a[0] < b[0])
+        z = add(a[0], b[0]);
+    else if(a[0] >= b[0])
+        z = subtract(a[0], b[0]);
 
-    d[0] = z;
+    int i = c[0] + z;
+
+    d[0] = i;
     
-    return z;
+    return i;
 }

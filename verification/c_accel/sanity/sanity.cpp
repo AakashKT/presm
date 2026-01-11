@@ -45,7 +45,7 @@ void run_sanity(std::vector<std::string> args)
             //     std::cout << "Failed! This should never happen" << std::endl;
         }
         else
-            fsa_func(&a, &b, &c, &output);
+            cond_func(&a, &b, &c, &output);
 
         // std::cout << output << std::endl;
     }
