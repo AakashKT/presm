@@ -1,12 +1,12 @@
 #include "c_accel_app.h"
 #include "c_accel.h"
-#include "sanity_kernel.h"
+#include "fc_kernel.h"
 
-void run_sanity(std::vector<std::string> args)
+void run_function_call(std::vector<std::string> args)
 {
     if(args[0] == "device") {
         caDeviceInit();
-        caSetKernel("sanity_kernel.s");
+        caSetKernel("fc_kernel.s");
         caDebugCheckDisassembly();
     }
 
@@ -46,7 +46,7 @@ void run_sanity(std::vector<std::string> args)
             //     std::cout << "Failed! This should never happen" << std::endl;
         }
         else
-            sanity_kernel(&a, &b, &c, &output);
+            func_calls(&a, &b, &c, &output);
 
         // std::cout << output << std::endl;
     }

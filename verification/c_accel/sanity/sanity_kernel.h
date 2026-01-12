@@ -1,1 +1,1 @@
-int cond_func(int *a, int *b, int *c, int *d);
+int sanity_kernel(int* a, int* b, int* c, int* d);

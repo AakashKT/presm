@@ -14,6 +14,10 @@ bool CAccelTestHandler::run_test(std::string test_name, std::vector<std::string>
 
     if(test_name == "sanity")
         run_sanity(args);
+    else if(test_name == "conditionals")
+        run_conditionals(args);
+    else if(test_name == "fuction_call")
+        run_function_call(args);
     else
         return false;
 

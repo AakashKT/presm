@@ -9,5 +9,7 @@ public:
 };
 
 void run_sanity(std::vector<std::string> args);
+void run_conditionals(std::vector<std::string> args);
+void run_function_call(std::vector<std::string> args);
 
 #endif

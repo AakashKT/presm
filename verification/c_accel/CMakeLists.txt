@@ -8,24 +8,29 @@ endif()
 
 SET(VERIFICATION_KERNELS
     sanity/sanity_kernel.cpp
-    vector_add/vector_add_kernel.cpp
+    conditionals/cond_kernel.cpp
+    function_call/fc_kernel.cpp
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     SET(VERIFICATION_KERNELS_COMPILED_OUTPUTS
         ${PROJECT_SOURCE_DIR}/build/verification/Release/sanity_kernel.s
-        ${PROJECT_SOURCE_DIR}/build/verification/Release/vector_add_kernel.s
+        ${PROJECT_SOURCE_DIR}/build/verification/Release/cond_kernel.s
+        ${PROJECT_SOURCE_DIR}/build/verification/Release/fc_kernel.s
     )
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     SET(VERIFICATION_KERNELS_COMPILED_OUTPUTS
         ${PROJECT_SOURCE_DIR}/build/verification/sanity_kernel.s
-        ${PROJECT_SOURCE_DIR}/build/verification/vector_add_kernel.s
+        ${PROJECT_SOURCE_DIR}/build/verification/cond_kernel.s
+        ${PROJECT_SOURCE_DIR}/build/verification/fc_kernel.s
     )
 endif()
 
 SET(VERIFICATION_SOURCES
     c_accel_app.cpp
     sanity/sanity.cpp
+    conditionals/cond.cpp
+    function_call/fc.cpp
     
     ${VERIFICATION_KERNELS}
 )

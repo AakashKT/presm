@@ -1,0 +1,1 @@
+int func_calls(int *a, int *b, int *c, int *d);

@@ -15,6 +15,7 @@ public:
 
     std::string& get_instr_string() { return this->instr; };
     std::vector<std::string>& get_operand_strings() { return this->operands; };
+    std::vector<std::string>& get_processed_operand_strings() { return this->operands_; };
     uint32_t get_instr_binary() { return this->instr_bin.bits; };
     INSTR_TYPE get_instr_type() { return this->type; };
 
@@ -43,6 +44,12 @@ public:
     uint32_t estimated_binary_size_in_bytes();
 
     void print_instructions();
+
+    void check_instr_eq_either(RiscvInstr instr, std::string s1, std::string s2, std::string s3);
+    void check_instr_eq_either(RiscvInstr instr, std::string s1, std::string s2);
+    bool check_instr_eq(RiscvInstr instr, std::string s1, bool exit = true);
+    void instr_check(RiscvInstr& instr);
+    void disassemble_check();
 
 private:
     std::string source_file = "";

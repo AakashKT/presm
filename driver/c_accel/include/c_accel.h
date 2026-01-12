@@ -23,4 +23,6 @@ void caKernelRun();
 void caSync();
 void* caGetKernelOutput();
 
+void caDebugCheckDisassembly();
+
 #endif
