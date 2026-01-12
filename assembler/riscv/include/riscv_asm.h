@@ -1,7 +1,7 @@
 #ifndef RISCV_ASM_H
 #define RISCV_ASM_H
 
-#include "common.h"
+#include "assembler.h"
 #include "isa_defs/riscv_defs.h"
 
 class RiscvInstr {
@@ -32,26 +32,27 @@ private:
     std::regex operands_reg_offset_regex = std::regex(R"~((.*)\((.*)\))~");
 };
 
-class RiscvAssembler {
+class RiscvAssembler : public Assembler {
 public:
     RiscvAssembler() {};
 
-    void set_source_file(std::string file_name);
+    void set_source_file(std::string file_name) override;
+    void assemble() override;
+    uint32_t estimated_binary_size_in_bytes() override;
+
+    void debug_print() override;
+    void disassemble_check() override;
+
+private:
     bool is_label(std::string line);
     bool is_instruction(std::string line);
     void preprocess();
-    void assemble();
-    uint32_t estimated_binary_size_in_bytes();
-
-    void print_instructions();
 
     void check_instr_eq_either(RiscvInstr instr, std::string s1, std::string s2, std::string s3);
     void check_instr_eq_either(RiscvInstr instr, std::string s1, std::string s2);
     bool check_instr_eq(RiscvInstr instr, std::string s1, bool exit = true);
     void instr_check(RiscvInstr& instr);
-    void disassemble_check();
 
-private:
     std::string source_file = "";
     std::ifstream source_file_stream;
 

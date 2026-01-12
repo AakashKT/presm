@@ -2,6 +2,7 @@
 #define RISCV_ACCEL_H
 
 #include "device.h"
+#include "riscv_defs.h"
 
 class RISCVAccel : public Device {
 public:

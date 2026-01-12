@@ -1,5 +1,10 @@
 #include "riscv_asm.h"
 
+Assembler* get_assembler()
+{
+    return new RiscvAssembler();
+}
+
 void asm_runtime_error(std::string err)
 {
     throw std::runtime_error("Assembler: " + err);
@@ -92,7 +97,7 @@ uint32_t RiscvAssembler::estimated_binary_size_in_bytes()
     return sz * 4;
 }
 
-void RiscvAssembler::print_instructions()
+void RiscvAssembler::debug_print()
 {
     std::map<std::string, std::vector<RiscvInstr>>::iterator it;  
     for (it = asm_instr.begin(); it != asm_instr.end(); it++) {

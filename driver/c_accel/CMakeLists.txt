@@ -4,8 +4,8 @@ include_directories(include/)
 
 SET(DRIVER_SOURCE
     c_accel.cpp
-    riscv_asm.cpp
     $<TARGET_OBJECTS:device>
+    $<TARGET_OBJECTS:assembler>
 )
 
 if(PRESM_SHARED_LIB)

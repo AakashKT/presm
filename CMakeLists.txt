@@ -16,9 +16,13 @@ set(DRIVER "cuda" CACHE STRING "Which driver to use? (default: cuda, see driver/
 # General includes
 include_directories(include)
 include_directories(device/include)
+include_directories(assembler/include)
 
 # Add device directory
 add_subdirectory(device/)
+
+# Add assembler directory
+add_subdirectory(assembler/)
 
 # Verification tests
 add_subdirectory(verification/)
