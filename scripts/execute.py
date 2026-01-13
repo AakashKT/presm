@@ -1,15 +1,21 @@
-import os, argparse, shutil
+import os, argparse, shutil, json
 import utils
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--driver', help='Which driver to use?', default='cuda', required=True)
-    parser.add_argument('--working_directory', required=True)
+    parser.add_argument('--config', required=True)
     parser.add_argument('--executable', required=True)
     parser.add_argument('--args', nargs='+', type=str)
     args = parser.parse_args()
 
     utils.init()
+    config = json.load(open(args.config))
 
-    source = utils.presm_execute(args.working_directory, args.executable, args.args, args.driver)
+    if not args.args:
+        app_args = []
+    else:
+        app_args = args.args
+
+    working_directory, executable = os.path.split(args.executable)
+    source = utils.presm_execute(working_directory, executable, app_args, config['driver']['name'])
     print(source)
