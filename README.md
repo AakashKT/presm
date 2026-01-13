@@ -26,7 +26,7 @@ First run the following
 ```
 python scripts/build.py --config configs/riscv_compute_accelerator.json --get_extern_tools
 ```
-Note the ```--get_extern_tools``` flag, which is required when building for the first time. Subsequent buildS can/should not include this flag.
+Note the ```--get_extern_tools``` flag, which is required when building for the first time. Subsequent builds should not include this flag.
 
 ### Rebuilding & Clean builds
 To rebuild, run

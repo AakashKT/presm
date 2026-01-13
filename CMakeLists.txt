@@ -48,3 +48,10 @@ else()
     message(FATAL_ERROR "PRESM: Driver named ${DRIVER} not found!")
     return()
 endif()
+
+# Make packages
+set_target_properties(driver PROPERTIES PUBLIC_HEADER ${PROJECT_SOURCE_DIR}/driver/${DRIVER}/include/${DRIVER}.h)
+install(TARGETS driver 
+        LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/packages/${DRIVER}/lib/
+        PUBLIC_HEADER DESTINATION ${PROJECT_SOURCE_DIR}/packages/${DRIVER}/include/
+)

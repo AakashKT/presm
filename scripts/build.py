@@ -26,10 +26,7 @@ def build_presm(args, config):
         os.system('cmake .. -DDRIVER=%s -DDEVICE=%s' % (config['driver']['name'].lower(), config['device']['name'].lower()))
 
     os.system('cmake --build . --config Release')
-
-    # Driver specific steps
-    if config['driver']['name'].lower() == 'cuda':
-        os.system('cmake --build . --config Release --target install')
+    os.system('cmake --build . --config Release --target install')
 
 def build_riscv_compiler_linux(args, config):
     path_exists = os.path.exists('linux')
