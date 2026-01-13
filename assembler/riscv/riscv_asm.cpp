@@ -103,7 +103,7 @@ void RiscvAssembler::debug_print()
 {
     std::map<std::string, std::vector<RiscvInstr>>::iterator it;  
     for (it = this->asm_instr.begin(); it != this->asm_instr.end(); it++) {
-        std::cout << it->first  << ": (" << this->label_addresses[it->first] << ")" << std::endl;
+        std::cout << it->first  << ": (address " << this->label_addresses[it->first] << ")" << std::endl;
 
         for(int i=0; i<it->second.size(); i++) {
             if(it->second[i].get_instr_type() != NONE_TYPE) {
@@ -254,6 +254,35 @@ void RiscvAssembler::instr_check(RiscvInstr& instr)
     }
 }
 
+void RiscvAssembler::operands_check(RiscvInstr& instr)
+{
+    uint32_t bits = instr.get_instr_binary();
+    RISCV_INSTR_BIN* bin = (RISCV_INSTR_BIN*)(&bits);
+
+    if(instr.get_instr_type() == R_TYPE) {
+
+    }
+    else if(instr.get_instr_type() == I_TYPE) {
+        
+    }
+    else if(instr.get_instr_type() == B_TYPE) {
+        
+    }
+    else if(instr.get_instr_type() == S_TYPE) {
+        
+    }
+    else if(instr.get_instr_type() == U_TYPE) {
+        
+    }
+    else if(instr.get_instr_type() == J_TYPE) {
+        
+    }
+    else {
+        std::string err = "No disassembly rule for instruction '" + instr.get_instr_string() + "' found ";
+        dasm_runtime_error(err);
+    }
+}
+
 void RiscvAssembler::disassembly_check()
 {
     std::map<uint32_t, std::string> label_addresses_inv;
@@ -264,6 +293,7 @@ void RiscvAssembler::disassembly_check()
     for (it = asm_instr.begin(); it != asm_instr.end(); it++) {
         for(auto& instr : it->second) {
             this->instr_check(instr);
+            this->operands_check(instr);
         }
     }
 }

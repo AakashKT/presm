@@ -27,6 +27,7 @@ private:
     void check_instr_eq_either(RiscvInstr instr, std::string s1, std::string s2);
     bool check_instr_eq(RiscvInstr instr, std::string s1, bool exit = true);
     void instr_check(RiscvInstr& instr);
+    void operands_check(RiscvInstr& instr);
 
     std::string source_file = "";
     std::ifstream source_file_stream;
