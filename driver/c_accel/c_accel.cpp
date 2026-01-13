@@ -51,7 +51,7 @@ void* caGetKernelOutput()
 
 void caDebugCheckDisassembly()
 {
-    caAsm->disassemble_check();
+    caAsm->disassembly_check();
 }
 
 caDeviceBuffer::caDeviceBuffer(size_t size_in_bytes)

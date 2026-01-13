@@ -1,0 +1,18 @@
+{
+    "driver": {
+        "name": "c_accel"
+    },
+
+    "device": {
+        "name": "riscv_accel"
+    },
+
+    "verification": [
+        {
+            "name": "sanity",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": false
+        }
+    ]
+}

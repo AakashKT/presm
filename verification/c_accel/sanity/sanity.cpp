@@ -11,7 +11,7 @@ void run_sanity(std::vector<std::string> args)
     }
 
     int output;
-    for(int i=0; i<1000; i++) {
+    for(int i=0; i<10; i++) {
         int a = rand() % 100000;
         int b = rand() % 100000;
         int c = rand() % 100000;

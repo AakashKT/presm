@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15...4.0)
 
-add_library(assembler OBJECT)
+add_library(assembler OBJECT
+    assembler.cpp
+)
 target_include_directories(assembler PUBLIC include/)
 
 if(PRESM_SHARED_LIB)
@@ -16,3 +18,6 @@ else()
     return()
 endif()
 
+add_executable(asm
+    $<TARGET_OBJECTS:assembler>
+)

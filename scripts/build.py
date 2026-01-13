@@ -1,10 +1,10 @@
-import os, argparse, shutil, utils, platform
+import os, argparse, shutil, utils, platform, json
 import urllib.request
 import zipfile
 
-def build_presm(args):
+def build_presm(args, config):
     # Device specific steps
-    if args.device.lower() == 'riscv_accel':
+    if config['device']['name'].lower() == 'riscv_accel':
         # Check if riscv compiler exists
         linux_path = os.path.exists('build_riscv_compiler/linux/bin')
         windows_path = os.path.exists('build_riscv_compiler/windows/xpack/bin')
@@ -23,15 +23,15 @@ def build_presm(args):
     os.chdir('build')
 
     if args.clean or (not path_exists):
-        os.system('cmake .. -DDRIVER=%s -DDEVICE=%s' % (args.driver.lower(), args.device.lower()))
+        os.system('cmake .. -DDRIVER=%s -DDEVICE=%s' % (config['driver']['name'].lower(), config['device']['name'].lower()))
 
     os.system('cmake --build . --config Release')
 
     # Driver specific steps
-    if args.driver.lower() == 'cuda':
+    if config['driver']['name'].lower() == 'cuda':
         os.system('cmake --build . --config Release --target install')
 
-def build_riscv_compiler_linux(args):
+def build_riscv_compiler_linux(args, config):
     path_exists = os.path.exists('linux')
     if not path_exists:
         os.mkdir('linux')
@@ -49,7 +49,7 @@ def build_riscv_compiler_linux(args):
             + current_directory + ' --with-arch=rv32im')
     os.system('make -j8')
 
-def get_riscv_compiler_windows(args):
+def get_riscv_compiler_windows(args, config):
     path_exists = os.path.exists('windows')
     if not path_exists:
         os.mkdir('windows')
@@ -65,9 +65,9 @@ def get_riscv_compiler_windows(args):
     
     os.rename('xpack-riscv-none-elf-gcc-15.2.0-1', 'xpack')
 
-def get_or_build_extern_tools(args):
+def get_or_build_extern_tools(args, config):
     system_name = platform.system()
-    if args.device.lower() == 'riscv_accel':
+    if config['device']['name]'].lower() == 'riscv_accel':
         path_exists = os.path.exists('build_riscv_compiler')
         if not path_exists:
             os.mkdir('build_riscv_compiler')
@@ -75,26 +75,26 @@ def get_or_build_extern_tools(args):
         os.chdir('build_riscv_compiler')
 
         if system_name == 'Linux':
-            build_riscv_compiler_linux(args)
+            build_riscv_compiler_linux(args, config)
         
         elif system_name == 'Windows':
-            get_riscv_compiler_windows(args)
+            get_riscv_compiler_windows(args, config)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--driver', help='Which driver to use? (see driver/ folder)', default='cuda', required=True)
-    parser.add_argument('--device', help='Which device to use? (see device/ folder)', default='ptx_gpu_1', required=True)
+    parser.add_argument('--config', required=True)
     parser.add_argument('--clean', action="store_true")
     parser.add_argument('--get_extern_tools', action="store_true")
     args = parser.parse_args()
 
     utils.init()
+    config = json.load(open(args.config))
 
     if args.get_extern_tools:
-        get_or_build_extern_tools(args)
+        get_or_build_extern_tools(args, config)
 
-    build_presm(args)
+    build_presm(args, config)
 
         
     

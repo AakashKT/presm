@@ -2,13 +2,14 @@ import os, argparse, shutil, utils
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--driver', required=True)
+    parser.add_argument('--config', required=True)
     parser.add_argument('--app', required=True)
     parser.add_argument('--app_args', required=False)
     parser.add_argument('--on_presm', action='store_true')
     args = parser.parse_args()
 
     utils.init()
+    config = json.load(open(args.config))
 
     working_directory, executable = utils.get_working_directory_and_executable()
 
