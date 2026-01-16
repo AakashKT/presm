@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15...4.0)
 
 add_library(device OBJECT
-            memory.cpp
+            host_resident_memory.cpp
         )
 target_include_directories(device PUBLIC include/)
 

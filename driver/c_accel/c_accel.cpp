@@ -14,9 +14,7 @@ void caDeviceInit()
 void caSetKernel(std::string kernel_file)
 {
     caAsm->set_source_file(kernel_file);
-
     caAsm->assemble();
-    // caAsm->debug_print();
 }
 
 void caCopyHtoD(void* src, caDeviceBuffer& dest, size_t size_in_bytes)

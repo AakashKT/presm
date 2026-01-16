@@ -4,7 +4,15 @@
     },
 
     "device": {
-        "name": "riscv_accel"
+        "name": "riscv_accel",
+        "verilog": {
+            "top_module_src": "riscv.v",
+            "top_module": "riscv_accel"
+        }
+    },
+
+    "fpga": {
+        "name": "tangnano20k"
     },
 
     "verification": [

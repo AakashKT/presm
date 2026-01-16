@@ -8,7 +8,8 @@ class Device {
 public:
     virtual std::string get_name() = 0;
 
-    virtual DeviceMemory* get_device_memory() = 0;
+public:
+    DeviceMemory* device_memory;
 };
 
 Device* get_device();

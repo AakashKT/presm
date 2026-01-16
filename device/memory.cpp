@@ -1,7 +1,7 @@
 #include "memory.h"
 
-DeviceMemory::DeviceMemory(unsigned long long size_in_bytes)
-    : size(size_in_bytes)
+DeviceMemory::DeviceMemory(uint64_t size_in_bytes)
+    : size_in_bytes(size_in_bytes)
 {
-
+    
 }

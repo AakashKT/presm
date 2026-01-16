@@ -2,6 +2,7 @@
 #define RISCV_ACCEL_H
 
 #include "device.h"
+#include "host_resident_memory.h"
 #include "riscv_defs.h"
 
 class RISCVAccel : public Device {
@@ -9,12 +10,9 @@ public:
     RISCVAccel();
 
     std::string get_name() override { return name; };
-    DeviceMemory* get_device_memory() override { return device_memory; };
 
 private:
     std::string name;
-
-    DeviceMemory* device_memory;
 };
 
 #endif

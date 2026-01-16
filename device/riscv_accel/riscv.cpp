@@ -9,5 +9,5 @@ RISCVAccel::RISCVAccel()
 {
     this->name = "RISC-V Accelerator";
 
-    this->device_memory = new DeviceMemory(12e9);
+    this->device_memory = new HostResidentMemory(1e9);
 }
