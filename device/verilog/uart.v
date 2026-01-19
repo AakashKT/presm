@@ -8,7 +8,6 @@ module UART
     input _extern_27mhz_clock,
     input _extern_uart_rx,
     output _extern_uart_tx,
-
     output reg [7:0] op,
     output wire op_enable
 );
