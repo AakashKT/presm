@@ -3,6 +3,7 @@ import os, argparse, shutil, utils, json
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', required=True)
+    parser.add_argument('--synthesis_only', action="store_true")
     args = parser.parse_args()
 
     utils.init()
@@ -12,8 +13,12 @@ if __name__ == '__main__':
     device_name = config['device']['name']
     top_module = config['device']['verilog']['top_module']
     top_module_src = config['device']['verilog']['top_module_src']
-    cst_src = '%s_%s.cst' % (config['device']['verilog']['top_module_src'].replace('.v', ''), fpga_name)
 
     os.chdir('fpga/' + fpga_name)
-    os.system('make PRESM_DEVICE=%s TOP_MODULE=%s TOP_MODULE_SRC=%s CST_SRC=%s' \
-                % (device_name, top_module, top_module_src, cst_src))
+
+    if args.synthesis_only:
+        os.system('make SYNTHESIS PRESM_DEVICE=%s TOP_MODULE=%s TOP_MODULE_SRC=%s' \
+                    % (device_name, top_module, top_module_src))
+    else:
+        os.system('make PRESM_DEVICE=%s TOP_MODULE=%s TOP_MODULE_SRC=%s' \
+                    % (device_name, top_module, top_module_src))

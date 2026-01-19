@@ -29,3 +29,14 @@ You can check if the device was successfully exposed by running the following in
 ```
 >>> lsusb
 ```
+
+# Loading FTDI driver in WSL ubuntu
+Run the following to add the driver:
+```
+sudo modprobe ftdi_sio
+```
+
+You may need to install the linux-generic package
+```
+sudo apt install linux-generic
+```
