@@ -10,6 +10,7 @@ module riscv_accel
 (
     input _extern_27mhz_clock,
     input _extern_uart_rx,
+    input _extern_reset,
     output _extern_uart_tx,
     output [5:0] _extern_led
 );
@@ -19,6 +20,7 @@ module riscv_accel
     UART uart_comm(
         _extern_27mhz_clock,
         _extern_uart_rx,
+        _extern_reset,
         _extern_uart_tx,
         dataIn,
         byte_ready
@@ -26,7 +28,7 @@ module riscv_accel
 
     always @(posedge _extern_27mhz_clock) begin
         if (byte_ready) begin
-            _extern_led <= ~dataIn[5:0];
+            _extern_led <= ~dataIn[7:2];
         end
     end
 

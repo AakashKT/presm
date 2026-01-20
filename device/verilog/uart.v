@@ -2,69 +2,84 @@
 
 module UART
 #(
-    parameter DELAY_FRAMES = 234
+    parameter DELAY_WAIT = 234
 )
 (
     input _extern_27mhz_clock,
     input _extern_uart_rx,
+    input _extern_reset,
     output _extern_uart_tx,
     output reg [7:0] op,
     output wire op_enable
 );
 
-    localparam HALF_DELAY_WAIT = (DELAY_FRAMES / 2);
+    localparam HALF_DELAY_WAIT = (DELAY_WAIT / 2);
 
-    reg [3:0] rxState = 0;
-    reg [12:0] rxCounter = 0;
-    reg [7:0] dataIn = 0;
-    reg [2:0] rxBitNumber = 0;
+    // Receiver
+    localparam RX_IDLE = 0;
+    localparam RX_START = 1;
+    localparam RX_READ = 2;
+    localparam RX_STOP = 3;
 
-    localparam RX_STATE_IDLE = 0;
-    localparam RX_STATE_START_BIT = 1;
-    localparam RX_STATE_READ_WAIT = 2;
-    localparam RX_STATE_READ = 3;
-    localparam RX_STATE_STOP_BIT = 5;
+    reg [8:0] rx_counter = 0;
+    reg [2:0] rx_bit_number = 0;
+    reg [2:0] rx_state = 0;
 
-    always @(posedge _extern_27mhz_clock) begin
-        case (rxState)
-            RX_STATE_IDLE: begin
-                if (_extern_uart_rx == 0) begin
-                    rxState <= RX_STATE_START_BIT;
-                    rxCounter <= 1;
-                    rxBitNumber <= 0;
+    always @(posedge _extern_27mhz_clock)
+    begin
+        case(rx_state)
+
+            RX_IDLE:
+            begin
+                if(_extern_uart_rx == 0)
+                begin
+                    rx_counter <= 0;
+                    rx_bit_number <= 0;
+                    op <= 0;
                     op_enable = 0;
-                end
-            end 
-            RX_STATE_START_BIT: begin
-                if (rxCounter == HALF_DELAY_WAIT) begin
-                    rxState <= RX_STATE_READ_WAIT;
-                    rxCounter <= 1;
-                end else 
-                    rxCounter <= rxCounter + 1;
-            end
-            RX_STATE_READ_WAIT: begin
-                rxCounter <= rxCounter + 1;
-                if ((rxCounter + 1) == DELAY_FRAMES) begin
-                    rxState <= RX_STATE_READ;
+                    
+                    rx_state <= RX_START;
                 end
             end
-            RX_STATE_READ: begin
-                rxCounter <= 1;
-                op <= {_extern_uart_rx, op[7:1]};
-                rxBitNumber <= rxBitNumber + 1;
-                if (rxBitNumber == 3'b111)
-                    rxState <= RX_STATE_STOP_BIT;
-                else
-                    rxState <= RX_STATE_READ_WAIT;
+
+            RX_START:
+            begin
+                rx_counter <= rx_counter + 1;
+                if(rx_counter == HALF_DELAY_WAIT)
+                begin
+                    rx_counter <= 0;
+                    
+                    rx_state <= RX_READ;
+                end
             end
-            RX_STATE_STOP_BIT: begin
-                rxCounter <= rxCounter + 1;
-                if ((rxCounter + 1) == DELAY_FRAMES) begin
-                    rxState <= RX_STATE_IDLE;
-                    rxCounter <= 0;
+
+            RX_READ:
+            begin
+                rx_counter <= rx_counter + 1;
+                if(rx_counter == DELAY_WAIT)
+                begin
+                    op <= {_extern_uart_rx, op[7:1]};
+                    rx_bit_number <= rx_bit_number + 1;
+                    rx_counter <= 0;
+
+                    if(rx_bit_number == 3'b111)
+                    begin
+                        rx_state <= RX_STOP;
+                    end
+                end
+            end
+
+            RX_STOP:
+            begin
+                rx_counter <= rx_counter + 1;
+                if(rx_counter == DELAY_WAIT)
+                begin
                     op_enable = 1;
+
+                    rx_state <= RX_IDLE;
                 end
             end
+
         endcase
     end
 

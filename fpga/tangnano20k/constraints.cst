@@ -25,4 +25,4 @@ IO_PORT "_extern_led[4]" PULL_MODE=DOWN;
 IO_LOC "_extern_led[5]" 20;
 IO_PORT "_extern_led[5]" PULL_MODE=DOWN;
 
-IO_LOC "_extern_btn_s2" 87;
+IO_LOC "_extern_reset" 87;
