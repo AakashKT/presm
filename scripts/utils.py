@@ -10,18 +10,22 @@ def init():
     if last_dir == 'scripts':
         os.chdir('../')
 
-def get_working_directory_and_executable():
-    system_name = platform.system()
+def make_numbered_execution_dir(parent_dir):
+    path_exists = os.path.exists(parent_dir)
+    if not path_exists:
+        os.mkdir(parent_dir)
 
-    if system_name == 'Windows':
-        working_directory = os.getcwd() + '/build/verification/Release/'
-        executable = 'verification.exe'
-    
-    elif system_name == 'Linux':
-        working_directory = os.getcwd() + '/build/verification/'
-        executable = 'verification'
-    
-    return working_directory, executable
+    l = os.listdir(parent_dir)
+    if len(l) == 0:
+        max_num = -1
+    else:
+        l.sort()
+        max_num = int(l[-1].split('/')[-1])
+
+    final_path = parent_dir + '/' + str(max_num+1).zfill(5)
+    os.mkdir(final_path)
+
+    return final_path
 
 def get_driver_lib(driver_name):
     system_name = platform.system()
@@ -49,6 +53,36 @@ def get_driver_lib(driver_name):
             print_red('Cannot find static or shared library of PRESM.')
             exit()
 
+def get_verification_dir_and_exe():
+    system_name = platform.system()
+
+    if system_name == 'Windows':
+        working_directory = os.getcwd() + '/build/verification/Release/'
+        executable = 'verification.exe'
+    
+    elif system_name == 'Linux':
+        working_directory = os.getcwd() + '/build/verification/'
+        executable = 'verification'
+    
+    return working_directory, executable
+
+def _copy_file(src_file, dst_dir):
+    print_white(f'Copying file {src_file} to {dst_dir}')
+    shutil.copy(src_file, dst_dir)
+
+def _copy_files_only(src_dir, dst_dir):
+    print_white(f'Copying files from {src_dir} to {dst_dir}')
+
+    src_files = os.listdir(src_dir)
+    for file_name in src_files:
+        full_file_name = os.path.join(src_dir, file_name)
+        if os.path.isfile(full_file_name):
+            shutil.copy(full_file_name, dst_dir)
+
+def _copy_recursive(src_dir, dst_dir):
+    print_white(f'Copying recursively from {src_dir} to {dst_dir}')
+    shutil.copytree(src_dir, dst_dir, dirs_exist_ok=True)
+
 def _chdir(directory):
     os.chdir(directory)
     print_white('Changing working directory to: ' + os.getcwd())
@@ -72,18 +106,17 @@ def execute(working_directory, executable, args):
 
     return op.stdout
 
-def presm_execute(working_directory, executable, args, driver_name):
+def presm_execute(working_directory, executable, driver_lib, app_args, driver_name):
     print_white('======================')
     print_white('PRESM Execution Begin')
     print_white('======================')
 
     current_directory = os.getcwd()
-    library_path, is_static = get_driver_lib(driver_name)
 
     _chdir(working_directory)
     op = _execute(
-        './' + executable + ' ' + ' '.join(args), 
-        {'LD_PRELOAD': library_path}
+        './' + executable + ' ' + ' '.join(app_args), 
+        {'LD_PRELOAD': driver_lib}
     )
     _chdir(current_directory)
 

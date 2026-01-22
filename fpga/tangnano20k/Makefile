@@ -14,19 +14,19 @@ CST_SRC=constraints.cst
 VERILOG_DIR=../../device/${PRESM_DEVICE}/verilog/
 VERILOG_SRC_DIR=$(VERILOG_DIR)/
 
-all: GEN_BITSTREAM
+all: $(TOP_MODULE).fs
 	@echo "Programming FPGA $(DEVICE)"
 	sudo $(OPENFPGALOADER_EXEC) -b ${BOARD} -f $(TOP_MODULE).fs
 
-GEN_BITSTREAM: PLACE_AND_ROUTE
+$(TOP_MODULE).fs: $(TOP_MODULE)_PNR.json
 	@echo "Generating bitstream $(TOP_MODULE).fs"
 	gowin_pack -d ${DEVICE_FAMILY} -o $(TOP_MODULE).fs $(TOP_MODULE)_PNR.json
 
-PLACE_AND_ROUTE: SYNTHESIS
+$(TOP_MODULE)_PNR.json: $(TOP_MODULE)_SYNTH.json
 	@echo "Generating place-and-route $(TOP_MODULE)_PNR.json"
 	$(NEXTPNR_EXEC) --json $(TOP_MODULE)_SYNTH.json --write $(TOP_MODULE)_PNR.json --device $(DEVICE) --vopt cst=$(CST_SRC) --vopt family=$(DEVICE_FAMILY)
 
-SYNTHESIS: 
+$(TOP_MODULE)_SYNTH.json: 
 	@echo "Synthesizing: $(TOP_MODULE)_SYNTH.json"
 	$(YOSYS_EXEC) -p "read_verilog $(VERILOG_SRC_DIR)/$(TOP_MODULE_SRC); synth_gowin -top $(TOP_MODULE) -json $(TOP_MODULE)_SYNTH.json"
 

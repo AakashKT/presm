@@ -8,6 +8,4 @@ Device* get_device()
 RISCVAccel::RISCVAccel()
 {
     this->name = "RISC-V Accelerator";
-
-    this->device_memory = new HostResidentMemory(1e9);
 }

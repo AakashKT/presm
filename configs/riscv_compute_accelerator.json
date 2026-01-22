@@ -12,7 +12,8 @@
     },
 
     "fpga": {
-        "name": "tangnano20k"
+        "name": "tangnano20k",
+        "linux_device_path": "/dev/ttyUSB1"
     },
 
     "verification": [

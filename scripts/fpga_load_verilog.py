@@ -3,7 +3,6 @@ import os, argparse, shutil, utils, json
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', required=True)
-    parser.add_argument('--synthesis_only', action="store_true")
     args = parser.parse_args()
 
     utils.init()
@@ -16,9 +15,5 @@ if __name__ == '__main__':
 
     os.chdir('fpga/' + fpga_name)
 
-    if args.synthesis_only:
-        os.system('make SYNTHESIS PRESM_DEVICE=%s TOP_MODULE=%s TOP_MODULE_SRC=%s' \
-                    % (device_name, top_module, top_module_src))
-    else:
-        os.system('make PRESM_DEVICE=%s TOP_MODULE=%s TOP_MODULE_SRC=%s' \
+    os.system('make PRESM_DEVICE=%s TOP_MODULE=%s TOP_MODULE_SRC=%s' \
                     % (device_name, top_module, top_module_src))
