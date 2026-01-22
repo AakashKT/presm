@@ -17,6 +17,8 @@ def setup(args, config, execution_dir):
     utils._copy_file(driver_lib_path, execution_dir)
     driver_lib = driver_lib_path.split('/')[-1]
 
+    utils._copy_file(args.config, execution_dir)
+
     return os.path.join(os.getcwd(), verification_dir), verification_exe, driver_lib
 
 if __name__ == '__main__':
