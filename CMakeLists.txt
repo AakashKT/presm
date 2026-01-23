@@ -34,12 +34,7 @@ else()
 endif()
 
 # Add driver directory
-if(${DRIVER} MATCHES "cuda")
-    message(STATUS "PRESM: Compiling with CUDA driver")
-
-    # The actual driver
-    add_subdirectory(driver/cuda)
-elseif(${DRIVER} MATCHES "c_accel")
+if(${DRIVER} STREQUAL "c_accel")
     message(STATUS "PRESM: Compiling with COMPUTE ACCELERATOR driver")
 
     # The actual driver

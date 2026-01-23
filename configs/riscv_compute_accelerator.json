@@ -6,8 +6,8 @@
     "device": {
         "name": "riscv_accel",
         "verilog": {
-            "top_module_src": "riscv.v",
-            "top_module": "riscv_accel"
+            "top_module_src": "riscv_uart.v",
+            "top_module": "riscv_uart"
         }
     },
 

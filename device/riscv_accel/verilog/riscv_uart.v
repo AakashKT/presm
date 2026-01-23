@@ -3,37 +3,45 @@
 
 `include "../../verilog/uart.v"
 
-module riscv_accel
+module riscv_uart
 #(
     parameter DELAY_FRAMES = 234 // 27,000,000 (27Mhz) / 115200 Baud rate
 )
 (
-    input _extern_27mhz_clock,
+    input _extern_clock,
     input _extern_uart_rx,
     output _extern_uart_tx,
-    output [5:0] _extern_led
+    output [5:0] _extern_led,
+    input _extern_reset
 );
 
     reg [7:0] dataIn;
-    wire byte_ready;
-    UART uart_comm(
-        _extern_27mhz_clock,
+    reg dataInReady;
+
+    reg [7:0] dataOut = 8'b01100001;
+    reg dataOutReady = 1;
+
+    assign _extern_led = ~dataIn[5:0];
+
+    UARTReceiver uart_rx(
+        _extern_clock,
         _extern_uart_rx,
-        _extern_uart_tx,
         dataIn,
-        byte_ready
+        dataInReady
     );
 
-    always @(posedge _extern_27mhz_clock) begin
-        if (byte_ready) begin
-            _extern_led <= ~dataIn[7:2];
-        end
-    end
+    UARTTransmitter uart_tx(
+        _extern_clock,
+        _extern_uart_tx,
+        dataOut,
+        ~_extern_reset
+    );
 
-
-
-
-
+    // always @(posedge _extern_clock) begin
+    //     if (dataInReady) begin
+    //         _extern_led <= ~dataIn[5:0];
+    //     end
+    // end
 
     // localparam WAIT_TIME = 13500000;
 

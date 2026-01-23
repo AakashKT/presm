@@ -1,4 +1,4 @@
-IO_LOC "_extern_27mhz_clock" 4;
+IO_LOC "_extern_clock" 4;
 IO_PORT "clk" PULL_MODE=UP;
 
 IO_LOC "_extern_uart_rx" 70;

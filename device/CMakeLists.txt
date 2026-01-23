@@ -9,11 +9,7 @@ if(PRESM_SHARED_LIB)
     set_property(TARGET device PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
-if(${DEVICE} MATCHES "ptx_gpu_1")
-    message(STATUS "PRESM: Using device ptx_gpu_1")
-        
-    add_subdirectory(ptx_gpu_1/)
-elseif(${DEVICE} MATCHES "riscv_accel")
+if(${DEVICE} STREQUAL "riscv_accel")
     message(STATUS "PRESM: Using device RISC-V accelerator")
     
     add_subdirectory(riscv_accel/)

@@ -22,8 +22,7 @@ def build_presm(args, config):
 
     utils._chdir('build')
 
-    if args.clean or (not path_exists):
-        os.system('cmake .. -DDRIVER=%s -DDEVICE=%s' % (config['driver']['name'].lower(), config['device']['name'].lower()))
+    os.system('cmake .. -DDRIVER=%s -DDEVICE=%s' % (config['driver']['name'].lower(), config['device']['name'].lower()))
 
     os.system('cmake --build . --config Release')
     os.system('cmake --build . --config Release --target install')
