@@ -1,18 +1,16 @@
-PRESM_DEVICE=""
 TOP_MODULE_SRC=none.v
 TOP_MODULE=none
 
-YOSYS_EXEC=./../../extern/yosys/yosys
-NEXTPNR_EXEC=./../../extern/nextpnr/build/nextpnr-himbaechel
-OPENFPGALOADER_EXEC=./../../extern/openFPGALoader/build/openFPGALoader
+YOSYS_EXEC=none
+NEXTPNR_EXEC=none
+OPENFPGALOADER_EXEC=none
 
 DEVICE=GW2AR-LV18QN88C8/I7
 DEVICE_FAMILY=GW2A-18C
 BOARD=tangnano20k
 
 CST_SRC=constraints.cst
-VERILOG_DIR=../../device/${PRESM_DEVICE}/verilog/
-VERILOG_SRC_DIR=$(VERILOG_DIR)/
+VERILOG_SRC_DIR=rtl/
 
 all: $(TOP_MODULE).fs
 	@echo "Programming FPGA $(DEVICE)"

@@ -44,10 +44,10 @@ if __name__ == '__main__':
 
             result = verify_output(source, target)
             if result:
-                utils.print_green('Verification: ' + app['name'] + ' succeeded.')
+                utils.print_green(f'Verification of {app['name']} succeeded.')
                 print('')
             else:
-                utils.print_red('Verification: ' + app['name'] + ' failed.')
+                utils.print_red(f'Verification of {app['name']} failed.')
                 print('\nSource output:')
                 print(source)
 

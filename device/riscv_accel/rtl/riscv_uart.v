@@ -1,7 +1,8 @@
 
 `default_nettype none
 
-`include "../../verilog/uart.v"
+`include "uart_rx.v"
+`include "uart_tx.v"
 
 module riscv_uart
 #(
@@ -23,14 +24,14 @@ module riscv_uart
 
     assign _extern_led = ~dataIn[5:0];
 
-    UARTReceiver uart_rx(
+    UARTRx uart_rx(
         _extern_clock,
         _extern_uart_rx,
         dataIn,
         dataInReady
     );
 
-    UARTTransmitter uart_tx(
+    UARTTx uart_tx(
         _extern_clock,
         _extern_uart_tx,
         dataOut,

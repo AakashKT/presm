@@ -38,8 +38,6 @@ def build_riscv_compiler_linux(args, config):
 
     current_directory = os.getcwd()
 
-    os.system('sudo apt-get install autoconf automake autotools-dev curl python3 python3-pip python3-tomli libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake libglib2.0-dev libslirp-dev libncurses-dev')
-
     utils._chdir('../../extern/riscv-gnu-toolchain/')
     os.system('make clean')
 
@@ -96,9 +94,21 @@ def build_fpga_toolchain(args, config):
 
     utils._chdir('../../../')
 
+def install_ubuntu_packages():
+    os.system('sudo apt update')
+
+    os.system('sudo apt-get install iverilog')
+
+    os.system('sudo apt-get install autoconf automake autotools-dev \
+                curl python3 python3-pip python3-tomli libmpc-dev libmpfr-dev \
+                libgmp-dev gawk build-essential bison flex texinfo gperf libtool \
+                patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake \
+                libglib2.0-dev libslirp-dev libncurses-dev')
+
 def get_or_build_extern_tools(args, config):
     system_name = platform.system()
 
+    install_ubuntu_packages()
     build_fpga_toolchain(args, config)
 
     if config['device']['name]'].lower() == 'riscv_accel':

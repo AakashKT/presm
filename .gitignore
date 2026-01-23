@@ -2,5 +2,4 @@ __pycache__/
 build*/
 .vscode/
 packages/
-execute_runs/
-verify_runs/
+*_runs/
