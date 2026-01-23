@@ -13,14 +13,14 @@ module riscv_uart
     input _extern_uart_rx,
     output _extern_uart_tx,
     output [5:0] _extern_led,
-    input _extern_reset
 );
 
     reg [7:0] dataIn;
     reg dataInReady;
 
     reg [7:0] dataOut = 8'b01100001;
-    reg dataOutReady = 1;
+    reg dataOutReady = 0;
+    reg [31:0] dataOutReadyCount = 0;
 
     assign _extern_led = ~dataIn[5:0];
 
@@ -35,12 +35,31 @@ module riscv_uart
         _extern_clock,
         _extern_uart_tx,
         dataOut,
-        ~_extern_reset
+        dataOutReady
     );
 
-    // always @(posedge _extern_clock) begin
-    //     if (dataInReady) begin
-    //         _extern_led <= ~dataIn[5:0];
+    always @(posedge _extern_clock) 
+    begin
+        dataOutReady <= dataInReady;
+        dataOut <= dataIn;
+    end
+
+    // always @(negedge dataInReady)
+    // begin
+    //     dataOutReady <= 0;
+    // end
+
+    // always @(posedge _extern_clock) 
+    // begin
+    //     if(dataOutReady) 
+    //     begin
+    //         dataOutReadyCount <= dataOutReadyCount + 1;
+    //         if(dataOutReadyCount == 23'b111111111111111111)
+    //         begin
+    //             dataInReady <= 0;
+    //             dataOutReady <= 0;
+    //             dataOutReadyCount <= 0;
+    //         end
     //     end
     // end
 
