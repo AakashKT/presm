@@ -5,9 +5,6 @@
 `include "uart_tx.v"
 
 module RiscvUart
-#(
-    parameter DELAY_FRAMES = 234 // 27,000,000 (27Mhz) / 115200 Baud rate
-)
 (
     input _extern_clock,
     input _extern_uart_rx,
