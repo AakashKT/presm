@@ -1,3 +1,7 @@
+# Helpful VS Code plugins:
+- Verilog-HDL/SystemVerilog - provides syntax highlighting support for Verilog
+- WaveTrace - provides built in waveform viewing which can be used for debugging.
+
 # Exposing FPGA attached to Windows on WSL
 Assuming the FPGA is connected via USB, follow these steps.
 

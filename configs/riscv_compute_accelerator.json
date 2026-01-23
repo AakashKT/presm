@@ -23,5 +23,13 @@
             "args_device_run": ["device"],
             "verify": false
         }
+    ],
+
+    "rtl_testbench": [
+        {
+            "name": "uart_rx",
+            "rtl_src": "uart_rx.v",
+            "testbench_src": "uart_rx_tb.v"
+        }
     ]
 }
