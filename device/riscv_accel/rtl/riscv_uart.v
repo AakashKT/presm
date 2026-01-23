@@ -4,7 +4,7 @@
 `include "uart_rx.v"
 `include "uart_tx.v"
 
-module riscv_uart
+module RiscvUart
 #(
     parameter DELAY_FRAMES = 234 // 27,000,000 (27Mhz) / 115200 Baud rate
 )
@@ -43,55 +43,5 @@ module riscv_uart
         dataOutReady <= dataInReady;
         dataOut <= dataIn;
     end
-
-    // always @(negedge dataInReady)
-    // begin
-    //     dataOutReady <= 0;
-    // end
-
-    // always @(posedge _extern_clock) 
-    // begin
-    //     if(dataOutReady) 
-    //     begin
-    //         dataOutReadyCount <= dataOutReadyCount + 1;
-    //         if(dataOutReadyCount == 23'b111111111111111111)
-    //         begin
-    //             dataInReady <= 0;
-    //             dataOutReady <= 0;
-    //             dataOutReadyCount <= 0;
-    //         end
-    //     end
-    // end
-
-    // localparam WAIT_TIME = 13500000;
-
-    // reg [23:0] clockCounter = 0;
-
-    // wire [5:0] ledRegisterIn;
-    // wire ledRegisterEn;
-    // wire ledRegisterClear;
-    // wire ledRegisterReset;
-
-    // RegisterDFF #(3'd6) ledRegister(
-    //     _extern_27mhz_clock,
-    //     ledRegisterIn,
-    //     ledRegisterEn,
-    //     ledRegisterClear,
-    //     ledRegisterReset,
-    //     _extern_led
-    // );
-
-    // always @(posedge _extern_27mhz_clock) 
-    // begin
-    //     if(clockCounter == 0)
-    //     begin
-    //         ledRegisterIn = 5'd16;
-    //         ledRegisterClear = 1'b1;
-    //         ledRegisterReset = 1'b0;
-    //         ledRegisterEn = 1'b1;
-    //     end
-
-    //     clockCounter <= clockCounter + 1;
-    // end
 
 endmodule

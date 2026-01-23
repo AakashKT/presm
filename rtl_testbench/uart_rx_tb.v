@@ -15,7 +15,8 @@ module test();
     always
         #1 clock = ~clock;
     
-    initial begin
+    initial 
+    begin
         $display("Starting UART RX");
         $monitor("Data Value %b", data);
         #10 uart_rx=0;
@@ -31,7 +32,8 @@ module test();
         #1000 $finish;
     end
 
-    initial begin
+    initial 
+    begin
         $dumpfile("output/uart_rx.vcd");
         $dumpvars(0,test);
     end

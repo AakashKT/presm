@@ -1,21 +1,24 @@
 import os, argparse, shutil, utils, json
 
 def setup(args, config, execution_dir):
-    device_name = config['device']['name']
+    device = config['device']
 
     os.mkdir(execution_dir + '/output/')
     
     common_rtl_dir = 'device/rtl/'
     utils._copy_recursive(common_rtl_dir, execution_dir)
 
-    device_rtl_dir = f'device/{device_name}/rtl/'
-    utils._copy_recursive(device_rtl_dir, execution_dir)
-
     common_testbench_dir = f'rtl_testbench/'
     utils._copy_files_only(common_testbench_dir, execution_dir)
 
-    device_testbench_dir = f'rtl_testbench/{device_name}/'
-    utils._copy_files_only(device_testbench_dir, execution_dir)
+    if device:
+        device_name = device['name']
+
+        device_rtl_dir = f'device/{device_name}/rtl/'
+        utils._copy_recursive(device_rtl_dir, execution_dir)
+
+        device_testbench_dir = f'rtl_testbench/{device_name}/'
+        utils._copy_files_only(device_testbench_dir, execution_dir)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -33,7 +36,7 @@ if __name__ == '__main__':
     os.chdir(execution_dir)
 
     for testbench in config['rtl_testbench']:
-        test_name = testbench['name']
+        test_name = testbench['name'].replace(' ', '_')
         rtl_src = testbench['rtl_src']
         testbench_src = testbench['testbench_src']
 

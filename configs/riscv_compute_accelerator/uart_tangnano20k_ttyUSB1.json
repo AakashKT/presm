@@ -7,7 +7,7 @@
         "name": "riscv_accel",
         "verilog": {
             "top_module_src": "riscv_uart.v",
-            "top_module": "riscv_uart"
+            "top_module": "RiscvUart"
         }
     },
 
@@ -27,9 +27,9 @@
 
     "rtl_testbench": [
         {
-            "name": "uart_rx",
-            "rtl_src": "uart_rx.v",
-            "testbench_src": "uart_rx_tb.v"
+            "name": "Command Processor",
+            "rtl_src": "command_processor.v",
+            "testbench_src": "command_processor_tb.v"
         }
     ]
 }

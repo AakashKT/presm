@@ -1,0 +1,14 @@
+{
+    "driver": false,
+    "device": false,
+    "fpga": false,
+    "verification": false,
+
+    "rtl_testbench": [
+        {
+            "name": "UART RX",
+            "rtl_src": "uart_rx.v",
+            "testbench_src": "uart_rx_tb.v"
+        }
+    ]
+}

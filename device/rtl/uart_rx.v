@@ -10,8 +10,8 @@ module UARTRx
     input _extern_uart_rx,
 
     // Outgoing
-    output wire [7:0] data,
-    output wire data_en
+    output reg [7:0] data,
+    output reg data_en
 );
 
     localparam HALF_DELAY_WAIT = (DELAY_WAIT / 2);

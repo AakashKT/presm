@@ -10,8 +10,8 @@ module UARTTx
     output _extern_uart_tx,
 
     // Incoming
-    input wire [7:0] data,
-    input wire data_en
+    input reg [7:0] data,
+    input reg data_en
 );
     // Transmitter
     localparam TX_IDLE = 0;
