@@ -29,7 +29,14 @@
         {
             "name": "Command Processor",
             "rtl_src": "command_processor.v",
-            "testbench_src": "command_processor_tb.v"
+            "testbench_src": "command_processor_tb.v",
+            "enable": true
+        },
+        {
+            "name": "RiscV UART",
+            "rtl_src": "riscv_uart.v",
+            "testbench_src": "riscv_uart_tb.v",
+            "enable": true
         }
     ]
 }

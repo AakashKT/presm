@@ -1,12 +1,14 @@
 module test();
 
     reg clock = 0;
+    reg reset = 0;
     reg uart_rx = 1;
     wire [7:0] data;
     wire data_en;
 
-    UARTRx #(8'd8) uart_module(
+    UARTRx uart_module(
         clock,
+        reset,
         uart_rx,
         data,
         data_en
@@ -19,16 +21,38 @@ module test();
     begin
         $display("Starting UART RX");
         $monitor("Data Value %b", data);
-        #10 uart_rx=0;
-        #16 uart_rx=1;
-        #16 uart_rx=0;
-        #16 uart_rx=0;
-        #16 uart_rx=0;
-        #16 uart_rx=0;
-        #16 uart_rx=1;
-        #16 uart_rx=1;
-        #16 uart_rx=0;
-        #16 uart_rx=1;
+
+        #468 reset = 1;
+        #468 reset = 0;
+
+        #468 uart_rx = 0;
+
+        #468 uart_rx = 1;
+        #468 uart_rx = 0;
+        #468 uart_rx = 0;
+        #468 uart_rx = 1;
+        #468 uart_rx = 0;
+        #468 uart_rx = 1;
+        #468 uart_rx = 0;
+        #468 uart_rx = 1;
+
+        #468 uart_rx = 1;
+
+        $display("");
+
+        #468 uart_rx = 0;
+
+        #468 uart_rx = 1;
+        #468 uart_rx = 1;
+        #468 uart_rx = 0;
+        #468 uart_rx = 0;
+        #468 uart_rx = 1;
+        #468 uart_rx = 0;
+        #468 uart_rx = 1;
+        #468 uart_rx = 1;
+
+        #468 uart_rx = 1;
+
         #1000 $finish;
     end
 

@@ -3,10 +3,10 @@ module test();
     reg clock = 0;
     reg reset = 0;
 
-    reg [31:0] in = 0;
+    reg [7:0] in = 0;
     reg in_en = 0;
 
-    wire [31:0] out;
+    wire [7:0] out;
     wire out_en;
 
     CommandProcessor cp(
@@ -29,7 +29,7 @@ module test();
         #2 reset = 1;
         #2 reset = 0;
 
-        #2 in = 32'd2832662527;
+        #2 in = 8'b10100001;
         #2 in_en = 1;
 
         #100;

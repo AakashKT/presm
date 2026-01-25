@@ -5,9 +5,14 @@ module UARTRx
     parameter DELAY_WAIT = 234
 )
 (
-    // External pins
+    // Clock
     input _extern_clock,
-    input _extern_uart_rx,
+
+    // Reset
+    input async_reset,
+
+    // UART rx external
+    input wire _extern_uart_rx,
 
     // Outgoing
     output reg [7:0] data,
@@ -22,9 +27,20 @@ module UARTRx
     localparam RX_READ = 2;
     localparam RX_STOP = 3;
 
-    reg [8:0] rx_counter = 0;
-    reg [2:0] rx_bit_number = 0;
-    reg [2:0] rx_state = 0;
+    reg [8:0] rx_counter;
+    reg [2:0] rx_bit_number;
+    reg [2:0] rx_state;
+
+    // Reset signal
+    always @(posedge async_reset)
+    begin
+        rx_counter <= 0;
+        rx_bit_number <= 0;
+        rx_state <= RX_IDLE;
+
+        data <= 0;
+        data_en <= 0;
+    end
 
     always @(posedge _extern_clock)
     begin

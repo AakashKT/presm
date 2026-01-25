@@ -6,36 +6,38 @@ module CommandProcessor
     input _extern_clock,
 
     // Reset
-    input _extern_async_reset,
+    input async_reset,
 
     // Host input
-    input wire [31:0] in_host,
+    input wire [7:0] in_host,
     input wire in_en,
 
     // Host output
-    output reg [31:0] out_host,
+    output reg [7:0] out_host,
     output reg out_en
 );
 
+    // Convenient definitions
     localparam CP_IDLE = 0;
     localparam CP_INIT = 1;
     localparam CP_ACTIVE = 2;
     localparam CP_STOP = 3;
 
+    // Registers
     reg [2:0] cp_state;
+    reg [7:0] r1;
 
-    reg [31:0] r1, r2;
-
-    always @(posedge _extern_async_reset)
+    // Reset signal
+    always @(posedge async_reset)
     begin
         cp_state <= CP_IDLE;
         out_en <= 0;
         out_host <= 0;
 
         r1 <= 0;
-        r2 <= 0;
     end
 
+    // CP state machine
     always @(posedge _extern_clock)
     begin
         case(cp_state)
@@ -50,14 +52,13 @@ module CommandProcessor
 
             CP_INIT:
             begin
-                r1[15:0] = in_host[31:16];
-                r2[15:0] = in_host[15:0];
                 cp_state = CP_ACTIVE;
+                r1 <= in_host;
             end
 
             CP_ACTIVE:
             begin
-                out_host = r1 + r2;
+                out_host = r1;
                 cp_state = CP_STOP;
             end
 

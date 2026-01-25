@@ -36,6 +36,14 @@ if __name__ == '__main__':
     os.chdir(execution_dir)
 
     for testbench in config['rtl_testbench']:
+        if not testbench['enable']:
+            continue
+
+        print('')
+        utils.print_green('=============================================')
+        utils.print_green(f'RTL Testbench: {testbench["name"]}')
+        utils.print_green('=============================================')
+            
         test_name = testbench['name'].replace(' ', '_')
         rtl_src = testbench['rtl_src']
         testbench_src = testbench['testbench_src']

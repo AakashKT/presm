@@ -5,13 +5,18 @@ module UARTTx
     parameter DELAY_WAIT = 234
 )
 (
-    // External pins
+    // Clock
     input _extern_clock,
-    output _extern_uart_tx,
+
+    // Reset
+    input async_reset,
+
+    // UART tx external
+    output reg _extern_uart_tx,
 
     // Incoming
-    input reg [7:0] data,
-    input reg data_en
+    input wire [7:0] data,
+    input wire data_en
 );
     // Transmitter
     localparam TX_IDLE = 0;
@@ -19,9 +24,19 @@ module UARTTx
     localparam TX_WRITE = 2;
     localparam TX_STOP = 3;
 
-    reg [8:0] tx_counter = 0;
-    reg [2:0] tx_bit_number = 0;
-    reg [2:0] tx_state = 0;
+    reg [8:0] tx_counter;
+    reg [2:0] tx_bit_number;
+    reg [2:0] tx_state;
+
+    // Reset signal
+    always @(posedge async_reset)
+    begin
+        tx_counter <= 0;
+        tx_bit_number <= 0;
+        tx_state <= TX_IDLE;
+
+        _extern_uart_tx <= 1;
+    end
 
     always @(posedge _extern_clock)
     begin
@@ -45,28 +60,37 @@ module UARTTx
             TX_START:
             begin
                 _extern_uart_tx <= 0;
-                tx_counter <= tx_counter + 1;
                 if(tx_counter == DELAY_WAIT)
                 begin
                     tx_counter <= 0;
                     
                     tx_state <= TX_WRITE;
                 end
+                else
+                begin
+                    tx_counter <= tx_counter + 1;
+                end
             end
 
             TX_WRITE:
             begin
                 _extern_uart_tx <= data[tx_bit_number];
-                tx_counter <= tx_counter + 1;
                 if(tx_counter == DELAY_WAIT)
                 begin
-                    tx_bit_number <= tx_bit_number + 1;
-                    tx_counter <= 0;
-
                     if(tx_bit_number == 3'b111)
                     begin                        
                         tx_state <= TX_STOP;
                     end
+                    else
+                    begin
+                        tx_bit_number <= tx_bit_number + 1;
+                        tx_state <= TX_WRITE;
+                    end
+                    tx_counter <= 0;
+                end
+                else
+                begin
+                    tx_counter <= tx_counter + 1;
                 end
             end
 

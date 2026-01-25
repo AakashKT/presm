@@ -8,7 +8,14 @@
         {
             "name": "UART RX",
             "rtl_src": "uart_rx.v",
-            "testbench_src": "uart_rx_tb.v"
+            "testbench_src": "uart_rx_tb.v",
+            "enable": true
+        },
+        {
+            "name": "UART TX",
+            "rtl_src": "uart_tx.v",
+            "testbench_src": "uart_tx_tb.v",
+            "enable": true
         }
     ]
 }
