@@ -6,6 +6,18 @@
 
     "rtl_testbench": [
         {
+            "name": "D Flip Flop with Reset",
+            "rtl_src": "flip_flops.v",
+            "testbench_src": "d_flip_flop_rst_tb.v",
+            "enable": false
+        },
+        {
+            "name": "Register of D Flip Flop with Reset",
+            "rtl_src": "registers.v",
+            "testbench_src": "register_dff_rst_tb.v",
+            "enable": false
+        },
+        {
             "name": "UART RX",
             "rtl_src": "uart_rx.v",
             "testbench_src": "uart_rx_tb.v",

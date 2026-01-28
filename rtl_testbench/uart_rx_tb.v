@@ -24,6 +24,8 @@ module test();
 
         #468 reset = 1;
         #468 reset = 0;
+        if(data != 8'b00000000)
+            $error("UART RX reset error");
 
         #468 uart_rx = 0;
 
@@ -37,6 +39,9 @@ module test();
         #468 uart_rx = 1;
 
         #468 uart_rx = 1;
+
+        if(data != 8'b10101001)
+            $error("UART RX data set error");
 
         $display("");
 
@@ -52,6 +57,9 @@ module test();
         #468 uart_rx = 1;
 
         #468 uart_rx = 1;
+
+        if(data != 8'b11010011)
+            $error("UART RX data set error");
 
         #1000 $finish;
     end

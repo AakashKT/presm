@@ -27,52 +27,53 @@ module CommandProcessor
     reg [2:0] cp_state;
     reg [7:0] r1;
 
-    // Reset signal
-    always @(posedge async_reset)
-    begin
-        cp_state <= CP_IDLE;
-        out_en <= 0;
-        out_host <= 0;
-
-        r1 <= 0;
-    end
-
     // CP state machine
-    always @(posedge _extern_clock)
+    always @(posedge _extern_clock or posedge async_reset)
     begin
-        case(cp_state)
+        if(async_reset)
+        begin
+            cp_state <= CP_IDLE;
+        end
+        else
+        begin
+            case(cp_state)
 
-            CP_IDLE:
-            begin
-                if(in_en == 1)
+                CP_IDLE:
                 begin
-                    cp_state <= CP_INIT;
+                    if(in_en == 1)
+                    begin
+                        r1 <= 0;
+                        out_host <= 0;
+                        out_en <= 0;
+
+                        cp_state <= CP_INIT;
+                    end
                 end
-            end
 
-            CP_INIT:
-            begin
-                cp_state = CP_ACTIVE;
-                r1 <= in_host;
-            end
-
-            CP_ACTIVE:
-            begin
-                out_host = r1;
-                cp_state = CP_STOP;
-            end
-
-            CP_STOP:
-            begin
-                out_en <= 1;
-                if(in_en == 0)
+                CP_INIT:
                 begin
-                    out_en <= 0;
-                    cp_state = CP_IDLE;
+                    cp_state <= CP_ACTIVE;
+                    r1 <= in_host;
                 end
-            end
 
-        endcase
+                CP_ACTIVE:
+                begin
+                    out_host = r1;
+                    cp_state <= CP_STOP;
+                end
+
+                CP_STOP:
+                begin
+                    out_en <= 1;
+                    if(in_en == 0)
+                    begin
+                        out_en <= 0;
+                        cp_state <= CP_IDLE;
+                    end
+                end
+
+            endcase
+        end
     end
 
 endmodule

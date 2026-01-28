@@ -32,8 +32,8 @@ if __name__ == '__main__':
     nextpnr_exec = f'{os.getcwd()}/extern/nextpnr/build/nextpnr-himbaechel'
     openfpgaloader_exec = f'{os.getcwd()}/extern/openFPGALoader/build/openFPGALoader'
 
-    top_module = config['device']['verilog']['top_module']
-    top_module_src = config['device']['verilog']['top_module_src']
+    top_module = config['device']['rtl']['top_module']
+    top_module_src = config['device']['rtl']['top_module_src']
 
     os.chdir(execution_dir)
     os.system(f'make TOP_MODULE={top_module} \

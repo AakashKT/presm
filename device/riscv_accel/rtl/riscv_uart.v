@@ -15,10 +15,11 @@ module RiscvUart
     output wire _extern_uart_tx,
 
     // Reset hardware button
-    input _extern_reset
-);
+    input _extern_reset,
 
-    // Definitions
+    // Debug LED
+    output reg [5:0] _extern_led
+);
 
     // Registers
     wire [7:0] rx_data;
@@ -32,24 +33,11 @@ module RiscvUart
 
     wire [7:0] cp_out;
     wire cp_out_en;
-    
-    wire reset;
-    assign reset = ~_extern_reset;
-
-    // Reset signal
-    always @(posedge reset)
-    begin
-        tx_data <= 0;
-        tx_data_en <= 0;
-
-        cp_in <= 0;
-        cp_in_en <= 0;
-    end
 
     // Submodules
     UARTRx receiver(
         _extern_clock,
-        reset,
+        _extern_reset,
         _extern_uart_rx,
         rx_data,
         rx_data_en
@@ -57,7 +45,7 @@ module RiscvUart
 
     UARTTx transmitter(
         _extern_clock,
-        reset,
+        _extern_reset,
         _extern_uart_tx,
         tx_data,
         tx_data_en
@@ -65,7 +53,7 @@ module RiscvUart
 
     CommandProcessor cp(
         _extern_clock,
-        reset,
+        _extern_reset,
         cp_in,
         cp_in_en,
         cp_out,
@@ -76,8 +64,8 @@ module RiscvUart
     begin
         if(rx_data_en == 1)
         begin
-            cp_in = rx_data;
-            cp_in_en = 1;
+            cp_in <= rx_data;
+            cp_in_en <= 1;
         end
         else
         begin
@@ -87,8 +75,8 @@ module RiscvUart
 
         if(cp_out_en == 1)
         begin
-            tx_data = cp_out;
-            tx_data_en = 1;
+            tx_data <= cp_out;
+            tx_data_en <= 1;
         end
         else
         begin

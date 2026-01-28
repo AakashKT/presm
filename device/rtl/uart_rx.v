@@ -1,3 +1,5 @@
+`include "registers.v"
+
 `default_nettype none
 
 module UARTRx
@@ -29,75 +31,75 @@ module UARTRx
 
     reg [8:0] rx_counter;
     reg [2:0] rx_bit_number;
+
     reg [2:0] rx_state;
 
-    // Reset signal
-    always @(posedge async_reset)
+    always @(posedge _extern_clock or posedge async_reset)
     begin
-        rx_counter <= 0;
-        rx_bit_number <= 0;
-        rx_state <= RX_IDLE;
+        if(async_reset)
+        begin
+            rx_state <= RX_IDLE;
 
-        data <= 0;
-        data_en <= 0;
-    end
+            data <= 0;
+            data_en <= 0;
+        end
+        else
+        begin
+            case(rx_state)
 
-    always @(posedge _extern_clock)
-    begin
-        case(rx_state)
-
-            RX_IDLE:
-            begin
-                if(_extern_uart_rx == 0)
+                RX_IDLE:
                 begin
-                    rx_counter <= 0;
-                    rx_bit_number <= 0;
-                    data <= 0;
-                    data_en <= 0;
-                    
-                    rx_state <= RX_START;
-                end
-            end
-
-            RX_START:
-            begin
-                rx_counter <= rx_counter + 1;
-                if(rx_counter == HALF_DELAY_WAIT)
-                begin
-                    rx_counter <= 0;
-                    
-                    rx_state <= RX_READ;
-                end
-            end
-
-            RX_READ:
-            begin
-                rx_counter <= rx_counter + 1;
-                if(rx_counter == DELAY_WAIT)
-                begin
-                    data <= {_extern_uart_rx, data[7:1]};
-                    rx_bit_number <= rx_bit_number + 1;
-                    rx_counter <= 0;
-
-                    if(rx_bit_number == 3'b111)
+                    if(_extern_uart_rx == 0)
                     begin
-                        rx_state <= RX_STOP;
+                        rx_counter <= 0;
+                        rx_bit_number <= 0;
+                        data <= 0;
+                        data_en <= 0;
+                        
+                        rx_state <= RX_START;
                     end
                 end
-            end
 
-            RX_STOP:
-            begin
-                rx_counter <= rx_counter + 1;
-                if(rx_counter == DELAY_WAIT)
+                RX_START:
                 begin
-                    data_en <= 1;
-
-                    rx_state <= RX_IDLE;
+                    rx_counter <= rx_counter + 1;
+                    if(rx_counter == HALF_DELAY_WAIT)
+                    begin
+                        rx_counter <= 0;
+                        
+                        rx_state <= RX_READ;
+                    end
                 end
-            end
 
-        endcase
+                RX_READ:
+                begin
+                    rx_counter <= rx_counter + 1;
+                    if(rx_counter == DELAY_WAIT)
+                    begin
+                        data <= {_extern_uart_rx, data[7:1]};
+                        rx_bit_number <= rx_bit_number + 1;
+                        rx_counter <= 0;
+
+                        if(rx_bit_number == 3'b111)
+                        begin
+                            rx_state <= RX_STOP;
+                        end
+                    end
+                end
+
+                RX_STOP:
+                begin
+                    rx_counter <= rx_counter + 1;
+                    if(rx_counter == DELAY_WAIT)
+                    begin
+                        data_en <= 1;
+
+                        rx_state <= RX_IDLE;
+                    end
+                end
+
+            endcase
+        end
     end
 
 endmodule

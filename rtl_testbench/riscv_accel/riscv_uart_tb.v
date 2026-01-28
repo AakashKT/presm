@@ -1,16 +1,19 @@
 module test();
     
     reg clock = 0;
-    reg reset = 1;
+    reg reset = 0;
 
     reg uart_rx = 1;
     wire uart_tx;
+
+    wire [5:0] led;
 
     RiscvUart riscv_uart(
         clock,
         uart_rx,
         uart_tx,
-        reset
+        reset,
+        led
     );
 
     always
@@ -18,8 +21,10 @@ module test();
     
     initial 
     begin
-        #100 reset = 0;
-        #100 reset = 1;
+        $monitor("Debug LED: %b", led);
+
+        #468 reset = 1;
+        #468 reset = 0;
 
         #468 uart_rx = 0;
 
