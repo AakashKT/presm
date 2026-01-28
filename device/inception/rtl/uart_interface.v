@@ -5,7 +5,7 @@
 `include "uart_tx.v"
 `include "command_processor.v"
 
-module RiscvUart
+module UartInterface
 (
     // Clock
     input _extern_clock,
@@ -14,11 +14,8 @@ module RiscvUart
     input wire _extern_uart_rx,
     output wire _extern_uart_tx,
 
-    // Reset hardware button
-    input _extern_reset,
-
-    // Debug LED
-    output reg [5:0] _extern_led
+    // Hardware reset signal
+    input _extern_reset
 );
 
     // Registers
@@ -64,8 +61,8 @@ module RiscvUart
     begin
         if(rx_data_en == 1)
         begin
-            cp_in <= rx_data;
-            cp_in_en <= 1;
+            cp_in = rx_data;
+            cp_in_en = 1;
         end
         else
         begin
@@ -75,8 +72,8 @@ module RiscvUart
 
         if(cp_out_en == 1)
         begin
-            tx_data <= cp_out;
-            tx_data_en <= 1;
+            tx_data = cp_out;
+            tx_data_en = 1;
         end
         else
         begin

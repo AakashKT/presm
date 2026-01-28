@@ -8,12 +8,11 @@ module test();
 
     wire [5:0] led;
 
-    RiscvUart riscv_uart(
+    UartInterface riscv_uart(
         clock,
         uart_rx,
         uart_tx,
-        reset,
-        led
+        reset
     );
 
     always
@@ -21,8 +20,6 @@ module test();
     
     initial 
     begin
-        $monitor("Debug LED: %b", led);
-
         #468 reset = 1;
         #468 reset = 0;
 

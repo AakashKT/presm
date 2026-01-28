@@ -1,14 +1,12 @@
 {
+    "type": "functional",
+
     "driver": {
         "name": "c_accel"
     },
 
     "device": {
-        "name": "riscv_accel",
-        "verilog": {
-            "top_module_src": "riscv_uart.v",
-            "top_module": "RiscvUart"
-        }
+        "name": "inception"
     },
 
     "verification": [
@@ -18,8 +16,5 @@
             "args_device_run": ["device"],
             "verify": false
         }
-    ],
-    
-    "fpga": false,
-    "rtl_testbench": false
+    ]
 }

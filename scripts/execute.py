@@ -23,6 +23,11 @@ if __name__ == '__main__':
     utils.init()
     config = json.load(open(args.config))
 
+    if config['type'] != 'functional' and config['type'] != 'fpga':
+        utils.error_exit('Executing an app requires a config with type=functional or type=fpga')
+    
+    utils.sanitize_presm_config(config)
+
     execution_dir = 'execute_runs'
     execution_dir = utils.make_numbered_execution_dir(execution_dir)
 

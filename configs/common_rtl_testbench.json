@@ -1,8 +1,5 @@
 {
-    "driver": false,
-    "device": false,
-    "fpga": false,
-    "verification": false,
+    "type": "rtl_testbench",
 
     "rtl_testbench": [
         {

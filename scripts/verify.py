@@ -29,6 +29,11 @@ if __name__ == '__main__':
     utils.init()
     config = json.load(open(args.config))
 
+    if config['type'] != 'functional' and config['type'] != 'fpga':
+        utils.error_exit('Running verification apps require config with type=functional or type=fpga')
+    
+    utils.sanitize_presm_config(config)
+
     execution_dir = 'verify_runs'
     execution_dir = utils.make_numbered_execution_dir(execution_dir)
 
@@ -44,10 +49,10 @@ if __name__ == '__main__':
 
             result = verify_output(source, target)
             if result:
-                utils.print_green(f'Verification of {app['name']} succeeded.')
+                utils.print_green(f'Verification of {app["name"]} succeeded.')
                 print('')
             else:
-                utils.print_red(f'Verification of {app['name']} failed.')
+                utils.print_red(f'Verification of {app["name"]} failed.')
                 print('\nSource output:')
                 print(source)
 

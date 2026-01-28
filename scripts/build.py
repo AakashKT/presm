@@ -3,14 +3,14 @@ import urllib.request
 import zipfile
 
 def build_presm(args, config):
+    utils.sanitize_presm_config(config)
+
     # Device specific steps
-    if config['device']['name'].lower() == 'riscv_accel':
+    if config['device']['name'].lower() == 'inception':
         # Check if riscv compiler exists
         linux_path = os.path.exists('build_riscv_compiler/linux/bin')
-        windows_path = os.path.exists('build_riscv_compiler/windows/xpack/bin')
-        if (not linux_path) and (not windows_path):
-            utils.print_red('Did not find RISC-V compiler for your platform. Please run with --get_extern_tools to get/build it?')
-            exit()
+        if (not linux_path):
+            utils.error_exit('Did not find RISC-V compiler for your platform. Please run with --get_extern_tools to get/build it?')
 
     path_exists = os.path.exists('build')
     if args.clean and path_exists:
@@ -26,8 +26,6 @@ def build_presm(args, config):
 
     os.system('cmake --build . --config Release')
     os.system('cmake --build . --config Release --target install')
-
-    utils._chdir('../')
 
 def build_riscv_compiler_linux(args, config):
     path_exists = os.path.exists('linux')

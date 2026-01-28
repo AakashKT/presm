@@ -4,6 +4,10 @@ def print_red(s): print("\033[91m{}\033[00m".format('++ ' + s))
 def print_green(s): print("\033[92m{}\033[00m".format('++ ' + s))
 def print_white(s): print('++ ' + s)
 
+def error_exit(string):
+    print_red(string)
+    exit(1)
+
 def init():
     current_directory = os.getcwd()
     last_dir = current_directory.split('/')[-1]
@@ -34,8 +38,7 @@ def get_driver_lib(driver_name):
         static_lib_path = os.getcwd() + '/build/driver/' + driver_name + '/Release/driver.lib'
 
         if not os.path.isfile(static_lib_path):
-            print_red('Cannot find static library of PRESM. On windows, PRESM can be only run if built as a static library.')
-            exit()
+            error_exit('Cannot find static library of PRESM. On windows, PRESM can be only run if built as a static library.')
         
         return static_lib_path, True
     
@@ -50,8 +53,7 @@ def get_driver_lib(driver_name):
             return static_lib_path, True
         
         else:
-            print_red('Cannot find static or shared library of PRESM.')
-            exit()
+            error_exit('Cannot find static or shared library of PRESM.')
 
 def get_verification_dir_and_exe():
     system_name = platform.system()
@@ -126,3 +128,29 @@ def presm_execute(working_directory, executable, driver_lib, app_args, driver_na
     print('')
 
     return op.stdout
+
+def sanitize_presm_config(config):
+    config_type = config["type"]
+
+    if config_type == "functional":
+        try:
+            driver_name = config["driver"]["name"]
+            device_name = config["device"]["name"]
+        
+        except:
+            utils.error_exit(f"Incomplete config for type='{config_type}'")
+
+    elif config_type == "fpga":
+        try:
+            driver_name = config["driver"]["name"]
+
+            device_name = config["device"]["name"]
+            rtl_device = config["device"]["rtl"]
+
+            fpga_name = config["fpga"]["name"]
+        
+        except:
+            utils.error_exit(f"Incomplete config for type='{config_type}'")
+
+    else:
+        utils.error_exit(f"Config with type='{config_type}' is not supported.")

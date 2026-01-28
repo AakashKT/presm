@@ -9,10 +9,10 @@ if(PRESM_SHARED_LIB)
     set_property(TARGET device PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
-if(${DEVICE} STREQUAL "riscv_accel")
-    message(STATUS "PRESM: Using device RISC-V accelerator")
+if(${DEVICE} STREQUAL "inception")
+    message(STATUS "PRESM: Building device Inception - A RISC-V compute accelerator")
     
-    add_subdirectory(riscv_accel/)
+    add_subdirectory(inception/)
 else()
     message(FATAL_ERROR "PRESM: Device ${DEVICE} not found!")
     return()

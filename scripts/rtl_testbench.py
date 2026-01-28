@@ -1,8 +1,6 @@
 import os, argparse, shutil, utils, json
 
 def setup(args, config, execution_dir):
-    device = config['device']
-
     os.mkdir(execution_dir + '/output/')
     
     common_rtl_dir = 'device/rtl/'
@@ -11,14 +9,16 @@ def setup(args, config, execution_dir):
     common_testbench_dir = f'rtl_testbench/'
     utils._copy_files_only(common_testbench_dir, execution_dir)
 
-    if device:
-        device_name = device['name']
+    try:
+        device_name = config['device']['name']
 
         device_rtl_dir = f'device/{device_name}/rtl/'
         utils._copy_recursive(device_rtl_dir, execution_dir)
 
         device_testbench_dir = f'rtl_testbench/{device_name}/'
         utils._copy_files_only(device_testbench_dir, execution_dir)
+    except:
+        utils.print_red('Cannot include RTL testbenches for device.')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -28,6 +28,13 @@ if __name__ == '__main__':
     utils.init()
     config = json.load(open(args.config))
 
+    try:
+        tests = config['rtl_testbench']
+    except:
+        utils.error_exit('No RTL testbenches defined')
+    
+    utils.sanitize_presm_config(config)
+
     execution_dir = 'rtl_testbench_runs'
     execution_dir = utils.make_numbered_execution_dir(execution_dir)
 
@@ -35,7 +42,7 @@ if __name__ == '__main__':
 
     os.chdir(execution_dir)
 
-    for testbench in config['rtl_testbench']:
+    for testbench in tests:
         if not testbench['enable']:
             continue
 
