@@ -2,14 +2,20 @@
 #define DEVICE_H
 
 #include "common.h"
-#include "memory.h"
+#include "logging.h"
+#include <nlohmann/json.hpp>
 
 class Device {
 public:
-    virtual std::string get_name() = 0;
+    Device();
+    
+    std::string get_name() { return std::string(this->device_config["name"]); };
 
-public:
-    DeviceMemory* device_memory;
+private:
+    nlohmann::json top_config, device_config;
+
+protected:
+    Logger device_log;
 };
 
 Device* get_device();

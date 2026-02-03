@@ -13,13 +13,18 @@ set(PRESM_SHARED_LIB TRUE CACHE STRING "PRESM as a shared or a static library?")
 set(DEVICE "ptx_gpu_1" CACHE STRING "Which device to use? (default: ptx_gpu_1, see device/ folder)")
 set(DRIVER "cuda" CACHE STRING "Which driver to use? (default: cuda, see driver/ folder)")
 
+# External libraries
+add_subdirectory(extern/nlohmann-json/)
+include_directories(extern/nlohmann-json/include)
+
 # General includes
-include_directories(include)
+include_directories(common/include)
 include_directories(device/include)
 include_directories(assembler/include)
 
 # Add device directory
 add_subdirectory(device/)
+target_sources(device PUBLIC common/logging.cpp)
 
 # Add assembler directory
 add_subdirectory(assembler/)

@@ -91,6 +91,9 @@ def _chdir(directory):
 
 def _execute(command : list, env=None):
     print_white('Executing: ' + command)
+    if env:
+        print_white('Environment: ')
+        print(env)
     
     op = subprocess.run(command.split(' '), env=env, capture_output=True, text=True, errors='ignore')
     if op.returncode != 0:

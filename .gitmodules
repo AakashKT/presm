@@ -10,3 +10,6 @@
 [submodule "extern/riscv-gnu-toolchain"]
 	path = extern/riscv-gnu-toolchain
 	url = https://github.com/riscv-collab/riscv-gnu-toolchain
+[submodule "extern/nlohmann-json"]
+	path = extern/nlohmann-json
+	url = https://github.com/nlohmann/json.git

@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 3.15...4.0)
 
 add_library(device OBJECT
-            host_resident_memory.cpp
+            device.cpp
+            uart_device.cpp
         )
 target_include_directories(device PUBLIC include/)
+target_link_libraries(device
+	PRIVATE nlohmann_json::nlohmann_json
+)
 
 if(PRESM_SHARED_LIB)
     set_property(TARGET device PROPERTY POSITION_INDEPENDENT_CODE ON)

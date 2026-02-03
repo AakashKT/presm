@@ -15,11 +15,10 @@ def setup(args, config, execution_dir):
 
     driver_lib_path, _ = utils.get_driver_lib(config['driver']['name'])
     utils._copy_file(driver_lib_path, execution_dir)
-    driver_lib = driver_lib_path.split('/')[-1]
 
-    utils._copy_file(args.config, execution_dir)
+    utils._copy_file(args.config, execution_dir + '/config.json')
 
-    return os.path.join(os.getcwd(), verification_dir), verification_exe, driver_lib
+    return verification_exe
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -37,11 +36,12 @@ if __name__ == '__main__':
     execution_dir = 'verify_runs'
     execution_dir = utils.make_numbered_execution_dir(execution_dir)
 
-    working_directory, executable, driver_lib = setup(args, config, execution_dir)
+    executable = setup(args, config, execution_dir)
 
     for app in config['verification']:
         app_args = [app['name']] + app['args_device_run']
-        source = utils.presm_execute(working_directory, executable, driver_lib, app_args, config['driver']['name'])
+        source = utils.presm_execute(execution_dir, executable, 'libdriver.so', \
+                            app_args, config['driver']['name'])
 
         if app['verify']:
             app_args = [app['name']] + app['args_host_run']
