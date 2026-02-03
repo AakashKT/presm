@@ -28,4 +28,4 @@ $(TOP_MODULE)_SYNTH.json:
 	@echo "Synthesizing: $(TOP_MODULE)_SYNTH.json"
 	$(YOSYS_EXEC) -p "read_verilog $(VERILOG_SRC_DIR)/$(TOP_MODULE_SRC); synth_gowin -top $(TOP_MODULE) -json $(TOP_MODULE)_SYNTH.json"
 
-.INTERMEDIATE: $(TOP_MODULE).fs $(TOP_MODULE)_PNR.json $(TOP_MODULE)_SYNTH.json
+# .INTERMEDIATE: $(TOP_MODULE).fs $(TOP_MODULE)_PNR.json $(TOP_MODULE)_SYNTH.json
