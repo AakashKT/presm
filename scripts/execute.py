@@ -9,7 +9,7 @@ def setup(args, config, execution_dir):
     utils._copy_file(driver_lib_path, execution_dir)
     driver_lib = 'libdriver.so'
 
-    utils._copy_file(args.config, execution_dir)
+    utils._copy_file(args.config, execution_dir+ '/presm_config.json')
 
     return executable
 
