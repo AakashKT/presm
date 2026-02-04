@@ -7,5 +7,5 @@ Device* get_device()
 
 Inception::Inception()
 {
-    this->device_log.log_info("Inception constructor called");
+    this->log.log_info("Inception constructor called");
 }

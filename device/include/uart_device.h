@@ -16,10 +16,11 @@ public:
 
 private:
     void open_serial_port(std::string port_name);
-    bool configure_serial_port(uint32_t baud_rate = 115200);
+    void configure_serial_port(uint32_t baud_rate = 115200);
 
-    void serial_port_write(char byte);
-    void begin_serial_port_read();
+    void serial_port_listen();
+    void serial_port_write_byte(char byte);
+    char serial_port_read_byte();
 
     std::vector<char> write_queue;
     std::vector<char> read_queue;

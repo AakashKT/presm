@@ -9,7 +9,7 @@ def setup(args, config, execution_dir):
     utils._copy_file(driver_lib_path, execution_dir)
     driver_lib = 'libdriver.so'
 
-    utils._copy_file(args.config, execution_dir+ '/presm_config.json')
+    utils._copy_file(args.config, execution_dir + '/presm_config.json')
 
     return executable
 
@@ -38,6 +38,6 @@ if __name__ == '__main__':
     else:
         app_args = args.args
 
-    source = utils.presm_execute(executable_dir, executable, 'libdriver.so', \
+    source = utils.presm_execute(execution_dir, executable, 'libdriver.so', \
                             app_args, config['driver']['name'])
     print(source)

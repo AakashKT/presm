@@ -2,9 +2,8 @@
 
 Device::Device()
 {
-    this->device_log.init("device");
-
-    this->device_log.log_info("Device constructor called");
+    this->log.init("device");
+    this->log.log_info("Device constructor called");
 
     std::ifstream json_file("presm_config.json");
 

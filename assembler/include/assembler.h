@@ -8,6 +8,8 @@ void dasm_runtime_error(std::string err);
 
 class Assembler {
 public:
+    Assembler() = default;
+    
     virtual void set_source_file(std::string file_name) = 0;
     virtual uint32_t estimated_binary_size_in_bytes() = 0;
 
