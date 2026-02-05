@@ -1,5 +1,12 @@
 {
-    "type": "rtl_testbench",
+    "driver": {
+        "name": "presm"
+    },
+
+    "device": {
+        "name": "presm",
+        "type": "rtl_testbench"
+    },
 
     "rtl_testbench": [
         {

@@ -41,7 +41,7 @@ target_sources(verification PUBLIC
 target_include_directories(verification PUBLIC include/)
 target_include_directories(verification PUBLIC ${PROJECT_SOURCE_DIR}/driver/c_accel/include/)
 
-target_link_libraries(verification PUBLIC driver)
+target_link_libraries(verification PUBLIC ${DRIVER_LIB})
 
 # Compile kernels with the RISC-V compiler
 foreach(item IN ZIP_LISTS VERIFICATION_KERNELS VERIFICATION_KERNELS_COMPILED_OUTPUTS)

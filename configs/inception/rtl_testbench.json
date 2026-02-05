@@ -1,31 +1,12 @@
 {
-    "type": "fpga",
-
     "driver": {
         "name": "c_accel"
     },
 
     "device": {
         "name": "inception",
-        "rtl": {
-            "top_module_src": "uart_interface.v",
-            "top_module": "UartInterface"
-        }
+        "type": "rtl_testbench"
     },
-
-    "fpga": {
-        "name": "tangnano20k",
-        "linux_device_path": "/dev/ttyUSB1"
-    },
-
-    "verification": [
-        {
-            "name": "sanity",
-            "args_host_run": ["host"],
-            "args_device_run": ["device"],
-            "verify": false
-        }
-    ],
 
     "rtl_testbench": [
         {

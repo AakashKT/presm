@@ -5,13 +5,6 @@ import zipfile
 def build_presm(args, config):
     utils.sanitize_presm_config(config)
 
-    # Device specific steps
-    if config['device']['name'].lower() == 'inception':
-        # Check if riscv compiler exists
-        linux_path = os.path.exists('build_riscv_compiler/linux/bin')
-        if (not linux_path):
-            utils.error_exit('Did not find RISC-V compiler for your platform. Please run with --get_extern_tools to get/build it?')
-
     path_exists = os.path.exists('build')
     if args.clean and path_exists:
         shutil.rmtree('build')
@@ -22,7 +15,12 @@ def build_presm(args, config):
 
     utils._chdir('build')
 
-    os.system('cmake .. -DDRIVER=%s -DDEVICE=%s' % (config['driver']['name'].lower(), config['device']['name'].lower()))
+    driver_name = config['driver']['name']
+    device_name = config['device']['name']
+    device_type = config['device']['type']
+
+    os.system(f'cmake .. -DDRIVER={driver_name} -DDEVICE={device_name} \
+                -DDEVICE_TYPE={device_type}')
 
     os.system('cmake --build . --config Release')
     os.system('cmake --build . --config Release --target install')
@@ -109,19 +107,29 @@ def get_or_build_extern_tools(args, config):
     install_ubuntu_packages()
     build_fpga_toolchain(args, config)
 
-    if config['device']['name]'].lower() == 'riscv_accel':
-        path_exists = os.path.exists('build_riscv_compiler')
-        if not path_exists:
-            os.mkdir('build_riscv_compiler')
-        
-        utils._chdir('build_riscv_compiler')
+    path_exists = os.path.exists('build_riscv_compiler')
+    if not path_exists:
+        os.mkdir('build_riscv_compiler')
+    
+    utils._chdir('build_riscv_compiler')
 
-        if system_name == 'Linux':
-            build_riscv_compiler_linux(args, config)
-        
-        elif system_name == 'Windows':
-            utils.print_red('Cannot satisfy external tool requirement on Windows')
+    if system_name == 'Linux':
+        build_riscv_compiler_linux(args, config)
+    
+    elif system_name == 'Windows':
+        utils.print_red('Cannot satisfy external tool requirements on Windows')
 
+def check_external_tools(args, config):
+    yosys_linux_path = os.path.exists('extern/yosys')
+    nextpnr_linux_path = os.path.exists('extern/nextpnr/build')
+    openFPGALoader_linux_path = os.path.exists('extern/openFPGALoader/build')
+
+    if (not yosys_linux_path) or (not nextpnr_linux_path) or (not openFPGALoader_linux_path):
+        utils.error_exit('Did not find FPGA tools. Please run with --get_extern_tools to get/build them.')
+
+    riscv_linux_path = os.path.exists('build_riscv_compiler/linux/bin')
+    if (not riscv_linux_path):
+        utils.error_exit('Did not find RISC-V compiler for your platform. Please run with --get_extern_tools to get/build it.')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -132,6 +140,8 @@ if __name__ == '__main__':
 
     utils.init()
     config = json.load(open(args.config))
+
+    check_external_tools(args, config)
 
     if args.get_extern_tools:
         get_or_build_extern_tools(args, config)

@@ -10,8 +10,11 @@ set(CMAKE_CXX_STANDARD 20)
 # Configuration variables
 set(PRESM_SHARED_LIB TRUE CACHE STRING "PRESM as a shared or a static library?")
 
-set(DEVICE "ptx_gpu_1" CACHE STRING "Which device to use? (default: ptx_gpu_1, see device/ folder)")
-set(DRIVER "cuda" CACHE STRING "Which driver to use? (default: cuda, see driver/ folder)")
+set(DEVICE "inception" CACHE STRING "Which device to use? (default: 'inception', see device/ folder)")
+set(DEVICE_TYPE "functional" CACHE STRING "Device type? (default: 'functional')")
+set(DRIVER "c_accel" CACHE STRING "Which driver to use? (default: 'c_accel', see driver/ folder)")
+
+set(DRIVER_LIB ${DRIVER}_${DEVICE_TYPE})
 
 # External libraries
 add_subdirectory(extern/nlohmann-json/)
@@ -45,13 +48,13 @@ if(${DRIVER} STREQUAL "c_accel")
     # The actual driver
     add_subdirectory(driver/c_accel)
 else()
-    message(FATAL_ERROR "PRESM: Driver named ${DRIVER} not found!")
+    message(FATAL_ERROR "PRESM: Driver named '${DRIVER}' not found!")
     return()
 endif()
 
 # Make packages
-set_target_properties(driver PROPERTIES PUBLIC_HEADER ${PROJECT_SOURCE_DIR}/driver/${DRIVER}/include/${DRIVER}.h)
-install(TARGETS driver 
+set_target_properties(${DRIVER_LIB} PROPERTIES PUBLIC_HEADER ${PROJECT_SOURCE_DIR}/driver/${DRIVER}/include/${DRIVER}.h)
+install(TARGETS ${DRIVER_LIB} 
         LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/packages/${DRIVER}/lib/
         PUBLIC_HEADER DESTINATION ${PROJECT_SOURCE_DIR}/packages/${DRIVER}/include/
 )

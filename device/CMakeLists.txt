@@ -14,10 +14,10 @@ if(PRESM_SHARED_LIB)
 endif()
 
 if(${DEVICE} STREQUAL "inception")
-    message(STATUS "PRESM: Building device Inception - A RISC-V compute accelerator")
+    message(STATUS "PRESM: Building device 'inception' - A RISC-V compute accelerator")
     
     add_subdirectory(inception/)
 else()
-    message(FATAL_ERROR "PRESM: Device ${DEVICE} not found!")
+    message(FATAL_ERROR "PRESM: Device '${DEVICE}' not found!")
     return()
 endif()

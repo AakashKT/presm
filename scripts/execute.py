@@ -5,13 +5,12 @@ def setup(args, config, execution_dir):
     executable_dir, executable = os.path.split(args.executable)
     utils._copy_recursive(executable_dir, execution_dir)
 
-    driver_lib_path, _ = utils.get_driver_lib(config['driver']['name'])
-    utils._copy_file(driver_lib_path, execution_dir)
-    driver_lib = 'libdriver.so'
+    driver_lib_path, driver_lib, _ = utils.get_driver_lib(config)
+    utils._copy_file(f'{driver_lib_path}/{driver_lib}', execution_dir)
 
     utils._copy_file(args.config, execution_dir + '/presm_config.json')
 
-    return executable
+    return executable, driver_lib
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -23,21 +22,20 @@ if __name__ == '__main__':
     utils.init()
     config = json.load(open(args.config))
 
-    if config['type'] != 'functional' and config['type'] != 'fpga':
-        utils.error_exit('Executing an app requires a config with type=functional or type=fpga')
-    
     utils.sanitize_presm_config(config)
 
     execution_dir = 'execute_runs'
     execution_dir = utils.make_numbered_execution_dir(execution_dir)
 
-    executable = setup(args, config, execution_dir)
+    executable, driver_lib = setup(args, config, execution_dir)
 
     if not args.args:
         app_args = []
     else:
         app_args = args.args
 
-    source = utils.presm_execute(execution_dir, executable, 'libdriver.so', \
+    source = utils.presm_execute(execution_dir, executable, driver_lib, \
                             app_args, config['driver']['name'])
+
+    utils.print_green('Execution output ==>')
     print(source)

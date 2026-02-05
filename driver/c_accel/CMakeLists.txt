@@ -9,7 +9,7 @@ SET(DRIVER_SOURCE
 )
 
 if(PRESM_SHARED_LIB)
-    add_library(driver SHARED ${DRIVER_SOURCE})
+    add_library(${DRIVER_LIB} SHARED ${DRIVER_SOURCE})
 else()
-    add_library(driver STATIC ${DRIVER_SOURCE})
+    add_library(${DRIVER_LIB} STATIC ${DRIVER_SOURCE})
 endif()

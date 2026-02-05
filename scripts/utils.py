@@ -31,7 +31,9 @@ def make_numbered_execution_dir(parent_dir):
 
     return final_path
 
-def get_driver_lib(driver_name):
+def get_driver_lib(config):
+    driver_name = config['driver']['name']
+    device_type = config['device']['type']
     system_name = platform.system()
 
     if system_name == 'Windows':
@@ -40,20 +42,16 @@ def get_driver_lib(driver_name):
         if not os.path.isfile(static_lib_path):
             error_exit('Cannot find static library of PRESM. On windows, PRESM can be only run if built as a static library.')
         
-        return static_lib_path, True
+        return static_lib_path, 'driver.lib', True
     
     elif system_name == 'Linux':
-        shared_lib_path = os.getcwd() + '/build/driver/' + driver_name + '/libdriver.so'
-        static_lib_path = os.getcwd() + '/build/driver/' + driver_name + '/libdriver.a'
+        shared_lib_path = os.getcwd() + '/build/driver/' + driver_name
+        lib = f'lib{driver_name}_{device_type}.so'
 
-        if os.path.isfile(shared_lib_path):
-            return shared_lib_path, False
-        
-        elif os.path.isfile(static_lib_path):
-            return static_lib_path, True
-        
+        if os.path.isfile(f'{shared_lib_path}/{lib}'):
+            return shared_lib_path, lib, False
         else:
-            error_exit('Cannot find static or shared library of PRESM.')
+            error_exit('Cannot find shared library of PRESM.')
 
 def get_verification_dir_and_exe():
     system_name = platform.system()
@@ -133,27 +131,27 @@ def presm_execute(working_directory, executable, driver_lib, app_args, driver_na
     return op.stdout
 
 def sanitize_presm_config(config):
-    config_type = config["type"]
-
-    if config_type == "functional":
+    try:
+        driver = config["driver"]
+        device = config["device"]
+    except:
+        utils.error_exit(f"Both 'driver' and 'device' should be defined!")
+    
+    if device["type"] == "functional":
         try:
-            driver_name = config["driver"]["name"]
-            device_name = config["device"]["name"]
-        
+            verification = config["verification"]
         except:
-            utils.error_exit(f"Incomplete config for type='{config_type}'")
+            utils.error_exit(f"Verification tests not defined in 'verification'. Atleast one must be defined.")
 
-    elif config_type == "fpga":
+    elif device["type"] == "serial":
         try:
-            driver_name = config["driver"]["name"]
-
-            device_name = config["device"]["name"]
-            rtl_device = config["device"]["rtl"]
-
-            fpga_name = config["fpga"]["name"]
-        
+            rtl = device["rtl"]
+            fpga = device["fpga"]
         except:
-            utils.error_exit(f"Incomplete config for type='{config_type}'")
-
-    else:
-        utils.error_exit(f"Config with type='{config_type}' is not supported.")
+            utils.error_exit(f"Both 'rtl' and 'fpga' should be defined for deivce of type 'serial'")
+    
+    elif device["type"] == "rtl_testbench":
+        try:
+            rtl_testbench = config["rtl_testbench"]
+        except:
+            utils.error_exit(f"'rtl_testbench' should be defined for deivce of type 'rtl_testbench'")
