@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
         if app['verify']:
             app_args = [app['name']] + app['args_host_run']
-            target = utils.execute(working_directory, executable, app_args)
+            target = utils.execute(execution_dir, executable, app_args)
 
             result = verify_output(source, target)
             if result:

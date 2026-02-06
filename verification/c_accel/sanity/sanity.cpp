@@ -4,11 +4,26 @@
 
 void run_sanity(std::vector<std::string> args)
 {
+    uint32_t output = 0;
+    uint32_t a = 21;
+    uint32_t b = 34;
+
     if(args[0] == "device") {
         caDeviceInit();
-        caSetKernel("sanity_kernel.s");
-        caDebugCheckDisassembly();
+        output = caAdd(a, b);
     }
+    else {
+        output = a + b;
+    }
+
+    std::cout << output << std::endl;
+
+
+    // if(args[0] == "device") {
+    //     caDeviceInit();
+    //     caSetKernel("sanity_kernel.s");
+    //     caDebugCheckDisassembly();
+    // }
 
     // int output;
     // for(int i=0; i<10; i++) {

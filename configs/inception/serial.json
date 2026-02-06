@@ -14,7 +14,8 @@
 
         "fpga": {
             "name": "tangnano20k",
-            "linux_device_path": "/dev/ttyUSB1"
+            "linux_device_path": "/dev/ttyUSB1",
+            "baud_rate": 115200
         }
     },
 
@@ -23,7 +24,7 @@
             "name": "sanity",
             "args_host_run": ["host"],
             "args_device_run": ["device"],
-            "verify": false
+            "verify": true
         }
     ]
 }

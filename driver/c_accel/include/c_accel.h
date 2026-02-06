@@ -15,6 +15,8 @@ private:
 };
 
 void caDeviceInit();
+uint32_t caAdd(uint32_t a, uint32_t b);
+
 void caSetKernel(std::string kernel_file);
 void caCopyHtoD(void* src, caDeviceBuffer& dest, size_t size_in_bytes);
 void caCopyDtoH(caDeviceBuffer& src, void* dest, size_t size_in_bytes);

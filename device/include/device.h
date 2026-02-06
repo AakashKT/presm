@@ -11,9 +11,8 @@ public:
     
     std::string get_name() { return std::string(this->device_config["name"]); };
 
+protected:
     Logger log;
-
-private:
     nlohmann::json top_config, device_config;
 };
 

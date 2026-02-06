@@ -5,7 +5,8 @@ UartDevice::UartDevice()
 {
     this->log.log_info("UartDevice constructor called");
 
-    this->open_serial_port("/dev/deep");
+    // this->open_serial_port(this->device_config["fpga"]["linux_device_path"]);
+    // this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
 }
 
 void UartDevice::open_serial_port(std::string port_name)
@@ -13,6 +14,8 @@ void UartDevice::open_serial_port(std::string port_name)
     this->port_fd = open(port_name.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
     if (this->port_fd < 0)
         this->log.log_error_and_exit("Could not open serial port " + port_name + ", Error: " + std::string(strerror(errno)));
+
+    this->log.log_info("Serial port '" + port_name + "' opened.");
 }
 
 void UartDevice::configure_serial_port(uint32_t baud_rate)

@@ -11,6 +11,11 @@ void caDeviceInit()
     caAsm = get_assembler();
 }
 
+uint32_t caAdd(uint32_t a, uint32_t b)
+{
+    return a + b;
+}
+
 void caSetKernel(std::string kernel_file)
 {
     caAsm->set_source_file(kernel_file);
