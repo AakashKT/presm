@@ -99,7 +99,7 @@ def install_ubuntu_packages():
                 curl python3 python3-pip python3-tomli libmpc-dev libmpfr-dev \
                 libgmp-dev gawk build-essential bison flex texinfo gperf libtool \
                 patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake \
-                libglib2.0-dev libslirp-dev libncurses-dev')
+                libglib2.0-dev libslirp-dev libncurses-dev libreadline-dev')
 
 def get_or_build_extern_tools(args, config):
     system_name = platform.system()
