@@ -103,7 +103,7 @@ def install_ubuntu_packages():
                 patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake \
                 libglib2.0-dev libslirp-dev libncurses-dev libreadline-dev \
                 libboost-all-dev')
-    os.system('pip install apycula')
+    os.system('pip install apycula cocotb')
 
 def get_or_build_extern_tools(args, config):
     system_name = platform.system()
