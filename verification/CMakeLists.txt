@@ -14,6 +14,10 @@ elseif(${DRIVER} MATCHES "c_accel")
     message(STATUS "PRESM: Using COMPUTE ACCELERATOR verification tests")
 
     add_subdirectory(c_accel/)
+elseif(${DRIVER} MATCHES "matrix")
+    message(STATUS "PRESM: Using MATRIX verification tests")
+
+    add_subdirectory(matrix/)
 else()
     message(FATAL_ERROR "PRESM: Verification test for driver ${DRIVER} not found!")
     return()

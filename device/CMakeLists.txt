@@ -17,6 +17,10 @@ if(${DEVICE} STREQUAL "inception")
     message(STATUS "PRESM: Building device 'inception' - A RISC-V compute accelerator")
     
     add_subdirectory(inception/)
+elseif(${DEVICE} STREQUAL "preinception")
+    message(STATUS "PRESM: Building device 'preinception' - A matrix operations accelerator")
+    
+    add_subdirectory(preinception/)
 else()
     message(FATAL_ERROR "PRESM: Device '${DEVICE}' not found!")
     return()

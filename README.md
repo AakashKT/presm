@@ -8,6 +8,7 @@ This project exists so that one can ultimately do hardware research for photorea
 See <a href="https://github.com/AakashKT/presm/blob/main/GOALS.md">GOALS.md</a> for a in-details description on PRESM's goals and the plan for progressive releases. 
 
 ## Table of Contents  
+- [Device Configurations](#device-configurations)
 - [Building](#building)  
     - [Building for the first time](#building-for-the-first-time) 
     - [Rebuilding and Clean builds](#rebuilding-and-clean-builds)
@@ -15,6 +16,8 @@ See <a href="https://github.com/AakashKT/presm/blob/main/GOALS.md">GOALS.md</a> 
 - [Running your own app on PRESM](#running-your-own-app-on-presm)
     - [Souce code of the app is available](#souce-code-of-the-app-is-available)
     - [Only executable of the app is available](#only-executable-of-the-app-is-available)
+
+## Device Configurations
 
 
 ## Building
