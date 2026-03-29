@@ -7,9 +7,9 @@ module RegisterDFFRst
 )
 (
     input extern_clock,
-    input [NUM_BITS-1:0] in,
+    input [NUM_BITS-1:0] inp,
     input async_reset,
-    output wire [NUM_BITS-1:0] out
+    output wire [NUM_BITS-1:0] op
 );
     
     generate
@@ -18,9 +18,9 @@ module RegisterDFFRst
         begin
             DFlipFlopRst d_ff(
                 extern_clock,
-                in[i],
+                inp[i],
                 async_reset,
-                out[i]
+                op[i]
             );
         end
     endgenerate
@@ -33,11 +33,11 @@ module RegisterDFFEnClRst
 )
 (
     input extern_clock,
-    input [NUM_BITS-1:0] in,
+    input [NUM_BITS-1:0] inp,
     input enable,
     input clear,
     input async_reset,
-    output wire [NUM_BITS-1:0] out
+    output wire [NUM_BITS-1:0] op
 );
     
     generate
@@ -46,11 +46,11 @@ module RegisterDFFEnClRst
         begin
             DFlipFlopEnClRst d_ff(
                 extern_clock,
-                in[i],
+                inp[i],
                 enable,
                 clear,
                 async_reset,
-                out[i]
+                op[i]
             );
         end
     endgenerate
