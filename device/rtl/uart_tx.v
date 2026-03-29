@@ -6,13 +6,13 @@ module UARTTx
 )
 (
     // Clock
-    input _extern_clock,
+    input extern_clock,
 
     // Reset
     input async_reset,
 
     // UART tx external
-    output reg _extern_uart_tx,
+    output reg extern_uart_tx,
 
     // Incoming
     input wire [7:0] data,
@@ -28,7 +28,7 @@ module UARTTx
     reg [2:0] tx_bit_number;
     reg [2:0] tx_state;
 
-    always @(posedge _extern_clock or posedge async_reset)
+    always @(posedge extern_clock or posedge async_reset)
     begin
         if(async_reset)
         begin
@@ -49,13 +49,13 @@ module UARTTx
                     end
                     else
                     begin
-                        _extern_uart_tx <= 1;
+                        extern_uart_tx <= 1;
                     end
                 end
 
                 TX_START:
                 begin
-                    _extern_uart_tx <= 0;
+                    extern_uart_tx <= 0;
                     if(tx_counter == DELAY_WAIT)
                     begin
                         tx_counter <= 0;
@@ -70,7 +70,7 @@ module UARTTx
 
                 TX_WRITE:
                 begin
-                    _extern_uart_tx <= data[tx_bit_number];
+                    extern_uart_tx <= data[tx_bit_number];
                     if(tx_counter == DELAY_WAIT)
                     begin
                         if(tx_bit_number == 3'b111)
@@ -92,7 +92,7 @@ module UARTTx
 
                 TX_STOP:
                 begin
-                    _extern_uart_tx <= 1;
+                    extern_uart_tx <= 1;
                     if(data_en == 0)
                     begin
                         tx_state <= TX_IDLE;

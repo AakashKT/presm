@@ -8,14 +8,14 @@
 module UartInterface
 (
     // Clock
-    input _extern_clock,
+    input extern_clock,
 
     // UART rx & tx
-    input wire _extern_uart_rx,
-    output wire _extern_uart_tx,
+    input wire extern_uart_rx,
+    output wire extern_uart_tx,
 
     // Hardware reset signal
-    input _extern_reset
+    input extern_reset
 );
 
     // Registers
@@ -33,31 +33,31 @@ module UartInterface
 
     // Submodules
     UARTRx receiver(
-        _extern_clock,
-        _extern_reset,
-        _extern_uart_rx,
+        extern_clock,
+        extern_reset,
+        extern_uart_rx,
         rx_data,
         rx_data_en
     );
 
     UARTTx transmitter(
-        _extern_clock,
-        _extern_reset,
-        _extern_uart_tx,
+        extern_clock,
+        extern_reset,
+        extern_uart_tx,
         tx_data,
         tx_data_en
     );
 
     CommandProcessor cp(
-        _extern_clock,
-        _extern_reset,
+        extern_clock,
+        extern_reset,
         cp_in,
         cp_in_en,
         cp_out,
         cp_out_en
     );
 
-    always @(posedge _extern_clock)
+    always @(posedge extern_clock)
     begin
         if(rx_data_en == 1)
         begin
