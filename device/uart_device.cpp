@@ -5,8 +5,8 @@ UartDevice::UartDevice()
 {
     this->log.log_info("UartDevice constructor called");
 
-    // this->open_serial_port(this->device_config["fpga"]["linux_device_path"]);
-    // this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
+    this->open_serial_port(this->device_config["fpga"]["linux_device_path"]);
+    this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
 }
 
 void UartDevice::open_serial_port(std::string port_name)

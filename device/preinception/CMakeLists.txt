@@ -5,6 +5,13 @@ if(${DEVICE_TYPE} STREQUAL "functional")
     SET(DEVICE_CODE
         functional.cpp
     )
+
+elseif(${DEVICE_TYPE} STREQUAL "serial")
+
+    SET(DEVICE_CODE
+        serial.cpp
+    )
+
     
 else()
     message(FATAL_ERROR "PRESM: Device '${DEVICE}' does not define a '${DEVICE_TYPE}' variant!")

@@ -1,0 +1,30 @@
+{
+    "driver": {
+        "name": "matrix"
+    },
+
+    "device": {
+        "name": "preinception",
+        "type": "serial",
+
+        "rtl": {
+            "top_module_src": "uart_interface.v",
+            "top_module": "UartInterface"
+        },
+
+        "fpga": {
+            "name": "tangnano20k",
+            "linux_device_path": "/dev/ttyUSB0",
+            "baud_rate": 115200
+        }
+    },
+
+    "verification": [
+        {
+            "name": "sanity",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true
+        }
+    ]
+}

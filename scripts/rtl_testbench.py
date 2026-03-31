@@ -17,7 +17,7 @@ def setup(args, config, testbench, execution_dir):
         utils._copy_recursive(rtl_dir, execution_dir)
 
         testbench_src = testbench['testbench_src']
-        testbench_dir = f'rtl_testbench/{device_name}/{testbench_src}.py'
+        testbench_dir = f'rtl_testbench/{device_name}/{testbench_src}'
         utils._copy_file(testbench_dir, execution_dir)
 
     except:
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         setup(args, config, testbench, execution_dir)
 
         rtl_src = testbench['rtl_src']
-        testbench_src = testbench['testbench_src']
+        testbench_src = testbench['testbench_src'].replace('.py', '')
         rtl_top_level = testbench['rtl_top_level']
 
         os.chdir(execution_dir)
