@@ -9,6 +9,27 @@ UartDevice::UartDevice()
     this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
 }
 
+void UartDevice::temp_func()
+{
+    this->log.log_info("UartDecie temp_func() called");
+
+    // char write_val = 'a';
+    // write(this->port_fd, &write_val, 1);
+
+    char read_val = '0';
+    while(read_val != 'a')
+        read(this->port_fd, &read_val, 1);
+
+    char fin[2] = { read_val, '\0'};
+
+    this->log.log_info("Value read from device: " + std::string(fin));
+}
+
+void UartDevice::serial_port_listen()
+{
+
+}
+
 void UartDevice::open_serial_port(std::string port_name)
 {
     this->port_fd = open(port_name.c_str(), O_RDWR | O_NOCTTY | O_SYNC);

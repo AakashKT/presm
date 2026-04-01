@@ -8,3 +8,8 @@ void mInit()
     presm_device = get_device();
     std::cout << "mInit() called" << std::endl;
 }
+
+void mDeviceSignature()
+{
+    presm_device->temp_func();
+}
