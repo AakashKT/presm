@@ -2,6 +2,5 @@
 #define MATRIX_H
 
 void mInit();
-void mDeviceSignature();
 
 #endif

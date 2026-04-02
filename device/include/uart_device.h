@@ -14,8 +14,6 @@ class UartDevice : public Device {
 public:
     UartDevice();
 
-    void temp_func() override;
-
 private:
     void open_serial_port(std::string port_name);
     void configure_serial_port(uint32_t baud_rate = 115200);

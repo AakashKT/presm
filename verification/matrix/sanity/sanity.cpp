@@ -4,5 +4,4 @@
 void run_sanity(std::vector<std::string> args)
 {
     mInit();
-    mDeviceSignature();
 }

@@ -4,12 +4,14 @@ if(${DEVICE_TYPE} STREQUAL "functional")
 
     SET(DEVICE_CODE
         functional.cpp
+        memory.cpp
     )
 
 elseif(${DEVICE_TYPE} STREQUAL "serial")
 
     SET(DEVICE_CODE
         serial.cpp
+        memory.cpp
     )
 
     
