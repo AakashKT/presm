@@ -1,11 +1,13 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
-#include "uart_device.h"
+#include "serial_device.h"
 
-class Serial : public UartDevice {
+class SerialImpl : public SerialDevice {
 public:
-    Serial() = default;
+    SerialImpl();
+
+    void handle_incoming_byte(char data) override;
 
 private:
 

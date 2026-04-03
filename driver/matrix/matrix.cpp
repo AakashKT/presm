@@ -2,6 +2,7 @@
 #include "device.h"
 #include "device_memory.h"
 #include "logging.h"
+#include "symbols.h"
 
 Device* presm_device = nullptr;
 DeviceMemory* presm_device_memory = nullptr;
@@ -16,5 +17,6 @@ void mInit()
     presm_device = get_device();
     presm_device_memory = get_device_memory();
 
-    
+    char halt_symbol = HALT_SYMBOL;
+    presm_device_memory->write(0, 1, &halt_symbol);
 }

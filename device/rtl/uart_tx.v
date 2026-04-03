@@ -16,7 +16,10 @@ module UARTTx
 
     // Incoming
     input wire [7:0] data,
-    input wire data_en
+    input wire data_en,
+
+    // Output
+    output reg data_sent
 );
     // Transmitter
     localparam TX_IDLE = 0;
@@ -44,11 +47,13 @@ module UARTTx
                     begin
                         tx_bit_number <= 0;
                         tx_counter <= 0;
+                        data_sent <= 0;
 
                         tx_state <= TX_START;
                     end
                     else
                     begin
+                        data_sent <= 0;
                         extern_uart_tx <= 1;
                     end
                 end
@@ -93,9 +98,17 @@ module UARTTx
                 TX_STOP:
                 begin
                     extern_uart_tx <= 1;
-                    if(data_en == 0)
+                    data_sent <= 1;
+
+                    if(tx_counter == DELAY_WAIT)
                     begin
                         tx_state <= TX_IDLE;
+                        tx_counter <= 0;
+
+                        tx_state <= TX_IDLE;
+                    end
+                    begin
+                        tx_counter <= tx_counter + 1;
                     end
                 end
 

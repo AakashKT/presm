@@ -22,6 +22,7 @@ module UartInterface
 
     reg [7:0] tx_data;
     reg tx_data_en;
+    wire tx_data_sent;
 
     // Submodules
     UARTRx receiver(
@@ -37,12 +38,13 @@ module UartInterface
         extern_reset,
         extern_uart_tx,
         tx_data,
-        tx_data_en
+        tx_data_en,
+        tx_data_sent
     );
 
     always @(posedge extern_clock)
     begin
-        if(rx_data_en == 1)
+        if(rx_data_en == 1 && tx_data_sent == 0)
         begin
             tx_data = rx_data;
             tx_data_en = 1;

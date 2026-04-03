@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15...4.0)
 
 add_library(device OBJECT
             device.cpp
-            uart_device.cpp
+            serial_device.cpp
 
             device_memory.cpp
             host_resident_device_memory.cpp

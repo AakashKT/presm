@@ -11,5 +11,6 @@
 #include <bitset>
 #include <bits/stdc++.h>
 #include <regex>
+#include <thread>
 
 #endif

@@ -1,20 +1,33 @@
-#include "uart_device.h"
+#include "serial_device.h"
 
-UartDevice::UartDevice()
+SerialDevice::SerialDevice()
     : Device()
 {
-    this->log.log_info("UartDevice constructor called");
+    this->log.log_info("SerialDevice constructor called");
 
     this->open_serial_port(this->device_config["fpga"]["linux_device_path"]);
     this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
 }
 
-void UartDevice::serial_port_listen()
+void SerialDevice::initialize()
 {
+    this->serial_port_listen_thread = std::thread(
+        [&](SerialDevice *current_device) {
+            char data;
+            
+            while(true) {
+                auto bytes_read = read(this->port_fd, &data, 1);
+                if(bytes_read != 0)
+                    current_device->handle_incoming_byte(data);
+            }
+        },
+        this
+    );
 
+    this->serial_port_listen_thread.join();
 }
 
-void UartDevice::open_serial_port(std::string port_name)
+void SerialDevice::open_serial_port(std::string port_name)
 {
     this->port_fd = open(port_name.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
     if (this->port_fd < 0)
@@ -23,7 +36,7 @@ void UartDevice::open_serial_port(std::string port_name)
     this->log.log_info("Serial port '" + port_name + "' opened.");
 }
 
-void UartDevice::configure_serial_port(uint32_t baud_rate)
+void SerialDevice::configure_serial_port(uint32_t baud_rate)
 {
     struct termios tty;
     if (tcgetattr(this->port_fd, &tty) != 0)
