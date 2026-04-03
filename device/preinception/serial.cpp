@@ -2,7 +2,7 @@
 
 Device* get_device()
 {
-    return new Serial();
+    return new SerialImpl();
 }
 
 SerialImpl::SerialImpl()
