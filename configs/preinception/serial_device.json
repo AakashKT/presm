@@ -6,6 +6,7 @@
     "device": {
         "name": "preinception",
         "type": "serial",
+        "memory_size_in_bytes": 1e10,
 
         "rtl": {
             "top_module_src": "uart_interface.v",

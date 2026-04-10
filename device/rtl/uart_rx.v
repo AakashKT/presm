@@ -93,7 +93,6 @@ module UARTRx
                     if(rx_counter == DELAY_WAIT)
                     begin
                         data_en <= 1;
-
                         rx_state <= RX_IDLE;
                     end
                 end

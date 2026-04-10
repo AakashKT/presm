@@ -18,7 +18,7 @@ module UARTTx
     input wire [7:0] data,
     input wire data_en,
 
-    // Output
+    // Sent signal
     output reg data_sent
 );
     // Transmitter
@@ -30,7 +30,7 @@ module UARTTx
     reg [8:0] tx_counter;
     reg [2:0] tx_bit_number;
     reg [2:0] tx_state;
-
+    
     always @(posedge extern_clock or posedge async_reset)
     begin
         if(async_reset)

@@ -1,5 +1,5 @@
 IO_LOC "extern_clock" 4;
-IO_PORT "clk" PULL_MODE=UP;
+IO_PORT "extern_clock" PULL_MODE=UP;
 
 IO_LOC "extern_uart_rx" 70;
 IO_PORT "extern_uart_rx" IO_TYPE=LVCMOS33;

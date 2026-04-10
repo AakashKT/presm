@@ -9,22 +9,35 @@ SerialDevice::SerialDevice()
     this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
 }
 
-void SerialDevice::initialize()
+void SerialDevice::device_initialize()
 {
     this->serial_port_listen_thread = std::thread(
-        [&](SerialDevice *current_device) {
+        [&](SerialDevice* current_device) {
             char data;
             
             while(true) {
                 auto bytes_read = read(this->port_fd, &data, 1);
                 if(bytes_read != 0)
-                    current_device->handle_incoming_byte(data);
+                    current_device->read_queue.push(data);
+            }
+        },
+        this
+    );
+
+    this->serial_port_read_process_thread = std::thread(
+        [&](SerialDevice* current_device) {
+            while(true) {
+                if(current_device->read_queue.size() != 0) {
+                    current_device->serial_read_process(current_device->read_queue.front());
+                    current_device->read_queue.pop();
+                }
             }
         },
         this
     );
 
     this->serial_port_listen_thread.join();
+    this->serial_port_read_process_thread.join();
 }
 
 void SerialDevice::open_serial_port(std::string port_name)

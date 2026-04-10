@@ -14,8 +14,9 @@ class SerialDevice : public Device {
 public:
     SerialDevice();
     
-    void initialize();
-    virtual void handle_incoming_byte(char data) = 0;
+    void device_initialize() override;
+
+    virtual void serial_read_process(char data) = 0;
 
 private:
     void open_serial_port(std::string port_name);
@@ -24,12 +25,13 @@ private:
     void serial_port_write_byte(char byte);
     char serial_port_read_byte();
 
-    std::vector<char> write_queue;
-    std::vector<char> read_queue;
+    std::queue<char> write_queue;
+    std::queue<char> read_queue;
 
     int port_fd;
 
     std::thread serial_port_listen_thread;
+    std::thread serial_port_read_process_thread;
 };
 
 #endif

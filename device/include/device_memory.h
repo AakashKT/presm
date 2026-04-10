@@ -28,6 +28,4 @@ protected:
     nlohmann::json top_config, device_config;
 };
 
-DeviceMemory* get_device_memory();
-
 #endif

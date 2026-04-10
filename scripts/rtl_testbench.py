@@ -4,17 +4,18 @@ def setup(args, config, testbench, execution_dir):
     try:
         device_name = config['device']['name']
         device_type = config['device']['type']
-
-        if device_name == 'presm':
-            device_name = ''
         
         if device_type != 'rtl_testbench':
             raise
 
         utils._copy_file('rtl_testbench/Makefile', execution_dir)
-        
-        rtl_dir = f'device/{device_name}/rtl/'
+
+        rtl_dir = f'device/rtl/'
         utils._copy_recursive(rtl_dir, execution_dir)
+        
+        if device_name != 'presm':
+            rtl_dir = f'device/{device_name}/rtl/'
+            utils._copy_recursive(rtl_dir, execution_dir)
 
         testbench_src = testbench['testbench_src']
         testbench_dir = f'rtl_testbench/{device_name}/{testbench_src}'

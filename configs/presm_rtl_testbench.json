@@ -33,14 +33,14 @@
             "rtl_src": "uart_rx.v",
             "rtl_top_level": "UARTRx",
             "testbench_src": "uart_rx.py",
-            "enable": false
+            "enable": true
         },
         {
             "name": "UART TX",
             "rtl_src": "uart_tx.v",
             "rtl_top_level": "UARTTx",
             "testbench_src": "uart_tx.py",
-            "enable": true
+            "enable": false
         }
     ]
 }
