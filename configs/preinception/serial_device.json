@@ -15,7 +15,7 @@
 
         "fpga": {
             "name": "tangnano20k",
-            "linux_device_path": "/dev/ttyUSB0",
+            "linux_device_path": "/dev/ttyUSB1",
             "baud_rate": 115200
         }
     },

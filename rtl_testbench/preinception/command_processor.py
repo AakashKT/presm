@@ -22,16 +22,45 @@ async def command_processor(dut):
     await Timer(TIMER_WAIT, unit='ns')
     assert dut.out_en.value == 0, "Async reset failed"
 
-    dut.in_host.value = 0x61
+    dut.in_host.value = 0x64646461
     dut.in_en.value = 1
     await Timer(TIMER_WAIT, unit='ns')
 
     dut.in_en.value = 0
     await Timer(TIMER_WAIT, unit='ns')
+    dut.in_host.value = 25
+    dut.in_en.value = 1
+    await Timer(TIMER_WAIT, unit='ns')
 
-    dut.in_host.value = 0b10101100
+    dut.in_en.value = 0
+    await Timer(TIMER_WAIT, unit='ns')
+    dut.in_host.value = 50
     dut.in_en.value = 1
     await Timer(TIMER_WAIT, unit='ns')
 
     assert dut.out_en.value == 1
-    assert dut.out_host.value == 0b10101100
+    assert dut.out_host.value == 75
+
+
+    
+
+    dut.in_en.value = 0
+    await Timer(TIMER_WAIT, unit='ns')
+    dut.in_host.value = 0x64646461
+    dut.in_en.value = 1
+    await Timer(TIMER_WAIT, unit='ns')
+
+    dut.in_en.value = 0
+    await Timer(TIMER_WAIT, unit='ns')
+    dut.in_host.value = 54
+    dut.in_en.value = 1
+    await Timer(TIMER_WAIT, unit='ns')
+
+    dut.in_en.value = 0
+    await Timer(TIMER_WAIT, unit='ns')
+    dut.in_host.value = 12
+    dut.in_en.value = 1
+    await Timer(TIMER_WAIT, unit='ns')
+
+    assert dut.out_en.value == 1
+    assert dut.out_host.value == 66

@@ -2,6 +2,7 @@
 
 `include "uart_rx.v"
 `include "uart_tx.v"
+`include "command_processor.v"
 
 module UartInterface
 (
@@ -13,7 +14,9 @@ module UartInterface
     output wire extern_uart_tx,
 
     // Hardware reset signal
-    input extern_reset
+    input extern_reset,
+
+    output reg [5:0] extern_led
 );
     // Receive
     localparam DWORD_READ_BEGIN = 0;
@@ -42,8 +45,8 @@ module UartInterface
     wire tx_data_sent;
 
     reg [3:0] write_byte_num;
-    reg [31:0] dword_write;
-    reg dword_write_flag;
+    wire [31:0] dword_write;
+    wire dword_write_flag;
 
     // Submodules
     UARTRx receiver(
@@ -61,6 +64,16 @@ module UartInterface
         tx_data,
         tx_data_en,
         tx_data_sent
+    );
+
+    CommandProcessor cp(
+        extern_clock,
+        extern_reset,
+        dword_read,
+        dword_read_flag,
+        dword_write,
+        dword_write_flag,
+        extern_led
     );
 
     always @(posedge extern_clock or posedge extern_reset)
@@ -154,42 +167,49 @@ module UartInterface
 
                 DWORD_WRITE_BEGIN:
                 begin
-                    write_state <= DWORD_WRITE_WAIT;
+                    if(tx_data_sent == 0)
+                    begin
+                        write_state <= DWORD_WRITE_WAIT;
 
-                    if(write_byte_num == 0)
-                    begin
-                        tx_data <= dword_write[7:0];
-                        tx_data_en <= 1;
-                    end
-                    else if(write_byte_num == 1)
-                    begin
-                        tx_data <= dword_write[15:8];
-                        tx_data_en <= 1;
-                    end
-                    else if(write_byte_num == 2)
-                    begin
-                        tx_data <= dword_write[23:16];
-                        tx_data_en <= 1;
-                    end
-                    else if(write_byte_num == 3)
-                    begin
-                        tx_data <= dword_write[31:24];
-                        tx_data_en <= 1;
-                    end
+                        if(write_byte_num == 0)
+                        begin
+                            tx_data <= dword_write[7:0];
+                            tx_data_en <= 1;
+                        end
+                        else if(write_byte_num == 1)
+                        begin
+                            tx_data <= dword_write[15:8];
+                            tx_data_en <= 1;
+                        end
+                        else if(write_byte_num == 2)
+                        begin
+                            tx_data <= dword_write[23:16];
+                            tx_data_en <= 1;
+                        end
+                        else if(write_byte_num == 3)
+                        begin
+                            tx_data <= dword_write[31:24];
+                            tx_data_en <= 1;
+                        end
 
-                    write_byte_num <= write_byte_num + 1;
+                        write_byte_num <= write_byte_num + 1;
+                    end
                 end
 
                 DWORD_WRITE_WAIT:
                 begin
-                    if(write_byte_num >= 4'd4)
-                    begin
-                        write_state <= DWORD_WRITE_END;
-                    end
-                    else if(tx_data_sent == 1)
+                    if(tx_data_sent == 1)
                     begin
                         tx_data_en <= 0;
-                        write_state <= DWORD_WRITE_BEGIN;
+
+                        if(write_byte_num == 4)
+                        begin
+                            write_state <= DWORD_WRITE_END;
+                        end
+                        else
+                        begin
+                            write_state <= DWORD_WRITE_BEGIN;
+                        end
                     end
                 end
 

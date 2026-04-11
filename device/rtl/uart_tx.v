@@ -104,9 +104,8 @@ module UARTTx
                     begin
                         tx_state <= TX_IDLE;
                         tx_counter <= 0;
-
-                        tx_state <= TX_IDLE;
                     end
+                    else
                     begin
                         tx_counter <= tx_counter + 1;
                     end
