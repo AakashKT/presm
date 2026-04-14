@@ -9,10 +9,27 @@ SerialDevice::SerialDevice()
     this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
 }
 
+SerialDevice::~SerialDevice()
+{
+    this->log.log_info("SerialDevice destructor called");
+
+    this->serial_port_listen_thread.detach();
+    this->serial_port_read_process_thread.detach();
+    
+    char reset_cmd[4] = {
+        0x72,
+        0x65,
+        0x73,
+        0x74
+    };
+    write(this->port_fd, reset_cmd, 4);
+    close(this->port_fd);
+}
+
 void SerialDevice::find_device(std::string ident_str)
 {
     char device_ident[5] = { '\0' };
-    char ident_cmd[4] = {
+    char handshake_cmd[4] = {
         0x69,
         0x64,
         0x65,
@@ -27,8 +44,7 @@ void SerialDevice::find_device(std::string ident_str)
         if(port_opened) {
             this->log.log_info("Checking port '" + current_port_string + "'");
 
-            write(this->port_fd, ident_cmd, 4);
-            
+            tcflush(this->port_fd, TCIOFLUSH); 
             auto begin_time = std::chrono::high_resolution_clock::now();
             while(true) {
                 auto bytes_read = read(this->port_fd, device_ident, 4);
@@ -41,12 +57,15 @@ void SerialDevice::find_device(std::string ident_str)
                         device_ident[3] == ident_str[3]
                     ) {
                         this->log.log_info("Found device! Serial port '" + current_port_string + "' opened.");
+                        write(this->port_fd, handshake_cmd, 4);
+                        tcflush(this->port_fd, TCIOFLUSH); 
+
                         return;
                     }
                 }
 
                 auto time_diff = std::chrono::high_resolution_clock::now() - begin_time;
-                if(std::chrono::duration_cast<std::chrono::microseconds>(time_diff).count() >= 1e6)
+                if(std::chrono::duration_cast<std::chrono::microseconds>(time_diff).count() >= 2e6)
                     break;
             }
             
@@ -56,23 +75,6 @@ void SerialDevice::find_device(std::string ident_str)
     }
 
     this->log.log_error_and_exit("Could not find device over serial port");
-}
-
-void SerialDevice::serial_port_write(char* data, uint32_t length)
-{
-    ssize_t bytes_written = write(this->port_fd, data, length);
-
-    while(true) {
-        if (bytes_written < 0) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                continue;
-            } else {
-                this->log.log_error_and_exit("Serial port write error");
-            }
-        }
-        else
-            break;
-    }
 }
 
 void SerialDevice::device_initialize()
@@ -101,9 +103,6 @@ void SerialDevice::device_initialize()
         },
         this
     );
-
-    // this->serial_port_listen_thread.join();
-    // this->serial_port_read_process_thread.join();
 }
 
 bool SerialDevice::open_serial_port(std::string port_name)

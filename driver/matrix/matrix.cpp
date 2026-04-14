@@ -13,3 +13,8 @@ void mInit()
     
     presm_device = get_device();
 }
+
+void mFree()
+{
+    delete presm_device;
+}

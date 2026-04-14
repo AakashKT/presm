@@ -94,6 +94,14 @@ module CommandProcessor
                         begin
                             cp_state <= CP_ADD_CMD_BEGIN;
                         end
+                        else if(in_host == 32'h74736572)
+                        begin
+                            cp_state <= CP_IDENT_BROADCAST;
+                            out_host <= 0;
+                            out_en <= 0;
+
+                            wait_counter <= 0;
+                        end
                     end
                 end
 

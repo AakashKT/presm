@@ -12,6 +12,7 @@
 class SerialDevice : public Device {
 public:
     SerialDevice();
+    ~SerialDevice() override;
     
     void device_initialize() override;
 
@@ -21,9 +22,6 @@ private:
     void find_device(std::string ident_str);
     bool open_serial_port(std::string port_name);
     void configure_serial_port(uint32_t baud_rate = 115200);
-
-    void serial_port_write(char* data, uint32_t length);
-    char serial_port_read_byte();
 
     std::queue<char> write_queue;
     std::queue<char> read_queue;

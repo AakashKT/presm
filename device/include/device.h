@@ -9,6 +9,7 @@
 class Device {
 public:
     Device();
+    virtual ~Device() {};
     
     std::string get_name() { return std::string(this->device_config["name"]); };
 
