@@ -1,6 +1,9 @@
 `default_nettype none
 
 module CommandProcessor
+#(
+    parameter IDENT_INTERVAL = 27000000
+)
 (
     // Clock
     input extern_clock,
@@ -15,14 +18,17 @@ module CommandProcessor
     // Host output
     output reg [31:0] out_host,
     output reg out_en,
-
-    output reg [5:0] extern_led
+    input wire out_written
 );
-    localparam CP_IDLE = 0;
-    localparam CP_ADD_CMD_BEGIN = 1;
-    localparam CP_ADD_CMD_WAIT = 2;
-    localparam CP_ADD_CMD_READ = 3;
-    localparam CP_ADD_CMD_END = 4;
+    localparam CP_IDENT_BROADCAST = 0;
+    localparam CP_IDENT_BROADCAST_WAIT = 1;
+    localparam CP_IDLE = 2;
+    localparam CP_ADD_CMD_BEGIN = 3;
+    localparam CP_ADD_CMD_WAIT = 4;
+    localparam CP_ADD_CMD_READ = 5;
+    localparam CP_ADD_CMD_END = 6;
+
+    reg [31:0] wait_counter;
 
     reg [3:0] cp_state;
 
@@ -34,24 +40,58 @@ module CommandProcessor
     begin
         if(async_reset)
         begin
-            cp_state <= CP_IDLE;
+            cp_state <= CP_IDENT_BROADCAST;
             out_host <= 0;
             out_en <= 0;
-            
-            extern_led <= 0;
+
+            wait_counter <= 0;
         end
         else
         begin
             case(cp_state)
 
-                CP_IDLE:
+                CP_IDENT_BROADCAST:
                 begin
+                    out_host <= 32'h636e6970;
+                    out_en <= 1;
+
+                    if(out_written == 1)
+                    begin
+                        cp_state <= CP_IDENT_BROADCAST_WAIT;
+                        out_en <= 0;
+                        wait_counter <= 0;
+                    end
+                    
+                    if(in_en == 1 && in_host == 32'h6e656469)
+                    begin
+                        cp_state <= CP_IDLE;
+                    end
+                end
+
+                CP_IDENT_BROADCAST_WAIT:
+                begin
+                    if(in_en == 1 && in_host == 32'h6e656469)
+                    begin
+                        cp_state <= CP_IDLE;
+                    end
+
+                    if(wait_counter == IDENT_INTERVAL)
+                    begin
+                        cp_state <= CP_IDENT_BROADCAST;
+                    end
+                    else
+                    begin
+                        wait_counter <= wait_counter + 1;
+                    end
+                end
+
+                CP_IDLE:
+                begin                    
                     if(in_en == 1)
                     begin
                         out_en <= 0;
                         if(in_host == 32'h64646461)
                         begin
-                            extern_led <= 6'b111000;
                             cp_state <= CP_ADD_CMD_BEGIN;
                         end
                     end
@@ -86,12 +126,10 @@ module CommandProcessor
 
                         if(num_dwords_read == 0)
                         begin
-                            extern_led <= 6'b111001;
                             num1 <= in_host;
                         end
                         else if(num_dwords_read == 1)
                         begin
-                            extern_led <= 6'b111010;
                             num2 <= in_host;
                         end
 
@@ -101,7 +139,6 @@ module CommandProcessor
 
                 CP_ADD_CMD_END:
                 begin
-                    extern_led <= 6'b000001;
                     out_host <= num1 + num2;
                     out_en <= 1;
 

@@ -4,7 +4,6 @@
 #include <cstring>
 #include <errno.h>
 #include <fcntl.h>
-#include <iostream>
 #include <termios.h>
 #include <unistd.h>
 
@@ -19,15 +18,17 @@ public:
     virtual void serial_read_process(char data) = 0;
 
 private:
-    void open_serial_port(std::string port_name);
+    void find_device(std::string ident_str);
+    bool open_serial_port(std::string port_name);
     void configure_serial_port(uint32_t baud_rate = 115200);
 
-    void serial_port_write_byte(char byte);
+    void serial_port_write(char* data, uint32_t length);
     char serial_port_read_byte();
 
     std::queue<char> write_queue;
     std::queue<char> read_queue;
 
+    std::string port;
     int port_fd;
 
     std::thread serial_port_listen_thread;

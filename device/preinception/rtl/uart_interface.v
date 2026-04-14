@@ -19,9 +19,10 @@ module UartInterface
     output reg [5:0] extern_led
 );
     // Receive
-    localparam DWORD_READ_BEGIN = 0;
-    localparam DWORD_READ_WAIT = 1;
-    localparam DWORD_READ_END = 2;
+    localparam DWORD_READ_IDLE = 0;
+    localparam DWORD_READ_BEGIN = 1;
+    localparam DWORD_READ_WAIT = 2;
+    localparam DWORD_READ_END = 3;
 
     reg [2:0] read_state;
 
@@ -47,9 +48,10 @@ module UartInterface
     reg [3:0] write_byte_num;
     wire [31:0] dword_write;
     wire dword_write_flag;
+    reg dword_written;
 
     // Submodules
-    UARTRx receiver(
+    UARTRx #(.DELAY_WAIT(234)) receiver(
         extern_clock,
         extern_reset,
         extern_uart_rx,
@@ -57,7 +59,7 @@ module UartInterface
         rx_data_en
     );
 
-    UARTTx transmitter(
+    UARTTx #(.DELAY_WAIT(234)) transmitter(
         extern_clock,
         extern_reset,
         extern_uart_tx,
@@ -73,20 +75,29 @@ module UartInterface
         dword_read_flag,
         dword_write,
         dword_write_flag,
-        extern_led
+        dword_written
     );
 
+    // Compose DWORD from quad UARTRx byte
     always @(posedge extern_clock or posedge extern_reset)
     begin
         if(extern_reset)
         begin
             read_byte_num <= 0;
             dword_read_flag <= 0;
-            read_state <= DWORD_READ_BEGIN;
+            read_state <= DWORD_READ_IDLE;
         end
         else
         begin
             case(read_state)
+
+                DWORD_READ_IDLE:
+                begin
+                    if(rx_data_en == 0)
+                    begin 
+                        read_state <= DWORD_READ_BEGIN;
+                    end
+                end
 
                 DWORD_READ_BEGIN:
                 begin
@@ -133,23 +144,21 @@ module UartInterface
                     read_byte_num <= 0;
                     dword_read_flag <= 1;
 
-                    if(rx_data_en == 0)
-                    begin 
-                        read_state <= DWORD_READ_BEGIN;
-                    end
+                    read_state <= DWORD_READ_IDLE;
                 end
                 
             endcase
         end
     end
 
+    // Send DWORD one byte at a time to UARTTx
     always @(posedge extern_clock or posedge extern_reset)
     begin
         if(extern_reset)
         begin
             write_byte_num <= 0;
-            tx_data_en <= 0;
             write_state <= DWORD_WRITE_IDLE;
+            dword_written <= 0;
         end
         else
         begin
@@ -157,9 +166,10 @@ module UartInterface
 
                 DWORD_WRITE_IDLE:
                 begin
-                    tx_data_en <= 0;
+                    dword_written <= 0;
                     if(dword_write_flag == 1)
                     begin
+                        tx_data_en <= 0;
                         write_byte_num <= 0;
                         write_state <= DWORD_WRITE_BEGIN;
                     end
@@ -215,6 +225,7 @@ module UartInterface
 
                 DWORD_WRITE_END:
                 begin
+                    dword_written <= 1;
                     if(dword_write_flag == 0)
                     begin
                         write_state <= DWORD_WRITE_IDLE;
