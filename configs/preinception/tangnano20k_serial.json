@@ -9,8 +9,8 @@
         "memory_size_in_bytes": 1e10,
 
         "rtl": {
-            "top_module_src": "uart_interface.v",
-            "top_module": "UartInterface"
+            "top_module_src": "tangnano20k_serial.v",
+            "top_module": "Tangnano20kUart"
         },
 
         "fpga": {

@@ -4,7 +4,7 @@
 `include "uart_tx.v"
 `include "command_processor.v"
 
-module UartInterface
+module Tangnano20kUart
 (
     // Clock
     input extern_clock,
@@ -68,7 +68,7 @@ module UartInterface
         tx_data_sent
     );
 
-    CommandProcessor cp(
+    CommandProcessor #(.IDENT_INTERVAL(27000000)) cp(
         extern_clock,
         extern_reset,
         dword_read,
