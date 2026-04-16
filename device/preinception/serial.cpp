@@ -13,6 +13,6 @@ SerialImpl::SerialImpl()
 
 void SerialImpl::serial_read_process(char data)
 {
-    char temp[2] = {data, '\0'};
-    this->log.log_info(std::string(temp));
+    // this->device_memory.write(this->temp_count % 4, 1, &data);
+    // this->temp_count++;
 }

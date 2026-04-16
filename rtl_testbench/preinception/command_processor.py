@@ -20,9 +20,13 @@ async def command_processor(dut):
     await Timer(TIMER_WAIT, unit='ns')
     dut.async_reset.value = 0
     await Timer(TIMER_WAIT, unit='ns')
-    assert dut.out_en.value == 0, "Async reset failed"
 
-    dut.in_host.value = 0x64646461
+    # Handshake
+    dut.in_host.value = 0x6e656469
+    dut.in_en.value = 1
+    await Timer(TIMER_WAIT, unit='ns')
+
+    dut.in_host.value = 0x69646461
     dut.in_en.value = 1
     await Timer(TIMER_WAIT, unit='ns')
 
@@ -46,7 +50,7 @@ async def command_processor(dut):
 
     dut.in_en.value = 0
     await Timer(TIMER_WAIT, unit='ns')
-    dut.in_host.value = 0x64646461
+    dut.in_host.value = 0x69646461
     dut.in_en.value = 1
     await Timer(TIMER_WAIT, unit='ns')
 

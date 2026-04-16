@@ -11,7 +11,7 @@ public:
     void serial_read_process(char data) override;
 
 private:
-
+    uint32_t temp_count = 0;
 };
 
 #endif

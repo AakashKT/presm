@@ -1,5 +1,7 @@
 `default_nettype none
 
+`include "adder.v"
+
 module CommandProcessor
 #(
     parameter IDENT_INTERVAL = 27000000
@@ -23,18 +25,34 @@ module CommandProcessor
     localparam CP_IDENT_BROADCAST = 0;
     localparam CP_IDENT_BROADCAST_WAIT = 1;
     localparam CP_IDLE = 2;
-    localparam CP_ADD_CMD_BEGIN = 3;
-    localparam CP_ADD_CMD_WAIT = 4;
-    localparam CP_ADD_CMD_READ = 5;
-    localparam CP_ADD_CMD_END = 6;
+    localparam CP_ADDI_CMD_BEGIN = 3;
+    localparam CP_ADDI_CMD_WAIT = 4;
+    localparam CP_ADDI_CMD_INPUT = 5;
+    localparam CP_ADDI_CMD_END = 6;
 
     reg [31:0] wait_counter;
 
     reg [3:0] cp_state;
 
-    reg [31:0] num1;
-    reg [31:0] num2;
+    reg signed [31:0] ra;
+    reg signed [31:0] rb;
+
+    reg signed [31:0] rc;
+    reg rc_rdy;
+
+    reg adder_signal;
     reg [31:0] num_dwords_read;
+
+    // Submodules
+    Adder addr1(
+        extern_clock,
+        async_reset,
+        adder_signal,
+        ra,
+        rb,
+        rc,
+        rc_rdy
+    );
 
     always @(posedge extern_clock or posedge async_reset)
     begin
@@ -44,6 +62,8 @@ module CommandProcessor
             out_host <= 0;
             out_en <= 0;
 
+            adder_signal <= 0;
+
             wait_counter <= 0;
         end
         else
@@ -52,7 +72,7 @@ module CommandProcessor
 
                 CP_IDENT_BROADCAST:
                 begin
-                    out_host <= 32'h636e6970;
+                    out_host <= 32'h636e6970; // 'pinc'
                     out_en <= 1;
 
                     if(out_written == 1)
@@ -62,7 +82,7 @@ module CommandProcessor
                         wait_counter <= 0;
                     end
                     
-                    if(in_en == 1 && in_host == 32'h6e656469)
+                    if(in_en == 1 && in_host == 32'h6e656469) // 'iden'
                     begin
                         cp_state <= CP_IDLE;
                     end
@@ -90,11 +110,11 @@ module CommandProcessor
                     if(in_en == 1)
                     begin
                         out_en <= 0;
-                        if(in_host == 32'h64646461)
+                        if(in_host == 32'h69646461) // 'addi'
                         begin
-                            cp_state <= CP_ADD_CMD_BEGIN;
+                            cp_state <= CP_ADDI_CMD_BEGIN;
                         end
-                        else if(in_host == 32'h74736572)
+                        else if(in_host == 32'h74736572) // 'rest'
                         begin
                             cp_state <= CP_IDENT_BROADCAST;
                             out_host <= 0;
@@ -105,54 +125,60 @@ module CommandProcessor
                     end
                 end
 
-                CP_ADD_CMD_BEGIN:
+                CP_ADDI_CMD_BEGIN:
                 begin
+                    adder_signal <= 0;
                     if(in_en == 0)
                     begin
                         num_dwords_read <= 0;
-                        cp_state <= CP_ADD_CMD_READ;
+                        cp_state <= CP_ADDI_CMD_INPUT;
                     end
                 end
 
-                CP_ADD_CMD_WAIT:
-                begin
-                    if(num_dwords_read == 2)
-                    begin
-                        cp_state <= CP_ADD_CMD_END;
-                    end
-                    else if(in_en == 0)
-                    begin
-                        cp_state <= CP_ADD_CMD_READ;
-                    end
-                end
-
-                CP_ADD_CMD_READ:
+                CP_ADDI_CMD_INPUT:
                 begin
                     if(in_en == 1)
                     begin
-                        cp_state <= CP_ADD_CMD_WAIT;
+                        cp_state <= CP_ADDI_CMD_WAIT;
 
                         if(num_dwords_read == 0)
                         begin
-                            num1 <= in_host;
+                            ra <= in_host;
                         end
                         else if(num_dwords_read == 1)
                         begin
-                            num2 <= in_host;
+                            rb <= in_host;
                         end
 
                         num_dwords_read <= num_dwords_read + 1;
                     end
                 end
 
-                CP_ADD_CMD_END:
+                CP_ADDI_CMD_WAIT:
                 begin
-                    out_host <= num1 + num2;
-                    out_en <= 1;
-
-                    if(in_en == 0)
+                    if(num_dwords_read == 2)
                     begin
-                        cp_state <= CP_IDLE;
+                        cp_state <= CP_ADDI_CMD_END;
+                    end
+                    else if(in_en == 0)
+                    begin
+                        cp_state <= CP_ADDI_CMD_INPUT;
+                    end
+                end
+
+                CP_ADDI_CMD_END:
+                begin
+                    adder_signal <= 1;
+
+                    if(rc_rdy == 1)
+                    begin
+                        out_host <= rc;
+                        out_en <= 1;
+
+                        if(in_en == 0)
+                        begin
+                            cp_state <= CP_IDLE;
+                        end
                     end
                 end
 

@@ -15,17 +15,24 @@
 
     "rtl_testbench": [
         {
-            "name": "UART Interface",
-            "rtl_src": "uart_interface.v",
-            "rtl_top_level": "UartInterface",
-            "testbench_src": "uart_interface.py",
-            "enable": true
+            "name": "Tang Nano 20K FPGA top-level",
+            "rtl_src": "tangnano20k_serial.v",
+            "rtl_top_level": "Tangnano20kUart",
+            "testbench_src": "tangnano20k_serial.py",
+            "enable": false
         },
         {
             "name": "Command Processor (CP)",
             "rtl_src": "command_processor.v",
             "rtl_top_level": "CommandProcessor",
             "testbench_src": "command_processor.py",
+            "enable": true
+        },
+        {
+            "name": "Adder",
+            "rtl_src": "adder.v",
+            "rtl_top_level": "Adder",
+            "testbench_src": "adder.py",
             "enable": false
         }
     ]
