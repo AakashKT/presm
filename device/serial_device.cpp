@@ -6,7 +6,6 @@ SerialDevice::SerialDevice()
     this->log.log_info("SerialDevice constructor called");
 
     this->find_device(this->device_config["fpga"]["identity_string"]);
-    this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
 }
 
 SerialDevice::~SerialDevice()
@@ -42,9 +41,10 @@ void SerialDevice::find_device(std::string ident_str)
         bool port_opened = this->open_serial_port(current_port_string);
         
         if(port_opened) {
+            this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
             this->log.log_info("Checking port '" + current_port_string + "'");
 
-            tcflush(this->port_fd, TCIOFLUSH); 
+            tcflush(this->port_fd, TCIOFLUSH);
             auto begin_time = std::chrono::high_resolution_clock::now();
             while(true) {
                 auto bytes_read = read(this->port_fd, device_ident, 4);
@@ -58,7 +58,7 @@ void SerialDevice::find_device(std::string ident_str)
                     ) {
                         this->log.log_info("Found device! Serial port '" + current_port_string + "' opened.");
                         write(this->port_fd, handshake_cmd, 4);
-                        tcflush(this->port_fd, TCIOFLUSH); 
+                        tcflush(this->port_fd, TCIOFLUSH);
 
                         return;
                     }
@@ -69,7 +69,7 @@ void SerialDevice::find_device(std::string ident_str)
                     break;
             }
             
-            tcflush(this->port_fd, TCIOFLUSH); 
+            tcflush(this->port_fd, TCIOFLUSH);
             close(this->port_fd);
         }
     }
@@ -129,34 +129,27 @@ void SerialDevice::configure_serial_port(uint32_t baud_rate)
         this->log.log_error_and_exit("No rule for baud rate " + std::to_string(baud_rate));
     }
 
-    // tty.c_cflag |= (CLOCAL | CREAD); // Enable receiver, ignore control lines
-    // tty.c_cflag &= ~CSIZE;
-    // tty.c_cflag |= CS8;      // 8-bit characters
-    // tty.c_cflag &= ~PARENB;  // No parity
-    // tty.c_cflag &= ~CSTOPB;  // 1 stop bit
+    tty.c_cflag |= (CLOCAL | CREAD);    // Ignore modem lines, enable receiver
+    tty.c_cflag &= ~CSIZE;
+    tty.c_cflag |= CS8;                 // 8-bit characters
+    tty.c_cflag &= ~PARENB;             // No parity bit
+    tty.c_cflag &= ~CSTOPB;             // Only one stop bit
+    tty.c_cflag &= ~CRTSCTS;            // Disable hardware flow control
+    tty.c_cflag &= ~ICRNL;
+    tty.c_cflag &= ~IXON;
 
-    // // Critical for non-blocking: Disable canonical mode
-    // tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    tty.c_oflag &= ~OPOST;
+
+    // Critical for non-blocking: Disable canonical mode
+    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    tty.c_lflag &= ~ECHOK;
+    tty.c_lflag &= ~ECHOKE;
+    tty.c_lflag &= ~ECHOPRT;
+    tty.c_lflag &= ~ECHOCTL;
     
-    // // Set timeout to 0 for immediate return
-    // tty.c_cc[VMIN] = 0;
-    // tty.c_cc[VTIME] = 0;
-
-    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8; // 8-bit characters
-    tty.c_iflag &= ~IGNBRK; // disable break processing
-    tty.c_lflag = 0; // no signaling chars, no echo, no
-                     // canonical processing
-    tty.c_oflag = 0; // no remapping, no delays
-    tty.c_cc[VMIN] = 0; // read doesn't block
-    tty.c_cc[VTIME] = 0; // 0.5 seconds read timeout
-
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
-
-    tty.c_cflag |= (CLOCAL | CREAD); // ignore modem controls,
-                             // enable reading
-    tty.c_cflag &= ~(PARENB | PARODD); // shut off parity
-    tty.c_cflag &= ~CSTOPB;
-    tty.c_cflag &= ~CRTSCTS;
+    // Set timeout to 0 for immediate return
+    tty.c_cc[VMIN] = 0;
+    tty.c_cc[VTIME] = 0;
 
     if (tcsetattr(this->port_fd, TCSANOW, &tty) != 0)
         this->log.log_error_and_exit("Error from tcsetattr: " + std::string(strerror(errno)));

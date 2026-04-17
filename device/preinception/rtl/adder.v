@@ -13,8 +13,8 @@ module Adder
     input wire signed [31:0] ra,
     input wire signed [31:0] rb,
 
-    output reg signed [31:0] rc,
-    output reg rc_rdy
+    output reg signed [31:0] add_out,
+    output reg add_out_rdy
 );
 
     localparam ADDER_IDLE = 0;
@@ -27,8 +27,8 @@ module Adder
     begin
         if(async_reset)
         begin
-            rc <= 0;
-            rc_rdy <= 0;
+            add_out <= 0;
+            add_out_rdy <= 0;
 
             adder_state <= ADDER_IDLE;
         end
@@ -40,15 +40,15 @@ module Adder
                 begin
                     if(rdy == 1)
                     begin
-                        rc_rdy <= 0;
+                        add_out_rdy <= 0;
                         adder_state <= ADDER_COMPUTE;
                     end
                 end
 
                 ADDER_COMPUTE:
                 begin
-                    rc <= ra + rb;
-                    rc_rdy <= 1;
+                    add_out <= ra + rb;
+                    add_out_rdy <= 1;
                     adder_state <= ADDER_END;
                 end
 
