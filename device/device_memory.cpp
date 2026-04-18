@@ -1,6 +1,6 @@
 #include "device_memory.h"
 
-DeviceMemory::DeviceMemory(uint64_t size_in_bytes)
+DeviceMemory::DeviceMemory(uint32_t size_in_bytes)
     : size_in_bytes(size_in_bytes)
 {
     this->log.init("device_memory");

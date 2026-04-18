@@ -6,6 +6,7 @@ Logger::Logger()
 
 Logger::~Logger()
 {
+    this->log_info("Closing log.");
     this->error_file.close();
 }
 

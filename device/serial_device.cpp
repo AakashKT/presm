@@ -3,24 +3,20 @@
 SerialDevice::SerialDevice()
     : Device()
 {
-    this->log.log_info("SerialDevice constructor called");
+    this->log->log_info("SerialDevice constructor called");
 
     this->find_device(this->device_config["fpga"]["identity_string"]);
 }
 
 SerialDevice::~SerialDevice()
 {
-    this->log.log_info("SerialDevice destructor called");
+    this->log->log_info("SerialDevice destructor called");
 
     this->serial_port_listen_thread.detach();
-    this->serial_port_read_process_thread.detach();
     
-    char reset_cmd[4] = {
-        0x72,
-        0x65,
-        0x73,
-        0x74
-    };
+    char reset_cmd[4] = {0x72, 0x65, 0x73, 0x74}; // 'rest'
+    delete this->log;
+
     write(this->port_fd, reset_cmd, 4);
     close(this->port_fd);
 }
@@ -28,12 +24,7 @@ SerialDevice::~SerialDevice()
 void SerialDevice::find_device(std::string ident_str)
 {
     char device_ident[5] = { '\0' };
-    char handshake_cmd[4] = {
-        0x69,
-        0x64,
-        0x65,
-        0x6e
-    };
+    char handshake_cmd[4] = {0x69, 0x64, 0x65, 0x6e}; // 'iden'
     std::string port_string = "/dev/ttyUSB";
 
     for(uint32_t i=0; i<5; i++) {
@@ -42,23 +33,23 @@ void SerialDevice::find_device(std::string ident_str)
         
         if(port_opened) {
             this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
-            this->log.log_info("Checking port '" + current_port_string + "'");
+            this->log->log_info("Checking port '" + current_port_string + "'");
 
             tcflush(this->port_fd, TCIOFLUSH);
+
             auto begin_time = std::chrono::high_resolution_clock::now();
             while(true) {
                 auto bytes_read = read(this->port_fd, device_ident, 4);
                 if(bytes_read > 0) {
-                    this->log.log_info("Received '" + std::string(device_ident) + "' from device...");
+                    this->log->log_info("Received '" + std::string(device_ident) + "' from device...");
 
                     if(device_ident[0] == ident_str[0] &&
                         device_ident[1] == ident_str[1] &&
                         device_ident[2] == ident_str[2] &&
                         device_ident[3] == ident_str[3]
                     ) {
-                        this->log.log_info("Found device! Serial port '" + current_port_string + "' opened.");
+                        this->log->log_info("Found device! Serial port '" + current_port_string + "' opened.");
                         write(this->port_fd, handshake_cmd, 4);
-                        tcflush(this->port_fd, TCIOFLUSH);
 
                         return;
                     }
@@ -74,19 +65,57 @@ void SerialDevice::find_device(std::string ident_str)
         }
     }
 
-    this->log.log_error_and_exit("Could not find device over serial port");
+    this->log->log_error_and_exit("Could not find device over serial port");
 }
 
 void SerialDevice::device_initialize()
 {
     this->serial_port_listen_thread = std::thread(
         [&](SerialDevice* current_device) {
-            char data;
-            
+            char data[256];
+            uint32_t packet_size = 0;
+
+            bool packet_read_state = false;
+            uint32_t bytes_read = 0, total_bytes_read = 0;
+
             while(true) {
-                auto bytes_read = read(this->port_fd, &data, 1);
-                if(bytes_read > 0)
-                    current_device->read_queue.push(data);
+
+                if(!packet_read_state) {
+                    bytes_read = read(this->port_fd, data + total_bytes_read, 4);
+
+                    if(bytes_read > 0) {
+                        total_bytes_read += bytes_read;
+
+                        if(total_bytes_read == 4) {
+                            for(uint32_t i=0; i<4; i++) {
+                                current_device->read_buffer[current_device->read_buffer_ptr_hi % 256] = data[i];
+                                current_device->read_buffer_ptr_hi++;
+                            }
+                            
+                            total_bytes_read = 0;
+                            packet_size |= data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+                            packet_read_state = true;
+                        }
+                    }
+                }
+                else {
+                    bytes_read = read(this->port_fd, data + total_bytes_read, packet_size);
+                    
+                    if(bytes_read > 0) {
+                        total_bytes_read += bytes_read;
+
+                        if(total_bytes_read == packet_size) {
+                            for(uint32_t i=0; i<packet_size; i++) {
+                                current_device->read_buffer[current_device->read_buffer_ptr_hi % 256] = data[i];
+                                current_device->read_buffer_ptr_hi++;
+                            }
+                            
+                            total_bytes_read = 0;
+                            packet_size = 0;
+                            packet_read_state = false;
+                        }
+                    }
+                }
             }
         },
         this
@@ -95,9 +124,9 @@ void SerialDevice::device_initialize()
     this->serial_port_read_process_thread = std::thread(
         [&](SerialDevice* current_device) {
             while(true) {
-                if(current_device->read_queue.size() != 0) {
-                    current_device->serial_read_process(current_device->read_queue.front());
-                    current_device->read_queue.pop();
+                if(current_device->read_buffer_ptr_hi != current_device->read_buffer_ptr_lo) {
+                    current_device->serial_read_process(current_device->read_buffer[current_device->read_buffer_ptr_lo % 256]);
+                    current_device->read_buffer_ptr_lo++;
                 }
             }
         },
@@ -105,13 +134,31 @@ void SerialDevice::device_initialize()
     );
 }
 
+void SerialDevice::send_device_packet(uint32_t size_in_bytes, char* packet)
+{
+    write(this->port_fd, packet, size_in_bytes);
+    
+    std::stringstream ss;
+    for(uint32_t i=0; i<size_in_bytes; i++)
+        ss << std::hex << (int)packet[i];
+}
+
+void SerialDevice::serial_port_write_block(uint32_t size_in_bytes, char* data)
+{
+    while(true) {
+        auto bytes_written = write(this->port_fd, data, size_in_bytes);
+        if(bytes_written == size_in_bytes)
+            break;
+    }
+}
+
 bool SerialDevice::open_serial_port(std::string port_name)
 {
-    this->port_fd = open(port_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+    this->port_fd = open(port_name.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
     if (this->port_fd < 0)
         return false;
 
-    this->log.log_info("Serial port '" + port_name + "' opened.");
+    this->log->log_info("Serial port '" + port_name + "' opened.");
     return true;
 }
 
@@ -119,14 +166,14 @@ void SerialDevice::configure_serial_port(uint32_t baud_rate)
 {
     struct termios tty;
     if (tcgetattr(this->port_fd, &tty) != 0)
-        this->log.log_error_and_exit("Error from tcgetattr: " + std::string(strerror(errno)));
+        this->log->log_error_and_exit("Error from tcgetattr: " + std::string(strerror(errno)));
 
     if(baud_rate == 115200) {
         cfsetospeed(&tty, B115200);
         cfsetispeed(&tty, B115200);
     }
     else {
-        this->log.log_error_and_exit("No rule for baud rate " + std::to_string(baud_rate));
+        this->log->log_error_and_exit("No rule for baud rate " + std::to_string(baud_rate));
     }
 
     tty.c_cflag |= (CLOCAL | CREAD);    // Ignore modem lines, enable receiver
@@ -149,8 +196,8 @@ void SerialDevice::configure_serial_port(uint32_t baud_rate)
     
     // Set timeout to 0 for immediate return
     tty.c_cc[VMIN] = 0;
-    tty.c_cc[VTIME] = 0;
+    tty.c_cc[VTIME] = 5;
 
     if (tcsetattr(this->port_fd, TCSANOW, &tty) != 0)
-        this->log.log_error_and_exit("Error from tcsetattr: " + std::string(strerror(errno)));
+        this->log->log_error_and_exit("Error from tcsetattr: " + std::string(strerror(errno)));
 }

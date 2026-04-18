@@ -4,7 +4,8 @@
 
 module CommandProcessor
 #(
-    parameter IDENT_INTERVAL = 27000000
+    parameter CLOCK_FREQ = 27000000,
+    parameter OUTGOING_PACKET_HEADER_DELAY = 10
 )
 (
     // Clock
@@ -20,7 +21,9 @@ module CommandProcessor
     // Host output
     output reg [31:0] out_host,
     output reg out_en,
-    input wire out_ack
+    input wire out_ack,
+
+    output reg [5:0] extern_led
 );
     // =================
     // State definitions
@@ -35,29 +38,35 @@ module CommandProcessor
 
     // Memory fetch
     localparam CP_MEM_FETCH_BEGIN = 3;
-    localparam CP_MEM_FETCH_CMD = 4;
-    localparam CP_MEM_FETCH_ADDR = 5;
-    localparam CP_MEM_FETCH_WAIT = 6;
+    localparam CP_MEM_FETCH_CMD_HEADER = 4;
+    localparam CP_MEM_FETCH_CMD = 5;
+    localparam CP_MEM_FETCH_ADDR = 6;
+    localparam CP_MEM_FETCH_WAIT = 7;
 
     // Memory write
-    localparam CP_MEM_WRITE_BEGIN = 7;
-    localparam CP_MEM_WRITE_CMD = 8;
-    localparam CP_MEM_WRITE_ADDR = 9;
-    localparam CP_MEM_WRITE_DATA = 10;
+    localparam CP_MEM_WRITE_BEGIN = 8;
+    localparam CP_MEM_WRITE_CMD = 9;
+    localparam CP_MEM_WRITE_ADDR = 10;
+    localparam CP_MEM_WRITE_DATA = 11;
 
     // Input read
-    localparam CP_INPUT_READ = 11;
-    localparam CP_INPUT_READ_WAIT = 12;
+    localparam CP_INPUT_READ = 12;
+    localparam CP_INPUT_READ_WAIT = 13;
 
     // ADDI command
-    localparam CP_ADDI_CMD_BEGIN = 13;
-    localparam CP_ADDI_CMD_INPUT_FETCH = 14;
-    localparam CP_ADDI_CMD_EXEC = 15;
-    localparam CP_ADDI_CMD_END = 16;
+    localparam CP_ADDI_CMD_BEGIN = 14;
+    localparam CP_ADDI_CMD_INPUT_FETCH = 15;
+    localparam CP_ADDI_CMD_EXEC = 16;
+    localparam CP_ADDI_CMD_END = 17;
 
-    reg [31:0] broadcast_wait_counter;
+    // Misc
+    localparam CP_DELAY_ONE = 18;
+    localparam CP_DELAY_HEADER = 19;
+
+    reg [31:0] delay_wait_counter;
     reg [4:0] cp_state;
     reg [4:0] restore_cp_state;
+    reg [4:0] delay_restore_cp_state;
 
     // Memory fetch, write registers
     reg [31:0] mem_addr;
@@ -104,7 +113,7 @@ module CommandProcessor
 
             adder_signal <= 0;
 
-            broadcast_wait_counter <= 0;
+            delay_wait_counter <= 0;
         end
         else
         begin
@@ -112,6 +121,8 @@ module CommandProcessor
 
                 CP_IDENT_BROADCAST:
                 begin
+                    extern_led <= 6'b110000;
+
                     out_host <= 32'h636e6970; // 'pinc'
                     out_en <= 1;
 
@@ -119,11 +130,12 @@ module CommandProcessor
                     begin
                         cp_state <= CP_IDENT_BROADCAST_WAIT;
                         out_en <= 0;
-                        broadcast_wait_counter <= 0;
+                        delay_wait_counter <= 0;
                     end
                     
                     if(in_en == 1 && in_host == 32'h6e656469) // 'iden'
                     begin
+                        out_en <= 0;
                         cp_state <= CP_IDLE;
                     end
                 end
@@ -132,24 +144,26 @@ module CommandProcessor
                 begin
                     if(in_en == 1 && in_host == 32'h6e656469)
                     begin
+                        out_en <= 0;
                         cp_state <= CP_IDLE;
                     end
 
-                    if(broadcast_wait_counter == IDENT_INTERVAL)
+                    if(delay_wait_counter == CLOCK_FREQ)
                     begin
                         cp_state <= CP_IDENT_BROADCAST;
                     end
                     else
                     begin
-                        broadcast_wait_counter <= broadcast_wait_counter + 1;
+                        delay_wait_counter <= delay_wait_counter + 1;
                     end
                 end
 
                 CP_IDLE:
-                begin                    
+                begin
+                    extern_led <= 6'b001100;
+
                     if(in_en == 1)
                     begin
-                        out_en <= 0;
                         if(in_host == 32'h69646461) // 'addi'
                         begin
                             cp_state <= CP_ADDI_CMD_BEGIN;
@@ -160,7 +174,7 @@ module CommandProcessor
                             out_host <= 0;
                             out_en <= 0;
 
-                            broadcast_wait_counter <= 0;
+                            delay_wait_counter <= 0;
                         end
                     end
                 end
@@ -168,18 +182,39 @@ module CommandProcessor
                 CP_MEM_FETCH_BEGIN:
                 begin
                     out_en <= 0;
-                    cp_state <= CP_MEM_FETCH_CMD;
+
+                    delay_restore_cp_state <= CP_MEM_FETCH_CMD_HEADER;
+                    cp_state <= CP_DELAY_ONE;
+                end
+
+                CP_MEM_FETCH_CMD_HEADER:
+                begin
+                    out_host <= 32'd8; // size in bytes of the packet
+                    out_en <= 1;
+
+                    if(out_ack == 1)
+                    begin
+                        out_en <= 0;
+
+                        delay_wait_counter <= 0;
+                        delay_restore_cp_state <= CP_MEM_FETCH_CMD;
+                        cp_state <= CP_DELAY_HEADER;
+                    end
                 end
 
                 CP_MEM_FETCH_CMD:
                 begin
+                    extern_led <= 6'b000011;
+
                     out_host <= 32'h726d656d; // 'memr' --> memory read
                     out_en <= 1;
 
                     if(out_ack == 1)
                     begin
                         out_en <= 0;
-                        cp_state <= CP_MEM_FETCH_ADDR;
+
+                        delay_restore_cp_state <= CP_MEM_FETCH_ADDR;
+                        cp_state <= CP_DELAY_ONE;
                     end
                 end
 
@@ -218,7 +253,8 @@ module CommandProcessor
                     if(out_ack == 1)
                     begin
                         out_en <= 0;
-                        cp_state <= CP_MEM_WRITE_ADDR;
+                        delay_restore_cp_state <= CP_MEM_WRITE_ADDR;
+                        cp_state <= CP_DELAY_ONE;
                     end
                 end
 
@@ -230,7 +266,8 @@ module CommandProcessor
                     if(out_ack == 1)
                     begin
                         out_en <= 0;
-                        cp_state <= CP_MEM_WRITE_DATA;
+                        delay_restore_cp_state <= CP_MEM_WRITE_DATA;
+                        cp_state <= CP_DELAY_ONE;
                     end
                 end
 
@@ -334,6 +371,23 @@ module CommandProcessor
                     if(in_en == 0)
                     begin
                         cp_state <= CP_IDLE;
+                    end
+                end
+
+                CP_DELAY_ONE:
+                begin
+                    cp_state <= delay_restore_cp_state;
+                end
+
+                CP_DELAY_HEADER:
+                begin
+                    if(delay_wait_counter == OUTGOING_PACKET_HEADER_DELAY)
+                    begin
+                        cp_state <= delay_restore_cp_state;
+                    end
+                    else
+                    begin
+                        delay_wait_counter <= delay_wait_counter + 1;
                     end
                 end
 

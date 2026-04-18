@@ -9,9 +9,12 @@ public:
     SerialImpl();
 
     void serial_read_process(char data) override;
+    
+    uint32_t allocate_device_memory(uint32_t size_in_bytes) override;
+    char* read_from_device_memory(uint32_t address, uint32_t size_in_bytes) override;
+    void write_to_device_memory(uint32_t address, uint32_t size_in_bytes, const char* data) override;
 
 private:
-    uint32_t temp_count = 0;
 };
 
 #endif

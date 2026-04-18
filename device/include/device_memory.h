@@ -7,22 +7,17 @@
 
 class DeviceMemory {
 public:
-    DeviceMemory(uint64_t size_in_bytes);
+    DeviceMemory(uint32_t size_in_bytes);
 
-    uint64_t get_size() { return size_in_bytes; };
+    uint32_t get_size() { return size_in_bytes; };
 
-    virtual void write(uint64_t start_address, uint64_t num_bytes, const char* data) = 0;
-    virtual char* read(uint64_t start_address, uint64_t num_bytes) = 0;
+    virtual uint32_t allocate(uint32_t size_in_bytes) = 0;
 
-//     void write_request(uint64_t start_address, uint64_t num_bytes, const char* data);
-//     void read_request(uint64_t start_address, uint64_t num_bytes);
-
-// private:
-//     virtual void write_byte(uint64_t address, const char data) = 0;
-//     virtual char read_byte(uint64_t address) = 0;
+    virtual void write(uint32_t start_address, uint32_t num_bytes, const char* data) = 0;
+    virtual char* read(uint32_t start_address, uint32_t num_bytes) = 0;
 
 protected:
-    uint64_t size_in_bytes; 
+    uint32_t size_in_bytes; 
     
     Logger log;
     nlohmann::json top_config, device_config;

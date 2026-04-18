@@ -5,13 +5,16 @@
 
 class HostResidentMemory : public DeviceMemory {
 public:
-    HostResidentMemory(uint64_t size_in_bytes);
+    HostResidentMemory(uint32_t size_in_bytes);
 
-    void write(uint64_t start_address, uint64_t num_bytes, const char* data) override;
-    char* read(uint64_t start_address, uint64_t num_bytes) override;
+    uint32_t allocate(uint32_t size_in_bytes) override;
+
+    void write(uint32_t start_address, uint32_t num_bytes, const char* data) override;
+    char* read(uint32_t start_address, uint32_t num_bytes) override;
 
 private:
     char* contents;
+    uint32_t allocation_ptr = 0;
 };
 
 #endif

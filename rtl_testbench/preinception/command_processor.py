@@ -49,11 +49,19 @@ async def command_processor(dut):
     await Timer(TIMER_WAIT, unit='ns')
 
     assert dut.out_en.value == 1
+    assert dut.out_host.value == 8 # packet size assert
+    
+    dut.out_ack.value = 1
+    await Timer(2, unit='ns')
+    dut.out_ack.value = 0
+    await Timer(101, unit='ns')
+
+    assert dut.out_en.value == 1
     assert dut.out_host.value == 0x726d656d # memr assert
 
     dut.out_ack.value = 1
     dut.in_en.value = 0
-    await Timer(1, unit='ns')
+    await Timer(2, unit='ns')
     dut.out_ack.value = 0
     await Timer(TIMER_WAIT, unit='ns')
     
@@ -62,22 +70,35 @@ async def command_processor(dut):
 
     dut.out_ack.value = 1
     dut.in_en.value = 0
-    await Timer(1, unit='ns')
+    await Timer(2, unit='ns')
     dut.in_en.value = 1
     dut.in_host.value = 40
+    dut.out_ack.value = 0
     await Timer(TIMER_WAIT, unit='ns')
+
+    assert dut.out_en.value == 1
+    assert dut.out_host.value == 8 # packet size assert
     
     dut.out_ack.value = 1
+    await Timer(2, unit='ns')
+    dut.out_ack.value = 0
+    await Timer(101, unit='ns')
+
+    assert dut.out_en.value == 1
+    assert dut.out_host.value == 0x726d656d # memr assert
+    
+    dut.out_ack.value = 1
+    dut.in_en.value = 0
     await Timer(1, unit='ns')
     dut.out_ack.value = 0
     await Timer(TIMER_WAIT, unit='ns')
-    
+
     assert dut.out_en.value == 1
     assert dut.out_host.value == 50 # Address 2 assert
 
     dut.out_ack.value = 1
     dut.in_en.value = 0
-    await Timer(1, unit='ns')
+    await Timer(2, unit='ns')
     dut.in_en.value = 1
     dut.in_host.value = 40
     await Timer(7, unit='ns')
@@ -85,22 +106,22 @@ async def command_processor(dut):
     assert dut.mem_addr.value == 75
     
     dut.out_ack.value = 0
-    await Timer(1, unit='ns')
+    await Timer(2, unit='ns')
     assert dut.out_en.value == 1
     assert dut.out_host.value == 0x776d656d # memw assert
 
     dut.out_ack.value = 1
-    await Timer(1, unit='ns')
+    await Timer(2, unit='ns')
 
     dut.out_ack.value = 0
-    await Timer(1, unit='ns')
+    await Timer(2, unit='ns')
     assert dut.out_en.value == 1
     assert dut.out_host.value == 75 # Address
 
     dut.out_ack.value = 1
-    await Timer(1, unit='ns')
+    await Timer(2, unit='ns')
 
     dut.out_ack.value = 0
-    await Timer(1, unit='ns')
+    await Timer(2, unit='ns')
     assert dut.out_en.value == 1
     assert dut.out_host.value == 80 # Addition result

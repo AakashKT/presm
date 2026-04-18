@@ -68,14 +68,18 @@ module Tangnano20kUart
         tx_data_sent
     );
 
-    CommandProcessor #(.IDENT_INTERVAL(27000000)) cp(
+    CommandProcessor #(
+        .CLOCK_FREQ(27000000), 
+        .OUTGOING_PACKET_HEADER_DELAY(2)
+    ) cp(
         extern_clock,
         extern_reset,
         dword_read,
         dword_read_flag,
         dword_write,
         dword_write_flag,
-        dword_written
+        dword_written,
+        extern_led
     );
 
     // Compose DWORD from quad UARTRx byte
