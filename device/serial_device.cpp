@@ -73,47 +73,22 @@ void SerialDevice::device_initialize()
     this->serial_port_listen_thread = std::thread(
         [&](SerialDevice* current_device) {
             char data[256];
-            uint32_t packet_size = 0;
 
-            bool packet_read_state = false;
             uint32_t bytes_read = 0, total_bytes_read = 0;
 
             while(true) {
+                bytes_read = read(this->port_fd, data + total_bytes_read, 12);
 
-                if(!packet_read_state) {
-                    bytes_read = read(this->port_fd, data + total_bytes_read, 4);
+                if(bytes_read > 0) {
+                    total_bytes_read += bytes_read;
 
-                    if(bytes_read > 0) {
-                        total_bytes_read += bytes_read;
-
-                        if(total_bytes_read == 4) {
-                            for(uint32_t i=0; i<4; i++) {
-                                current_device->read_buffer[current_device->read_buffer_ptr_hi % 256] = data[i];
-                                current_device->read_buffer_ptr_hi++;
-                            }
-                            
-                            total_bytes_read = 0;
-                            packet_size |= data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
-                            packet_read_state = true;
+                    if(total_bytes_read == 12) {
+                        for(uint32_t i=0; i<12; i++) {
+                            current_device->read_buffer[current_device->read_buffer_ptr_hi % 256] = data[i];
+                            current_device->read_buffer_ptr_hi++;
                         }
-                    }
-                }
-                else {
-                    bytes_read = read(this->port_fd, data + total_bytes_read, packet_size);
-                    
-                    if(bytes_read > 0) {
-                        total_bytes_read += bytes_read;
-
-                        if(total_bytes_read == packet_size) {
-                            for(uint32_t i=0; i<packet_size; i++) {
-                                current_device->read_buffer[current_device->read_buffer_ptr_hi % 256] = data[i];
-                                current_device->read_buffer_ptr_hi++;
-                            }
-                            
-                            total_bytes_read = 0;
-                            packet_size = 0;
-                            packet_read_state = false;
-                        }
+                        
+                        total_bytes_read = 0;
                     }
                 }
             }

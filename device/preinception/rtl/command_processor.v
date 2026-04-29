@@ -136,7 +136,8 @@ module CommandProcessor
                     if(in_en == 1 && in_host == 32'h6e656469) // 'iden'
                     begin
                         out_en <= 0;
-                        cp_state <= CP_IDLE;
+                        delay_restore_cp_state <= CP_IDLE;
+                        cp_state <= CP_DELAY_ONE;
                     end
                 end
 
@@ -145,7 +146,8 @@ module CommandProcessor
                     if(in_en == 1 && in_host == 32'h6e656469)
                     begin
                         out_en <= 0;
-                        cp_state <= CP_IDLE;
+                        delay_restore_cp_state <= CP_IDLE;
+                        cp_state <= CP_DELAY_ONE;
                     end
 
                     if(delay_wait_counter == CLOCK_FREQ)
@@ -198,7 +200,7 @@ module CommandProcessor
 
                         delay_wait_counter <= 0;
                         delay_restore_cp_state <= CP_MEM_FETCH_CMD;
-                        cp_state <= CP_DELAY_HEADER;
+                        cp_state <= CP_DELAY_ONE;
                     end
                 end
 

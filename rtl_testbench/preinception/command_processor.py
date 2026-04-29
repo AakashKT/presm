@@ -54,7 +54,7 @@ async def command_processor(dut):
     dut.out_ack.value = 1
     await Timer(2, unit='ns')
     dut.out_ack.value = 0
-    await Timer(101, unit='ns')
+    await Timer(2, unit='ns')
 
     assert dut.out_en.value == 1
     assert dut.out_host.value == 0x726d656d # memr assert
@@ -82,7 +82,7 @@ async def command_processor(dut):
     dut.out_ack.value = 1
     await Timer(2, unit='ns')
     dut.out_ack.value = 0
-    await Timer(101, unit='ns')
+    await Timer(2, unit='ns')
 
     assert dut.out_en.value == 1
     assert dut.out_host.value == 0x726d656d # memr assert
