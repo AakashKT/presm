@@ -29,9 +29,6 @@ include_directories(assembler/include)
 add_subdirectory(device/)
 target_sources(device PUBLIC common/logging.cpp)
 
-# Add assembler directory
-add_subdirectory(assembler/)
-
 # Verification tests
 add_subdirectory(verification/)
 
@@ -45,8 +42,16 @@ endif()
 if(${DRIVER} STREQUAL "c_accel")
     message(STATUS "PRESM: Compiling with COMPUTE ACCELERATOR driver")
 
+    # Assembler
+    add_subdirectory(assembler/)
+
     # The actual driver
     add_subdirectory(driver/c_accel)
+elseif(${DRIVER} STREQUAL "matrix")
+    message(STATUS "PRESM: Compiling with MATRIX driver")
+
+    # The actual driver
+    add_subdirectory(driver/matrix)
 else()
     message(FATAL_ERROR "PRESM: Driver named '${DRIVER}' not found!")
     return()

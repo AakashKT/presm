@@ -1,0 +1,39 @@
+{
+    "driver": {
+        "name": "matrix"
+    },
+
+    "device": {
+        "name": "preinception",
+        "type": "rtl_testbench",
+
+        "rtl_testbench": {
+            "simulator": "icarus",
+            "language": "verilog"
+        }
+    },
+
+    "rtl_testbench": [
+        {
+            "name": "Tang Nano 20K FPGA top-level",
+            "rtl_src": "tangnano20k_serial.v",
+            "rtl_top_level": "Tangnano20kUart",
+            "testbench_src": "tangnano20k_serial.py",
+            "enable": false
+        },
+        {
+            "name": "Command Processor (CP)",
+            "rtl_src": "command_processor.v",
+            "rtl_top_level": "CommandProcessor",
+            "testbench_src": "command_processor.py",
+            "enable": true
+        },
+        {
+            "name": "Adder",
+            "rtl_src": "adder.v",
+            "rtl_top_level": "Adder",
+            "testbench_src": "adder.py",
+            "enable": false
+        }
+    ]
+}

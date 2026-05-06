@@ -22,8 +22,8 @@ def build_presm(args, config):
     os.system(f'cmake .. -DDRIVER={driver_name} -DDEVICE={device_name} \
                 -DDEVICE_TYPE={device_type}')
 
-    os.system('cmake --build . --config Release')
-    os.system('cmake --build . --config Release --target install')
+    os.system('cmake --build . --config Release -- -j 4')
+    os.system('cmake --build . --config Release --target install -- -j 4')
 
 def build_riscv_compiler_linux(args, config):
     path_exists = os.path.exists('linux')
@@ -39,7 +39,7 @@ def build_riscv_compiler_linux(args, config):
 
     os.system('./configure --prefix=' 
             + current_directory + ' --with-arch=rv32im')
-    os.system('make -j8')
+    os.system('make -j4')
 
     utils._chdir('../../build_riscv_compiler')
 
@@ -66,7 +66,7 @@ def build_fpga_toolchain(args, config):
 
     # Build yosys (Synthesis)
     utils._chdir('extern/yosys')
-    utils._execute('make -j8')
+    utils._execute('make -j4')
 
     # Build nextpnr-himbaechel (place-and-route)
     utils._chdir('../nextpnr')
@@ -76,7 +76,7 @@ def build_fpga_toolchain(args, config):
     utils._chdir('build')
 
     utils._execute('cmake .. -DARCH=himbaechel -DHIMBAECHEL_UARCH=gowin')
-    utils._execute('make -j8')
+    utils._execute('make -j4')
 
     # Build openFPGALoader (programming the FPGA)
     utils._chdir('../../openFPGALoader/')
@@ -86,7 +86,7 @@ def build_fpga_toolchain(args, config):
     utils._chdir('build')
 
     utils._execute('cmake ..')
-    utils._execute('make -j8')
+    utils._execute('make -j4')
 
     utils._chdir('../../../')
 
@@ -96,10 +96,14 @@ def install_ubuntu_packages():
     os.system('sudo apt-get install iverilog')
 
     os.system('sudo apt-get install autoconf automake autotools-dev \
+                make lld libffi-dev libfl-dev pkg-config tcl-dev graphviz xdot libeigen3-dev \
+                gzip libftdi1-2 libftdi1-dev libhidapi-hidraw0 libhidapi-dev libudev-dev g++ \
                 curl python3 python3-pip python3-tomli libmpc-dev libmpfr-dev \
                 libgmp-dev gawk build-essential bison flex texinfo gperf libtool \
                 patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake \
-                libglib2.0-dev libslirp-dev libncurses-dev libreadline-dev')
+                libglib2.0-dev libslirp-dev libncurses-dev libreadline-dev \
+                libboost-all-dev')
+    os.system('pip install apycula cocotb')
 
 def get_or_build_extern_tools(args, config):
     system_name = platform.system()
@@ -141,10 +145,10 @@ if __name__ == '__main__':
     utils.init()
     config = json.load(open(args.config))
 
-    check_external_tools(args, config)
-
     if args.get_extern_tools:
         get_or_build_extern_tools(args, config)
+        
+    check_external_tools(args, config)
 
     build_presm(args, config)
 

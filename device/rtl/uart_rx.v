@@ -8,13 +8,13 @@ module UARTRx
 )
 (
     // Clock
-    input _extern_clock,
+    input extern_clock,
 
     // Reset
     input async_reset,
 
     // UART rx external
-    input wire _extern_uart_rx,
+    input wire extern_uart_rx,
 
     // Outgoing
     output reg [7:0] data,
@@ -34,7 +34,7 @@ module UARTRx
 
     reg [2:0] rx_state;
 
-    always @(posedge _extern_clock or posedge async_reset)
+    always @(posedge extern_clock or posedge async_reset)
     begin
         if(async_reset)
         begin
@@ -49,7 +49,7 @@ module UARTRx
 
                 RX_IDLE:
                 begin
-                    if(_extern_uart_rx == 0)
+                    if(extern_uart_rx == 0)
                     begin
                         rx_counter <= 0;
                         rx_bit_number <= 0;
@@ -76,7 +76,7 @@ module UARTRx
                     rx_counter <= rx_counter + 1;
                     if(rx_counter == DELAY_WAIT)
                     begin
-                        data <= {_extern_uart_rx, data[7:1]};
+                        data <= {extern_uart_rx, data[7:1]};
                         rx_bit_number <= rx_bit_number + 1;
                         rx_counter <= 0;
 
@@ -93,7 +93,6 @@ module UARTRx
                     if(rx_counter == DELAY_WAIT)
                     begin
                         data_en <= 1;
-
                         rx_state <= RX_IDLE;
                     end
                 end

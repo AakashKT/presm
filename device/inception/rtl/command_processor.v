@@ -3,7 +3,7 @@
 module CommandProcessor
 (
     // Clock
-    input _extern_clock,
+    input extern_clock,
 
     // Reset
     input async_reset,
@@ -28,7 +28,7 @@ module CommandProcessor
     reg [7:0] r1;
 
     // CP state machine
-    always @(posedge _extern_clock or posedge async_reset)
+    always @(posedge extern_clock or posedge async_reset)
     begin
         if(async_reset)
         begin

@@ -1,0 +1,31 @@
+{
+    "driver": {
+        "name": "matrix"
+    },
+
+    "device": {
+        "name": "preinception",
+        "type": "serial",
+        "memory_size_in_bytes": 1e10,
+
+        "rtl": {
+            "top_module_src": "tangnano20k_serial.v",
+            "top_module": "Tangnano20kUart"
+        },
+
+        "fpga": {
+            "name": "tangnano20k",
+            "identity_string": "pinc",
+            "baud_rate": 115200
+        }
+    },
+
+    "verification": [
+        {
+            "name": "sanity",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true
+        }
+    ]
+}

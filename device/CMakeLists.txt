@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.15...4.0)
 
 add_library(device OBJECT
             device.cpp
-            uart_device.cpp
+            serial_device.cpp
+
+            device_memory.cpp
+            host_resident_device_memory.cpp
         )
 target_include_directories(device PUBLIC include/)
 target_link_libraries(device
@@ -17,6 +20,10 @@ if(${DEVICE} STREQUAL "inception")
     message(STATUS "PRESM: Building device 'inception' - A RISC-V compute accelerator")
     
     add_subdirectory(inception/)
+elseif(${DEVICE} STREQUAL "preinception")
+    message(STATUS "PRESM: Building device 'preinception' - A matrix operations accelerator")
+    
+    add_subdirectory(preinception/)
 else()
     message(FATAL_ERROR "PRESM: Device '${DEVICE}' not found!")
     return()
