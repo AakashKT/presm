@@ -7,5 +7,5 @@ Device* get_device()
 
 Functional::Functional()
 {
-    this->log.log_info("Functional 'Preinception' constructor called");
+    this->log->log_info("Functional 'Preinception' constructor called");
 }

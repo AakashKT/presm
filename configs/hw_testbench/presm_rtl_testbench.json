@@ -1,10 +1,10 @@
 {
     "driver": {
-        "name": "presm"
+        "name": ""
     },
 
     "device": {
-        "name": "presm",
+        "name": "",
         "type": "rtl_testbench",
 
         "rtl_testbench": {
