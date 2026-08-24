@@ -1,0 +1,19 @@
+{
+    "driver": {
+        "name": "matrix"
+    },
+
+    "device": {
+        "name": "preinception",
+        "type": "functional"
+    },
+
+    "verification": [
+        {
+            "name": "sanity",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true
+        }
+    ]
+}

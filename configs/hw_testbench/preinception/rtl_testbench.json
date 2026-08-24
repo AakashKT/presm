@@ -19,6 +19,13 @@
             "rtl_src": "tangnano20k_serial.v",
             "rtl_top_level": "Tangnano20kUart",
             "testbench_src": "tangnano20k_serial.py",
+            "enable": false
+        },
+        {
+            "name": "UART Packet",
+            "rtl_src": "uart_packet.v",
+            "rtl_top_level": "UARTPacket",
+            "testbench_src": "uart_packet.py",
             "enable": true
         },
         {
