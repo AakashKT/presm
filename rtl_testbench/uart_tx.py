@@ -24,34 +24,33 @@ async def uart_tx(dut):
     dut.async_reset.value = 0
     await Timer(clk_ns, unit='ns')
     assert dut.extern_uart_tx.value == 0b1, "UART TX reset failed"
-    assert dut.data_sent.value == 0b0, "UART TX reset failed"
+    assert dut.data_sent.value == 0b1, "UART TX reset failed"
 
     dut.data.value = 0b10101100
     dut.data_en.value = 0b1
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b0, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b0, "UART TX data set failed"
     dut.data_en.value = 0b0
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b0, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b0, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b0, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b0, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b0, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b0, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b0, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b0, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     assert dut.data_sent.value == 0b1, "data_sent not set"
     await Timer(bit_hold, unit='ns')
-    assert dut.data_sent.value == 0b0, "data_sent not re-set"
 
     dut.data_en.value = 0b0
     await Timer(bit_hold, unit='ns')
@@ -59,25 +58,24 @@ async def uart_tx(dut):
     dut.data.value = 0b11011101
     dut.data_en.value = 0b1
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b0, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b0, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b0, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b0, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b0, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b0, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     await Timer(bit_hold, unit='ns')
-    assert dut.extern_uart_tx.value == 0b1, "UART RX data set failed"
+    assert dut.extern_uart_tx.value == 0b1, "UART TX data set failed"
     assert dut.data_sent.value == 0b1, "data_sent not set"
     await Timer(bit_hold, unit='ns')
-    assert dut.data_sent.value == 0b0, "data_sent not re-set"

@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 3.15...4.0)
 if(${DEVICE_TYPE} STREQUAL "functional")
 
     SET(DEVICE_CODE
-        functional.cpp
+        functional_impl.cpp
     )
 
 elseif(${DEVICE_TYPE} STREQUAL "serial")
 
     SET(DEVICE_CODE
-        serial.cpp
+        serial_impl.cpp
     )
 
     
