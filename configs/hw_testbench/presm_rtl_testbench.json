@@ -1,10 +1,10 @@
 {
     "driver": {
-        "name": "presm"
+        "name": ""
     },
 
     "device": {
-        "name": "presm",
+        "name": "",
         "type": "rtl_testbench",
 
         "rtl_testbench": {
@@ -40,7 +40,7 @@
             "rtl_src": "uart_tx.v",
             "rtl_top_level": "UARTTx",
             "testbench_src": "uart_tx.py",
-            "enable": false
+            "enable": true
         }
     ]
 }

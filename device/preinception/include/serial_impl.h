@@ -8,7 +8,7 @@ class SerialImpl : public SerialDevice {
 public:
     SerialImpl();
 
-    void serial_read_process(char data) override;
+    void serial_read_process(uint8_t data) override;
     
     uint32_t allocate_device_memory(uint32_t size_in_bytes) override;
     char* read_from_device_memory(uint32_t address, uint32_t size_in_bytes) override;

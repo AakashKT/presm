@@ -16,7 +16,7 @@ def setup(args, config, execution_dir):
     driver_lib_path, driver_lib, _ = utils.get_driver_lib(config)
     utils._copy_file(f'{driver_lib_path}/{driver_lib}', execution_dir)
 
-    utils._copy_file(args.config, execution_dir + '/presm_config.json')
+    utils._copy_file(args.config, execution_dir + '/hw_config.json')
 
     return verification_exe, driver_lib
 

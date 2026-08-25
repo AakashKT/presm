@@ -36,6 +36,7 @@ module UARTTx
         if(async_reset)
         begin
             tx_state <= TX_IDLE;
+            data_sent <= 0;
         end
         else
         begin
@@ -47,7 +48,6 @@ module UARTTx
                     begin
                         tx_bit_number <= 0;
                         tx_counter <= 0;
-                        data_sent <= 0;
 
                         tx_state <= TX_START;
                     end
@@ -98,12 +98,15 @@ module UARTTx
                 TX_STOP:
                 begin
                     extern_uart_tx <= 1;
-                    data_sent <= 1;
 
                     if(tx_counter == DELAY_WAIT)
                     begin
-                        tx_state <= TX_IDLE;
-                        tx_counter <= 0;
+                        data_sent <= 1;
+                        if(data_en == 0)
+                        begin
+                            tx_state <= TX_IDLE;
+                            tx_counter <= 0;
+                        end
                     end
                     else
                     begin

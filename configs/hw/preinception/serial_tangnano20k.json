@@ -15,7 +15,9 @@
 
         "fpga": {
             "name": "tangnano20k",
-            "identity_string": "pinc",
+            "start_byte": 1,
+            "identity_byte": 2,
+            "reset_byte": 3,
             "baud_rate": 115200
         }
     },

@@ -41,7 +41,7 @@ module UARTRx
             rx_state <= RX_IDLE;
 
             data <= 0;
-            data_en <= 0;
+            data_en <= 1;
         end
         else
         begin
@@ -57,6 +57,10 @@ module UARTRx
                         data_en <= 0;
                         
                         rx_state <= RX_START;
+                    end
+                    else
+                    begin
+                        data_en <= 1;
                     end
                 end
 
