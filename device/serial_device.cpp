@@ -50,12 +50,6 @@ void SerialDevice::device_initialize()
         this
     );
 
-    uint8_t tx[5] = {1, 0, 0, 1, 0};
-    ssize_t bytes_written = write(this->port_fd, &tx, 5);
-    if (bytes_written != 5) {
-        this->log->log_error_and_exit("Failed initialize handshake over UART.");
-    }
-
     this->serial_port_read_process_thread = std::thread(
         [&](SerialDevice* current_device) {
             while(true) {
@@ -67,6 +61,12 @@ void SerialDevice::device_initialize()
         },
         this
     );
+
+    uint8_t tx[5] = {1, 1, 0, 0, 0};
+    ssize_t bytes_written = write(this->port_fd, &tx, 5);
+    if (bytes_written != 5) {
+        this->log->log_error_and_exit("Failed initialize handshake over UART.");
+    }
     
     usleep(10000);
 }

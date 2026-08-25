@@ -17,7 +17,7 @@ async def send_rx_bits(dut, bit_hold, bits, num_bits):
         await Timer(bit_hold, unit='ns')
 
 @cocotb.test()
-async def uart_interface_write(dut):
+async def uart_interface_test(dut):
     freq = 27000000 
     baud_rate = 115200
 
@@ -35,83 +35,38 @@ async def uart_interface_write(dut):
     dut.extern_reset.value = 0
     await Timer(clk_ns, unit='ns')
 
-    # Handshake 1
     b0 = 0b1000000010
-    b1 = 0b1000000000
+    b1 = 0b1000000100
     b2 = 0b1000000000
-    b3 = 0b1000000010
-    b4 = 0b1000000000
+    b3 = 0b1000000000
     await send_rx_bits(dut, bit_hold, b0, 10)
     await send_rx_bits(dut, bit_hold, b1, 10)
     await send_rx_bits(dut, bit_hold, b2, 10)
     await send_rx_bits(dut, bit_hold, b3, 10)
-    await send_rx_bits(dut, bit_hold, b4, 10)
 
-    bits_to_assert = 0b1000000110
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    # Handshake 2
-    b0 = 0b1000000010
-    b1 = 0b1000000000
-    b2 = 0b1000000000
-    b3 = 0b1000000010
-    b4 = 0b1000000000
+    b0 = 0b1000000110
+    b1 = 0b1000001110
     await send_rx_bits(dut, bit_hold, b0, 10)
     await send_rx_bits(dut, bit_hold, b1, 10)
-    await send_rx_bits(dut, bit_hold, b2, 10)
-    await send_rx_bits(dut, bit_hold, b3, 10)
-    await send_rx_bits(dut, bit_hold, b4, 10)
+
+    assert dut.rx_packet_ready.value == 1
+
+    bits_to_assert = 0b1000000010
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
+    bits_to_assert = 0b1000000100
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
+    bits_to_assert = 0b1000000000
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
+    bits_to_assert = 0b1000000000
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
+    bits_to_assert = 0b1000001100
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
 
     bits_to_assert = 0b1000000110
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
 
-
-# @cocotb.test()
-# async def uart_interface_read(dut):
-#     freq = 27000000 
-#     baud_rate = 115200
-
-#     clk_ns = round(1e9 / freq, 2)
-#     bit_hold = round(clk_ns * float(freq) / baud_rate, 2)
-
-#     dut.extern_reset.value = 0
-#     dut.extern_uart_rx.value = 1
-
-#     clk = Clock(dut.extern_clock, clk_ns, unit='ns')
-#     clk.start(start_high=False)
-
-#     await RisingEdge(dut.extern_clock)
-#     await Timer(clk_ns, unit='ns')
-
-#     dut.extern_reset.value = 1
-#     await Timer(clk_ns, unit='ns')
-#     dut.extern_reset.value = 0
-#     await Timer(clk_ns, unit='ns')
-
-#     # Handshake
-#     i = 0b1011010010
-#     d = 0b1011001000
-#     e = 0b1011001010
-#     n = 0b1011011100
-#     await send_rx_bits(dut, bit_hold, i, 10)
-#     await send_rx_bits(dut, bit_hold, d, 10)
-#     await send_rx_bits(dut, bit_hold, e, 10)
-#     await send_rx_bits(dut, bit_hold, n, 10)
-
-#     bit_to_send = 0b1101010010
-#     await send_rx_bits(dut, bit_hold, bit_to_send, 10)
-#     await send_rx_bits(dut, bit_hold, bit_to_send, 10)
-#     await send_rx_bits(dut, bit_hold, bit_to_send, 10)
-#     await send_rx_bits(dut, bit_hold, bit_to_send, 10)
-
-#     assert dut.dword_read_flag.value == 1
-#     assert dut.dword_read.value == 0b10101001101010011010100110101001
-
-#     bit_to_send = 0b1101111000
-#     await send_rx_bits(dut, bit_hold, bit_to_send, 10)
-#     await send_rx_bits(dut, bit_hold, bit_to_send, 10)
-#     await send_rx_bits(dut, bit_hold, bit_to_send, 10)
-#     await send_rx_bits(dut, bit_hold, bit_to_send, 10)
-
-#     assert dut.dword_read_flag.value == 1
-#     assert dut.dword_read.value == 0b10111100101111001011110010111100
+    assert dut.rx_packet_ready.value == 1
