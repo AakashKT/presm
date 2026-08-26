@@ -39,7 +39,7 @@ void SerialImpl::device_find()
         if (bytes_written != 4)
             this->log->log_error_and_exit("Failed initialize handshake over UART.");
 
-        uint8_t rx[4];
+        uint8_t rx[6];
         uint32_t total_bytes_read = 0;
         auto begin_time = std::chrono::high_resolution_clock::now();
         uint8_t rx_ptr = 0;
@@ -50,12 +50,9 @@ void SerialImpl::device_find()
                 rx_ptr += static_cast<uint8_t>(bytes_read);
                 total_bytes_read += bytes_read;
 
-                if(total_bytes_read == 4) {
-                    this->log->log_info("Read 4 bytes from device.");
-                    if(rx[0] == 1 &&
-                        rx[1] == 0 &&
-                        rx[2] == 2 &&
-                        rx[3] == 1
+                if(total_bytes_read == 6) {
+                    this->log->log_info("Read 6 bytes from device.");
+                    if(rx[4] == 2 && rx[5] == 1
                     ) {
                         this->log->log_info("Found device in serial port '" + port_string + "'.");
                         found = true;

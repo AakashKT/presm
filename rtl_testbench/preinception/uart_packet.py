@@ -38,7 +38,7 @@ async def uart_packet_read(dut):
     dut.tx_packet[0].value = 1
     dut.tx_packet[1].value = 2
     dut.tx_packet[2].value = 0
-    dut.tx_packet[3].value = 0
+    dut.tx_packet[3].value = 2
     
     dut.tx_packet[4].value = 2
     dut.tx_packet[5].value = 4
@@ -56,7 +56,7 @@ async def uart_packet_read(dut):
     bits_to_assert = 0b1000000000
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
 
-    bits_to_assert = 0b1000000000
+    bits_to_assert = 0b1000000100
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
 
     bits_to_assert = 0b1000000100
@@ -86,9 +86,9 @@ async def uart_packet_write(dut):
 
     # Packet 1
     b0 = 0b1000000010
-    b1 = 0b1000001000
-    b2 = 0b1000000000
-    b3 = 0b1000000010
+    b1 = 0b1000010000
+    b2 = 0b1000000100
+    b3 = 0b1000001000
     await send_rx_bits(dut, bit_hold, b0, 10)
     await send_rx_bits(dut, bit_hold, b1, 10)
     await send_rx_bits(dut, bit_hold, b2, 10)
@@ -106,14 +106,17 @@ async def uart_packet_write(dut):
     await send_rx_bits(dut, bit_hold, b3, 10)
 
     assert dut.rx_packet_ready.value == 1
-    assert dut.rx_packet[1].value == 4
+    assert dut.rx_packet[0].value == 1
+    assert dut.rx_packet[1].value == 8
+    assert dut.rx_packet[2].value == 2
+    assert dut.rx_packet[3].value == 4
     assert dut.rx_packet[4].value == 8
     assert dut.rx_packet[5].value == 9
     assert dut.rx_packet[6].value == 5
     assert dut.rx_packet[7].value == 3
 
     # Packet 2
-    b0 = 0b1000000010
+    b0 = 0b1000000100
     b1 = 0b1000000110
     b2 = 0b1000000000
     b3 = 0b1000000010
@@ -125,14 +128,11 @@ async def uart_packet_write(dut):
     assert dut.rx_packet_ready.value == 0
 
     b0 = 0b1000010110
-    b1 = 0b1000011010
-    b2 = 0b1000001110
     await send_rx_bits(dut, bit_hold, b0, 10)
-    await send_rx_bits(dut, bit_hold, b1, 10)
-    await send_rx_bits(dut, bit_hold, b2, 10)
 
     assert dut.rx_packet_ready.value == 1
+    assert dut.rx_packet[0].value == 2
     assert dut.rx_packet[1].value == 3
+    assert dut.rx_packet[2].value == 0
+    assert dut.rx_packet[3].value == 1
     assert dut.rx_packet[4].value == 11
-    assert dut.rx_packet[5].value == 13
-    assert dut.rx_packet[6].value == 7

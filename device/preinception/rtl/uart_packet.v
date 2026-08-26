@@ -77,15 +77,10 @@ module UARTPacket
             case(rx_state)
                 RX_IDLE:
                 begin
-                    if(rx_data_en == 1)
+                    if(rx_data_en == 0)
                     begin
-                        if(rx_data == 8'd1)
-                        begin
-                            rx_state <= RX_HEADER_RECEIVE_WAIT;
-
-                            rx_packet[0] <= 1;
-                            rx_packet_idx <= 1;
-                        end
+                        rx_state <= RX_HEADER_RECEIVE;
+                        rx_packet_idx <= 0;
                     end
                 end
 
@@ -115,7 +110,7 @@ module UARTPacket
 
                 RX_BODY_RECEIVE_WAIT:
                 begin
-                    if(rx_packet_idx == rx_packet[1])
+                    if(rx_packet_idx == rx_packet[3])
                     begin
                         rx_state <= RX_END;
                     end
@@ -213,7 +208,7 @@ module UARTPacket
                 begin
                     if(tx_data_sent == 1)
                     begin
-                        if(tx_packet_idx == tx_packet[1] + 4)
+                        if(tx_packet_idx == tx_packet[3] + 4)
                         begin
                             tx_state <= TX_END;
                         end

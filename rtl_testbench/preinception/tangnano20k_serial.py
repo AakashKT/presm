@@ -52,6 +52,12 @@ async def uart_interface_test(dut):
     bits_to_assert = 0b1000000000
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
 
+    bits_to_assert = 0b1000000000
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
+    bits_to_assert = 0b1000000100
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
     bits_to_assert = 0b1000000100
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
 
@@ -78,6 +84,12 @@ async def uart_interface_test(dut):
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
 
     bits_to_assert = 0b1000000000
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
+    bits_to_assert = 0b1000000000
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
+    bits_to_assert = 0b1000000100
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
 
     bits_to_assert = 0b1000000100
