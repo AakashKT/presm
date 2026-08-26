@@ -4,10 +4,6 @@ SerialDevice::SerialDevice()
     : Device()
 {
     this->log->log_info("SerialDevice constructor called");
-
-    this->start_byte = this->device_config["fpga"]["start_byte"];
-    this->identity_byte = this->device_config["fpga"]["identity_byte"];
-    this->reset_byte = this->device_config["fpga"]["reset_byte"];
 }
 
 SerialDevice::~SerialDevice()
@@ -23,23 +19,13 @@ SerialDevice::~SerialDevice()
 
 void SerialDevice::device_initialize()
 {
-    this->log->log_info("SerialDevice::device_initialize()");
-    
-    bool opened = this->open_serial_port("/dev/ttyUSB1");
-    if(!opened)
-        this->log->log_error_and_exit("Failed to open serial port.");
-
-    this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
-    tcflush(this->port_fd, TCIOFLUSH);
+    this->device_find();
 
     this->serial_port_listen_thread = std::thread(
         [&](SerialDevice* current_device) {
-            uint8_t data;
-
-            uint32_t bytes_read = 0;
-
             while(true) {
-                bytes_read = read(current_device->port_fd, &data, 1);
+                uint8_t data = 0;
+                uint32_t bytes_read = read(current_device->port_fd, &data, 1);
 
                 if(bytes_read > 0) {
                     current_device->read_buffer[current_device->read_buffer_ptr_hi % 256] = data;
@@ -61,32 +47,6 @@ void SerialDevice::device_initialize()
         },
         this
     );
-
-    uint8_t tx[5] = {1, 1, 0, 0, 0};
-    ssize_t bytes_written = write(this->port_fd, &tx, 5);
-    if (bytes_written != 5) {
-        this->log->log_error_and_exit("Failed initialize handshake over UART.");
-    }
-    
-    usleep(10000);
-}
-
-void SerialDevice::send_device_packet(uint32_t size_in_bytes, char* packet)
-{
-    write(this->port_fd, packet, size_in_bytes);
-    
-    std::stringstream ss;
-    for(uint32_t i=0; i<size_in_bytes; i++)
-        ss << std::hex << (int)packet[i];
-}
-
-void SerialDevice::serial_port_write_block(uint32_t size_in_bytes, char* data)
-{
-    while(true) {
-        auto bytes_written = write(this->port_fd, data, size_in_bytes);
-        if(bytes_written == size_in_bytes)
-            break;
-    }
 }
 
 bool SerialDevice::open_serial_port(std::string port_name)

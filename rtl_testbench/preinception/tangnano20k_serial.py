@@ -36,7 +36,7 @@ async def uart_interface_test(dut):
     await Timer(clk_ns, unit='ns')
 
     b0 = 0b1000000010
-    b1 = 0b1000000100
+    b1 = 0b1000000000
     b2 = 0b1000000000
     b3 = 0b1000000000
     await send_rx_bits(dut, bit_hold, b0, 10)
@@ -44,29 +44,46 @@ async def uart_interface_test(dut):
     await send_rx_bits(dut, bit_hold, b2, 10)
     await send_rx_bits(dut, bit_hold, b3, 10)
 
-    b0 = 0b1000000110
-    b1 = 0b1000001110
+    assert dut.rx_packet_ready.value == 1
+
+    bits_to_assert = 0b1000000010
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
+    bits_to_assert = 0b1000000000
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
+    bits_to_assert = 0b1000000100
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
+    bits_to_assert = 0b1000000010
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    
+    assert dut.rx_packet_ready.value == 1
+
+    dut.rx_packet_ready.value = 0
+    await Timer(clk_ns, unit='ns')
+    
+    b0 = 0b1000000010
+    b1 = 0b1000000000
+    b2 = 0b1000000000
+    b3 = 0b1000000000
     await send_rx_bits(dut, bit_hold, b0, 10)
     await send_rx_bits(dut, bit_hold, b1, 10)
+    await send_rx_bits(dut, bit_hold, b2, 10)
+    await send_rx_bits(dut, bit_hold, b3, 10)
 
     assert dut.rx_packet_ready.value == 1
 
     bits_to_assert = 0b1000000010
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
 
+    bits_to_assert = 0b1000000000
+    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+
     bits_to_assert = 0b1000000100
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
 
-    bits_to_assert = 0b1000000000
+    bits_to_assert = 0b1000000010
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    bits_to_assert = 0b1000001100
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    bits_to_assert = 0b1000000110
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
+    
     assert dut.rx_packet_ready.value == 1
