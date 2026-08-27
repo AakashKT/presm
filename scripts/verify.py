@@ -1,11 +1,14 @@
 import os, argparse, shutil, utils, json
 
 def verify_output(source, target):
-    i = 0
-    for line in target:
-        if line != source[i]:
-            return False
-        i += 1
+    try:
+        i = 0
+        for line in target:
+            if line != source[i]:
+                return False
+            i += 1
+    except:
+        return False
     
     return True
 
@@ -53,10 +56,10 @@ if __name__ == '__main__':
                 print('')
             else:
                 utils.print_red(f'Verification of {app["name"]} failed.')
-                print('\nSource output:')
+                print('\nPRESM output:')
                 print(source)
 
-                print('\nTarget output:')
+                print('\nHost output:')
                 print(target)
                 print('')
                 exit(1)

@@ -14,7 +14,14 @@ SerialDevice::~SerialDevice()
     this->serial_port_read_process_thread.detach();
 
     delete this->log;
+    
+    tcflush(this->port_fd, TCIOFLUSH);
     close(this->port_fd);
+}
+
+void SerialDevice::send_device_packet(void* packet, uint32_t size_in_bytes)
+{
+    write(this->port_fd, (uint8_t*)packet, size_in_bytes);
 }
 
 void SerialDevice::device_initialize()

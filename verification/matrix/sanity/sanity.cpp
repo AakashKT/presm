@@ -1,20 +1,36 @@
 #include "matrix.h"
 #include "matrix_app.h"
 
-void run_sanity(std::vector<std::string> args)
+void device_run()
 {
     mInit();
 
-    // MIntDeviceMemory a(60);
-    // MIntDeviceMemory b(20);
-    // MIntDeviceMemory c(10);
+    MIntDeviceMemory a(60);
+    MIntDeviceMemory b(20);
+    MIntDeviceMemory c(10);
 
-    // mAdd(a, b, c);
+    mAdd(a, b, c);
 
-    // std::cout << a.getValue() << " + " << b.getValue() << " = " << c.getValue() << std::endl;
-
-    // std::string temp;
-    // std::cin >> temp;
+    std::cout << a.getValue() << " + " << b.getValue() << " = " << c.getValue() << std::endl;
 
     mFree();
+}
+
+void host_run()
+{
+    int a = 64;
+    int b = 20;
+    int c = 10;
+
+    c = a + b;
+
+    std::cout << std::to_string(a) << " + " << std::to_string(b) << " = " << std::to_string(c) << std::endl; 
+}
+
+void run_sanity(std::vector<std::string> args)
+{
+    if(args[0] == "device")
+        device_run();
+    else
+        host_run();
 }
