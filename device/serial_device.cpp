@@ -19,11 +19,6 @@ SerialDevice::~SerialDevice()
     close(this->port_fd);
 }
 
-void SerialDevice::send_device_packet(void* packet, uint32_t size_in_bytes)
-{
-    write(this->port_fd, (uint8_t*)packet, size_in_bytes);
-}
-
 void SerialDevice::device_initialize()
 {
     this->device_find();

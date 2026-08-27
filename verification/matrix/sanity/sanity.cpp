@@ -9,7 +9,8 @@ void device_run()
     MIntDeviceMemory b(20);
     MIntDeviceMemory c(10);
 
-    mAdd(a, b, c);
+    MCommandInfo addCmd = mAdd(a, b, c);
+    mSync(addCmd);
 
     std::cout << a.getValue() << " + " << b.getValue() << " = " << c.getValue() << std::endl;
 

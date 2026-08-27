@@ -36,7 +36,7 @@ module CommandProcessor
                 begin
                     if(rx_packet_ready == 1)
                     begin
-                        if(rx_packet[15:8] == 8'd0)
+                        if(rx_packet[15:8] == 8'd1)
                         begin
                             cp_state <= CP_HANDSHAKE_PREP;
                         end
@@ -51,7 +51,7 @@ module CommandProcessor
 
                 CP_HANDSHAKE:
                 begin
-                    tx_packet[7:0] <= 1;
+                    tx_packet[7:0] <= rx_packet[7:0];
                     tx_packet[15:8] <= 0;
                     tx_packet[23:16] <= 0;
                     tx_packet[31:24] <= 8'd2;

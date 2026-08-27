@@ -1,6 +1,8 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include <cstdint>
+
 class MIntDeviceMemory {
 public:
     MIntDeviceMemory(int source);
@@ -11,10 +13,16 @@ private:
     int address;
 };
 
+class MCommandInfo {
+public:
+    MCommandInfo(uint8_t id) : id(id) {};
+
+    uint8_t id;
+};
+
 void mInit();
-
-void mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
-
+MCommandInfo mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
+void mSync(MCommandInfo& info);
 void mFree();
 
 #endif
