@@ -19,7 +19,8 @@ module UARTPacket
     output reg rx_packet_ready,
 
     input wire [63:0] tx_packet_flat,
-    input wire tx_packet_ready
+    input wire tx_packet_ready,
+    output reg tx_packet_sent
 );
 
     reg [7:0] rx_packet[8];
@@ -67,6 +68,14 @@ module UARTPacket
     begin
         if(extern_reset)
         begin
+            rx_packet[0] <= 0;
+            rx_packet[1] <= 0;
+            rx_packet[2] <= 0;
+            rx_packet[3] <= 0;
+            rx_packet[4] <= 0;
+            rx_packet[5] <= 0;
+            rx_packet[6] <= 0;
+            rx_packet[7] <= 0;
             rx_packet_ready <= 0;
 
             rx_state <= RX_IDLE;
@@ -174,6 +183,8 @@ module UARTPacket
 
             tx_state <= TX_IDLE;
             tx_packet_idx <= 0;
+
+            tx_packet_sent <= 0;
         end
         else
         begin
@@ -185,6 +196,10 @@ module UARTPacket
                     begin
                         tx_packet_idx <= 0;
                         tx_state <= TX_SEND;
+                    end
+                    else
+                    begin
+                        tx_packet_sent <= 0;
                     end
                 end
 
@@ -222,6 +237,7 @@ module UARTPacket
 
                 TX_END:
                 begin
+                    tx_packet_sent <= 1;
                     if(tx_packet_ready == 0)
                     begin
                         tx_state <= TX_IDLE;

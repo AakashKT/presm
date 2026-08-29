@@ -30,6 +30,8 @@ void SerialDevice::device_initialize()
                 uint32_t bytes_read = read(current_device->port_fd, &data, 1);
 
                 if(bytes_read > 0) {
+                    this->log->log_info("[SerialDevice] Received " + std::to_string(bytes_read) + " bytes from serial port.");
+                    
                     current_device->read_buffer[current_device->read_buffer_ptr_hi % 256] = data;
                     current_device->read_buffer_ptr_hi++;
                 }

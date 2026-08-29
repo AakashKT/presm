@@ -21,8 +21,9 @@ module Tangnano20kUart
     wire [63:0] rx_packet;
     wire rx_packet_ready;
 
-    wire [63:0] tx_packet;
+    reg [63:0] tx_packet;
     reg tx_packet_ready;
+    reg tx_packet_sent;
 
     UARTPacket uartPacket(
         extern_clock,
@@ -32,7 +33,8 @@ module Tangnano20kUart
         rx_packet,
         rx_packet_ready,
         tx_packet,
-        tx_packet_ready
+        tx_packet_ready,
+        tx_packet_sent
     );
 
     CommandProcessor cp(
@@ -41,7 +43,8 @@ module Tangnano20kUart
         rx_packet,
         rx_packet_ready,
         tx_packet,
-        tx_packet_ready
+        tx_packet_ready,
+        tx_packet_sent
     );
 
 endmodule

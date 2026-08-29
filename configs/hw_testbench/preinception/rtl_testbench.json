@@ -33,7 +33,7 @@
             "rtl_src": "command_processor.v",
             "rtl_top_level": "CommandProcessor",
             "testbench_src": "command_processor.py",
-            "enable": false
+            "enable": true
         },
         {
             "name": "Adder",

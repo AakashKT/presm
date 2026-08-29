@@ -8,9 +8,8 @@ public:
     MIntDeviceMemory(int source);
     int getValue();
 
-private:
-    int size_in_bytes;
-    int address;
+    uint32_t size_in_bytes;
+    uint32_t address;
 };
 
 class MCommandInfo {

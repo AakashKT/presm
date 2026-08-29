@@ -17,7 +17,7 @@ async def send_rx_bits(dut, bit_hold, bits, num_bits):
         await Timer(bit_hold, unit='ns')
 
 @cocotb.test()
-async def uart_packet_read(dut):
+async def uart_packet_transmit(dut):
     freq = 27000000 
     baud_rate = 115200
 
@@ -46,27 +46,35 @@ async def uart_packet_read(dut):
     dut.tx_packet_ready.value = 1
     await Timer(3*clk_ns, unit='ns')
     await Timer(1*bit_hold, unit='ns')
+
+    assert dut.tx_packet_sent.value == 0
     
     bits_to_assert = 0b1000000010
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    assert dut.tx_packet_sent.value == 0
 
     bits_to_assert = 0b1000000100
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    assert dut.tx_packet_sent.value == 0
 
     bits_to_assert = 0b1000000000
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    assert dut.tx_packet_sent.value == 0
 
     bits_to_assert = 0b1000000100
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    assert dut.tx_packet_sent.value == 0
 
     bits_to_assert = 0b1000000100
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    assert dut.tx_packet_sent.value == 0
 
     bits_to_assert = 0b1000001000
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    assert dut.tx_packet_sent.value == 1
 
 @cocotb.test()
-async def uart_packet_write(dut):
+async def uart_packet_receive(dut):
     freq = 27000000 
     baud_rate = 115200
 

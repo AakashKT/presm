@@ -17,22 +17,27 @@ void SerialImpl::send_device_payload(void* payload)
     DevicePayload* sc = (DevicePayload*) payload;
 
     auto bytes_written = write(this->port_fd, (uint8_t*)sc->packet, 4 + sc->fields.num_bytes);
-    if (bytes_written != 4)
+    if (bytes_written != 4 + sc->fields.num_bytes)
         this->log->log_error_and_exit("Failed to send device payload.");
+
+    this->log->log_info("[SerialImpl] Sent " + std::to_string(bytes_written) + " bytes to device.");
 }
 
 bool SerialImpl::receive_device_payload(void **payload)
 {
-    if(this->received_payloads.size() == 0)
+    auto sc = this->received_payloads.pop_front();
+
+    if(sc == std::nullopt)
         return false;
+    else {
+        DevicePayload* rval = (DevicePayload*) malloc(sizeof(DevicePayload));
+        *rval = *sc;
+        *payload = rval;
 
-    DevicePayload* sc = (DevicePayload*) malloc(sizeof(DevicePayload));
-    *sc = this->received_payloads.front();
-    *payload = sc;
+        this->log->log_info("[SerialImpl] Received " + std::to_string(4 + (*rval).fields.num_bytes) + " bytes from device.");
 
-    this->received_payloads.pop();
-
-    return true;
+        return true;
+    }
 }
 
 uint32_t SerialImpl::allocate_device_memory(uint32_t size_in_bytes)
@@ -40,14 +45,63 @@ uint32_t SerialImpl::allocate_device_memory(uint32_t size_in_bytes)
     return this->device_memory->allocate(size_in_bytes);
 }
 
-void SerialImpl::write_to_device_memory(uint32_t address, uint32_t size_in_bytes, const char* data)
+void SerialImpl::write_to_device_memory(uint32_t address, uint32_t size_in_bytes, const uint8_t* data)
 {
     this->device_memory->write(address, size_in_bytes, data);
 }
 
-char* SerialImpl::read_from_device_memory(uint32_t address, uint32_t size_in_bytes)
+uint8_t* SerialImpl::read_from_device_memory(uint32_t address, uint32_t size_in_bytes)
 {
     return this->device_memory->read(address, size_in_bytes);
+}
+
+void SerialImpl::process_mem_request(DevicePayload& payload)
+{
+    if(payload.fields.sub_cmd == 1) {
+        std::stringstream stream;
+        stream << std::hex << payload.fields32.body;
+        this->log->log_info("Device requested read from address: 0x" + stream.str());
+
+        uint8_t* mem_val = this->read_from_device_memory(payload.fields32.body, 4);
+
+        DevicePayload mem_response;
+        mem_response.fields.id = payload.fields.id;
+        mem_response.fields.cmd = payload.fields.cmd;
+        mem_response.fields.sub_cmd = payload.fields.sub_cmd;
+        mem_response.fields.num_bytes = 4;
+        mem_response.fields.body_1 = mem_val[0];
+        mem_response.fields.body_2 = mem_val[1];
+        mem_response.fields.body_3 = mem_val[2];
+        mem_response.fields.body_4 = mem_val[3];
+        this->send_device_payload(&mem_response);
+    }
+    else if(payload.fields.sub_cmd == 2 || payload.fields.sub_cmd == 3) {
+        if(this->mem_write_state == ADDR_RECV) {
+            std::stringstream stream;
+            stream << std::hex << payload.fields32.body;
+            this->log->log_info("Device requested write to address: 0x" + stream.str());
+
+            this->mem_write_addr_scratch = payload.fields32.body;
+            this->mem_write_state = VAL_RECV;
+        }
+        else if(this->mem_write_state == VAL_RECV) {
+            std::stringstream stream;
+            stream << std::hex << payload.fields32.body;
+            this->log->log_info("[Cont.] value: " + stream.str());
+
+            uint8_t data[4] = { payload.fields.body_1, payload.fields.body_2, payload.fields.body_3, payload.fields.body_4 };
+            this->write_to_device_memory(this->mem_write_addr_scratch, 4, data);
+
+            DevicePayload mem_response;
+            mem_response.fields.id = payload.fields.id;
+            mem_response.fields.cmd = 0;
+            mem_response.fields.sub_cmd = 0;
+            mem_response.fields.num_bytes = 0;
+            this->send_device_payload(&mem_response);
+
+            this->mem_write_state = ADDR_RECV;
+        }
+    }
 }
 
 void SerialImpl::serial_read_process(uint8_t data)
@@ -58,7 +112,11 @@ void SerialImpl::serial_read_process(uint8_t data)
         this->scratch_ptr_max = this->scratch.fields.num_bytes + 4;
 
     if(this->scratch_ptr == this->scratch_ptr_max) {
-        this->received_payloads.push(this->scratch);
+        if(this->scratch.fields.cmd == 0 && this->scratch.fields.sub_cmd > 0) 
+            this->process_mem_request(this->scratch);
+        else {
+            this->received_payloads.push_back(this->scratch);
+        }
 
         this->scratch_ptr = 0;
         this->scratch_ptr_max = 8;
@@ -80,6 +138,7 @@ void SerialImpl::device_find()
         }
 
         this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
+        usleep(1000000);
         tcflush(this->port_fd, TCIOFLUSH);
 
         DevicePayload tx;
