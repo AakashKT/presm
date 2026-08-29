@@ -29,7 +29,7 @@ public:
 private:
     ThreadSafeList<DevicePayload> received_payloads;
     DevicePayload scratch;
-    uint32_t scratch_ptr = 0, scratch_ptr_max = 8;
+    uint32_t scratch_ptr = 0;
 
     MemWriteState mem_write_state = ADDR_RECV;
     uint32_t mem_write_addr_scratch;

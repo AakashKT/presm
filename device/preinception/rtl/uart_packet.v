@@ -54,15 +54,13 @@ module UARTPacket
         rx_data_en
     );
 
-    reg [2:0] rx_state;
-    reg [4:0] rx_packet_idx;
+    reg [1:0] rx_state;
+    reg [3:0] rx_packet_idx;
 
     localparam RX_IDLE = 0;
-    localparam RX_HEADER_RECEIVE_WAIT = 1;
-    localparam RX_HEADER_RECEIVE = 2;
-    localparam RX_BODY_RECEIVE_WAIT = 3;
-    localparam RX_BODY_RECEIVE = 4;
-    localparam RX_END = 5;
+    localparam RX_RECEIVE_WAIT = 1;
+    localparam RX_RECEIVE = 2;
+    localparam RX_END = 3;
 
     always @(posedge extern_clock or posedge extern_reset)
     begin
@@ -88,55 +86,31 @@ module UARTPacket
                 begin
                     if(rx_data_en == 0)
                     begin
-                        rx_state <= RX_HEADER_RECEIVE;
+                        rx_state <= RX_RECEIVE;
                         rx_packet_idx <= 0;
                     end
                 end
 
-                RX_HEADER_RECEIVE_WAIT:
+                RX_RECEIVE_WAIT:
                 begin
-                    if(rx_packet_idx == 4)
+                    if(rx_packet_idx == 8)
                     begin
-                        rx_packet_idx <= 0;
-                        rx_state <= RX_BODY_RECEIVE_WAIT;
+                        rx_state <= RX_END;
                     end
                     else if(rx_data_en == 0)
                     begin
-                        rx_state <= RX_HEADER_RECEIVE;
+                        rx_state <= RX_RECEIVE;
                     end
                 end
 
-                RX_HEADER_RECEIVE:
+                RX_RECEIVE:
                 begin
                     if(rx_data_en == 1)
                     begin
                         rx_packet[rx_packet_idx] <= rx_data;
                         rx_packet_idx <= rx_packet_idx + 1;
 
-                        rx_state <= RX_HEADER_RECEIVE_WAIT;
-                    end
-                end
-
-                RX_BODY_RECEIVE_WAIT:
-                begin
-                    if(rx_packet_idx == rx_packet[3])
-                    begin
-                        rx_state <= RX_END;
-                    end
-                    else if(rx_data_en == 0)
-                    begin
-                        rx_state <= RX_BODY_RECEIVE;
-                    end
-                end
-
-                RX_BODY_RECEIVE:
-                begin
-                    if(rx_data_en == 1)
-                    begin
-                        rx_packet[rx_packet_idx + 4] <= rx_data;
-                        rx_packet_idx <= rx_packet_idx + 1;
-
-                        rx_state <= RX_BODY_RECEIVE_WAIT;
+                        rx_state <= RX_RECEIVE_WAIT;
                     end
                 end
 
@@ -168,7 +142,7 @@ module UARTPacket
     );
 
     reg [2:0] tx_state;
-    reg [4:0] tx_packet_idx;
+    reg [3:0] tx_packet_idx;
 
     localparam TX_IDLE = 0;
     localparam TX_SEND = 1;
@@ -223,7 +197,7 @@ module UARTPacket
                 begin
                     if(tx_data_sent == 1)
                     begin
-                        if(tx_packet_idx == tx_packet[3] + 4)
+                        if(tx_packet_idx == 8)
                         begin
                             tx_state <= TX_END;
                         end

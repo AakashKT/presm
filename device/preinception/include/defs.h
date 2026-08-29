@@ -5,9 +5,9 @@ union DevicePayload {
 
     struct Fields {
         uint8_t id;
+        uint8_t type;
         uint8_t cmd;
         uint8_t sub_cmd;
-        uint8_t num_bytes;
         uint8_t body_1;
         uint8_t body_2;
         uint8_t body_3;
