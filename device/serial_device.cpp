@@ -15,9 +15,9 @@ SerialDevice::~SerialDevice()
 
     delete this->log;
 
-    usleep(10);
+    usleep(1000);
     tcflush(this->port_fd, TCIOFLUSH);
-    usleep(10);
+    usleep(1000);
     close(this->port_fd);
 }
 
