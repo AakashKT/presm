@@ -37,6 +37,11 @@ module UARTTx
         begin
             tx_state <= TX_IDLE;
             data_sent <= 0;
+
+            extern_uart_tx <= 1;
+
+            tx_counter <= 0;
+            tx_bit_number <= 0;
         end
         else
         begin
@@ -101,11 +106,15 @@ module UARTTx
 
                     if(tx_counter == DELAY_WAIT)
                     begin
-                        data_sent <= 1;
                         if(data_en == 0)
                         begin
+                            data_sent <= 0;
                             tx_state <= TX_IDLE;
                             tx_counter <= 0;
+                        end
+                        else
+                        begin
+                            data_sent <= 1;
                         end
                     end
                     else

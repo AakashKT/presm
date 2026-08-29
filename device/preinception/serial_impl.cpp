@@ -16,6 +16,7 @@ void SerialImpl::send_device_payload(void* payload)
 {
     DevicePayload* sc = (DevicePayload*) payload;
 
+    usleep(10);
     auto bytes_written = write(this->port_fd, (uint8_t*)sc->packet, 8);
     if (bytes_written != 8)
         this->log->log_error_and_exit("Failed to send device payload.");
@@ -93,10 +94,10 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
             this->write_to_device_memory(this->mem_write_addr_scratch, 4, data);
 
             DevicePayload mem_response;
-            mem_response.fields.type = 1;
             mem_response.fields.id = payload.fields.id;
-            mem_response.fields.cmd = 0;
-            mem_response.fields.sub_cmd = 0;
+            mem_response.fields.type = 1;
+            mem_response.fields.cmd = payload.fields.cmd;
+            mem_response.fields.sub_cmd = payload.fields.sub_cmd;
             this->send_device_payload(&mem_response);
 
             this->mem_write_state = ADDR_RECV;
@@ -121,75 +122,65 @@ void SerialImpl::serial_read_process(uint8_t data)
 
 void SerialImpl::device_find()
 {
+    std::string port_string_base = "/dev/ttyUSB";
+    bool found = false;
 
-    bool opened = this->open_serial_port("/dev/ttyUSB1");
-    if(!opened) {
-        this->log->log_info("Failed to open serial port '/dev/ttyUSB1'.");
+    for(int i=0; i<5; i++) {
+        std::string port_string = port_string_base + std::to_string(i);
+
+        bool opened = this->open_serial_port(port_string);
+        if(!opened) {
+            this->log->log_info("Failed to open serial port '" + port_string + "'.");
+            continue;
+        }
+
+        this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
+        tcflush(this->port_fd, TCIOFLUSH);
+
+        DevicePayload tx;
+        tx.fields.id = 1;
+        tx.fields.type = 0;
+        tx.fields.cmd = 1;
+        tx.fields.sub_cmd = 0;
+        tx.fields32.body = 0;
+        this->send_device_payload(&tx);
+
+        DevicePayload rx;
+        uint32_t total_bytes_read = 0;
+        auto begin_time = std::chrono::high_resolution_clock::now();
+        uint8_t rx_ptr = 0;
+        while(true) {
+            ssize_t bytes_read = read(this->port_fd, &rx.packet[rx_ptr], 1);
+
+            if(bytes_read == 1) {
+                rx_ptr += 1;
+                total_bytes_read += 1;
+
+                if(total_bytes_read == 8) {
+                    if(rx.fields.id == 1 && rx.fields.type == 1 && rx.fields.body_1 == 2 && rx.fields.body_2 == 1) {
+                        this->log->log_info("Found device in serial port '" + port_string + "'.");
+                        found = true;
+                    }
+
+                    break;
+                }
+            }
+
+            auto time_diff = std::chrono::high_resolution_clock::now() - begin_time;
+            if(found || std::chrono::duration_cast<std::chrono::microseconds>(time_diff).count() >= 2e6)
+                break;
+        }
+
+        if(found)
+            break;
+        else {
+            tcflush(this->port_fd, TCIOFLUSH);
+            close(this->port_fd);
+        }
     }
 
-    this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
-    usleep(1000000);
-    tcflush(this->port_fd, TCIOFLUSH);
+    if(!found)
+        this->log->log_error_and_exit("Could not find device over serial port.");
 
-
-
-    // std::string port_string_base = "/dev/ttyUSB";
-    // bool found = false;
-
-    // for(int i=0; i<5; i++) {
-    //     std::string port_string = port_string_base + std::to_string(i);
-
-    //     bool opened = this->open_serial_port(port_string);
-    //     if(!opened) {
-    //         this->log->log_info("Failed to open serial port '" + port_string + "'.");
-    //         continue;
-    //     }
-
-    //     this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
-    //     tcflush(this->port_fd, TCIOFLUSH);
-
-    //     DevicePayload tx;
-    //     tx.fields.id = 1;
-    //     tx.fields.type = 0;
-    //     tx.fields.cmd = 1;
-    //     tx.fields.sub_cmd = 0;
-    //     tx.fields32.body = 0;
-    //     this->send_device_payload(&tx);
-
-    //     DevicePayload rx;
-    //     uint32_t total_bytes_read = 0;
-    //     auto begin_time = std::chrono::high_resolution_clock::now();
-    //     uint8_t rx_ptr = 0;
-    //     while(true) {
-    //         ssize_t bytes_read = read(this->port_fd, &rx.packet[rx_ptr], 1);
-
-    //         if(bytes_read == 1) {
-    //             rx_ptr += 1;
-    //             total_bytes_read += 1;
-
-    //             if(total_bytes_read == 8) {
-    //                 if(rx.fields.id == 1 && rx.fields.type == 1 && rx.fields.body_1 == 2 && rx.fields.body_2 == 1) {
-    //                     this->log->log_info("Found device in serial port '" + port_string + "'.");
-    //                     found = true;
-    //                 }
-
-    //                 break;
-    //             }
-    //         }
-
-    //         auto time_diff = std::chrono::high_resolution_clock::now() - begin_time;
-    //         if(found || std::chrono::duration_cast<std::chrono::microseconds>(time_diff).count() >= 2e6)
-    //             break;
-    //     }
-
-    //     if(found)
-    //         break;
-    //     else {
-    //         tcflush(this->port_fd, TCIOFLUSH);
-    //         close(this->port_fd);
-    //     }
-    // }
-
-    // if(!found)
-    //     this->log->log_error_and_exit("Could not find device over serial port.");
+    usleep(10);
 }

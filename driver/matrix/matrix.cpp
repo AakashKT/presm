@@ -30,7 +30,7 @@ void cmdSync(uint8_t id)
         if(!command_status_readback.empty()) {
             command_status_readback.for_each(
                 [&](DevicePayload item) {
-                    if(item.fields.id == id)
+                    if(item.fields.id == id && item.fields.type == 1)
                         finished = true;
                 }
             );
@@ -38,8 +38,6 @@ void cmdSync(uint8_t id)
 
         if(finished)
             break;
-        else
-            usleep(10);
     }
 }
 
@@ -92,21 +90,21 @@ MCommandInfo mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceM
     add_op_2.fields.id = (uint8_t) global_command_id++;
     add_op_2.fields.type = (uint8_t) 0;
     add_op_2.fields.cmd = (uint8_t) 2;
-    add_op_2.fields.sub_cmd = (uint8_t) 0;
+    add_op_2.fields.sub_cmd = (uint8_t) 1;
     add_op_2.fields32.body = second.address;
 
-    // DevicePayload add_op_3;
-    // add_op_3.fields.id = (uint8_t) global_command_id++;
-    // add_op_3.fields.cmd = (uint8_t) 2;
-    // add_op_3.fields.sub_cmd = (uint8_t) 2;
-    // add_op_3.fields.num_bytes = (uint8_t) 4;
-    // add_op_3.fields32.body = result.address;
+    DevicePayload add_op_3;
+    add_op_3.fields.id = (uint8_t) global_command_id++;
+    add_op_3.fields.type = (uint8_t) 0;
+    add_op_3.fields.cmd = (uint8_t) 2;
+    add_op_3.fields.sub_cmd = (uint8_t) 2;
+    add_op_3.fields32.body = result.address;
 
     command_buffer.push_back(add_op_1);
-    // command_buffer.push_back(add_op_2);
-    // command_buffer.push(add_op_3);
+    command_buffer.push_back(add_op_2);
+    command_buffer.push_back(add_op_3);
     
-    return MCommandInfo(add_op_1.fields.id);
+    return MCommandInfo(add_op_3.fields.id);
 }
 
 void mSync(MCommandInfo& info)

@@ -42,6 +42,9 @@ module UARTRx
 
             data <= 0;
             data_en <= 1;
+
+            rx_counter <= 0;
+            rx_bit_number <= 0;
         end
         else
         begin

@@ -5,7 +5,7 @@ void device_run()
 {
     mInit();
 
-    MIntDeviceMemory a(60);
+    MIntDeviceMemory a(64);
     MIntDeviceMemory b(20);
     MIntDeviceMemory c(10);
 

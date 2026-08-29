@@ -14,8 +14,10 @@ SerialDevice::~SerialDevice()
     this->serial_port_read_process_thread.detach();
 
     delete this->log;
-    
+
+    usleep(10);
     tcflush(this->port_fd, TCIOFLUSH);
+    usleep(10);
     close(this->port_fd);
 }
 

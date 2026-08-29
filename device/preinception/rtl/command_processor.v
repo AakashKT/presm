@@ -253,7 +253,7 @@ module CommandProcessor
                     tx_packet[7:0] <= tx_cmd_id;
                     tx_packet[15:8] <= 0;
                     tx_packet[23:16] <= 0;
-                    tx_packet[31:24] <= 0;
+                    tx_packet[31:24] <= 1;
                     tx_packet[63:32] <= mem_write_addr;
                     tx_packet_ready <= 1;
 
@@ -282,7 +282,7 @@ module CommandProcessor
                     tx_packet[7:0] <= tx_cmd_id;
                     tx_packet[15:8] <= 0;
                     tx_packet[23:16] <= 0;
-                    tx_packet[31:24] <= 0;
+                    tx_packet[31:24] <= 1;
                     tx_packet[63:32] <= mem_val;
                     tx_packet_ready <= 1;
                     
@@ -295,7 +295,7 @@ module CommandProcessor
                     if(rx_packet_ready == 1)
                     begin
                         if(rx_packet[7:0] == tx_cmd_id && rx_packet[15:8] == 1 
-                            && rx_packet[23:16] == 0 && rx_packet[31:24] == 0)
+                            && rx_packet[23:16] == 0 && rx_packet[31:24] == 1)
                         begin
                             cp_state <= mem_op_restore_state;
                         end
