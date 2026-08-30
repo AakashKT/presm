@@ -14,7 +14,9 @@ module CommandProcessor
 
     output reg [63:0] tx_packet,
     output reg tx_packet_ready,
-    input wire tx_packet_sent
+    input wire tx_packet_sent,
+
+    input wire [5:0] extern_led
 );
 
     localparam CP_IDLE = 0;
@@ -48,6 +50,8 @@ module CommandProcessor
     reg [5:0] cp_state, delay_restore_state, wait_restore_state, mem_op_restore_state;
     reg [7:0] pkt_id, pkt_type, pkt_cmd, pkt_sub_cmd;
     reg [7:0] tx_cmd_id;
+
+    // assign extern_led = ~cp_state;
     
     reg [31:0] mem_fetch_addr;
     reg [31:0] mem_write_addr;

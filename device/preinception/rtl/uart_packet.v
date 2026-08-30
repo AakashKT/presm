@@ -89,6 +89,10 @@ module UARTPacket
                         rx_state <= RX_RECEIVE;
                         rx_packet_idx <= 0;
                     end
+                    else
+                    begin
+                        rx_state <= RX_IDLE;
+                    end
                 end
 
                 RX_RECEIVE_WAIT:
@@ -101,6 +105,10 @@ module UARTPacket
                     begin
                         rx_state <= RX_RECEIVE;
                     end
+                    else
+                    begin
+                        rx_state <= RX_RECEIVE_WAIT;
+                    end
                 end
 
                 RX_RECEIVE:
@@ -112,16 +120,23 @@ module UARTPacket
 
                         rx_state <= RX_RECEIVE_WAIT;
                     end
+                    else
+                    begin
+                        rx_state <= RX_RECEIVE;
+                    end
                 end
 
                 RX_END:
                 begin
-                    rx_packet_ready <= 1;
-
                     if(rx_data_en == 0)
                     begin
                         rx_packet_ready <= 0;
                         rx_state <= RX_IDLE;
+                    end
+                    else
+                    begin
+                        rx_packet_ready <= 1;
+                        rx_state <= RX_END;
                     end
                 end
             endcase

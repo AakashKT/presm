@@ -69,18 +69,20 @@ module UARTRx
 
                 RX_START:
                 begin
-                    rx_counter <= rx_counter + 1;
                     if(rx_counter == HALF_DELAY_WAIT)
                     begin
                         rx_counter <= 0;
                         
                         rx_state <= RX_READ;
                     end
+                    else
+                    begin
+                        rx_counter <= rx_counter + 1;
+                    end
                 end
 
                 RX_READ:
                 begin
-                    rx_counter <= rx_counter + 1;
                     if(rx_counter == DELAY_WAIT)
                     begin
                         data <= {extern_uart_rx, data[7:1]};
@@ -92,15 +94,22 @@ module UARTRx
                             rx_state <= RX_STOP;
                         end
                     end
+                    else
+                    begin
+                        rx_counter <= rx_counter + 1;
+                    end
                 end
 
                 RX_STOP:
                 begin
-                    rx_counter <= rx_counter + 1;
                     if(rx_counter == DELAY_WAIT)
                     begin
                         data_en <= 1;
                         rx_state <= RX_IDLE;
+                    end
+                    else
+                    begin
+                        rx_counter <= rx_counter + 1;
                     end
                 end
 

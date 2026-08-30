@@ -55,7 +55,7 @@ void SerialDevice::device_initialize()
 
 bool SerialDevice::open_serial_port(std::string port_name)
 {
-    this->port_fd = open(port_name.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+    this->port_fd = open(port_name.c_str(), O_RDWR | O_NOCTTY);
     if (this->port_fd < 0)
         return false;
 

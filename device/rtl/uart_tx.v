@@ -66,6 +66,7 @@ module UARTTx
                 TX_START:
                 begin
                     extern_uart_tx <= 0;
+                    
                     if(tx_counter == DELAY_WAIT)
                     begin
                         tx_counter <= 0;
@@ -81,6 +82,7 @@ module UARTTx
                 TX_WRITE:
                 begin
                     extern_uart_tx <= data[tx_bit_number];
+
                     if(tx_counter == DELAY_WAIT)
                     begin
                         if(tx_bit_number == 3'b111)

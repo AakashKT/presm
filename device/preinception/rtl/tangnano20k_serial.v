@@ -44,7 +44,8 @@ module Tangnano20kUart
         rx_packet_ready,
         tx_packet,
         tx_packet_ready,
-        tx_packet_sent
+        tx_packet_sent,
+        extern_led
     );
 
 endmodule
