@@ -107,6 +107,36 @@ MCommandInfo mAdd(MUIntDeviceMemory& first, MUIntDeviceMemory& second, MUIntDevi
     return MCommandInfo(add_op_3.fields.id);
 }
 
+MCommandInfo mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result)
+{
+    DevicePayload add_op_1;
+    add_op_1.fields.id = (uint8_t) global_command_id++;
+    add_op_1.fields.type = (uint8_t) 0;
+    add_op_1.fields.cmd = (uint8_t) 2;
+    add_op_1.fields.sub_cmd = (uint8_t) 0;
+    add_op_1.fields32.body = first.address;
+    
+    DevicePayload add_op_2;
+    add_op_2.fields.id = (uint8_t) global_command_id++;
+    add_op_2.fields.type = (uint8_t) 0;
+    add_op_2.fields.cmd = (uint8_t) 2;
+    add_op_2.fields.sub_cmd = (uint8_t) 1;
+    add_op_2.fields32.body = second.address;
+
+    DevicePayload add_op_3;
+    add_op_3.fields.id = (uint8_t) global_command_id++;
+    add_op_3.fields.type = (uint8_t) 0;
+    add_op_3.fields.cmd = (uint8_t) 2;
+    add_op_3.fields.sub_cmd = (uint8_t) 2;
+    add_op_3.fields32.body = result.address;
+
+    command_buffer.push_back(add_op_1);
+    command_buffer.push_back(add_op_2);
+    command_buffer.push_back(add_op_3);
+    
+    return MCommandInfo(add_op_3.fields.id);
+}
+
 void mSync(MCommandInfo& info)
 {
     cmdSync(info.id);
@@ -122,12 +152,12 @@ void mFree()
     device_payload_receive_thread.detach();
 }
 
-MUIntDeviceMemory::MUIntDeviceMemory(int source)
+MUIntDeviceMemory::MUIntDeviceMemory(uint32_t source)
 {
     this->size_in_bytes = 4;
     this->address = presm_device->allocate_device_memory(this->size_in_bytes);
 
-    uint8_t data[4] = { source & 255, source & (255 << 8), source & (255 << 16), source & (255 << 24) };
+    char data[4] = { source & 255, (source & (255 << 8)) >> 8, (source & (255 << 16)) >> 16, (source & (255 << 24)) >> 24 };
     presm_device->write_to_device_memory(this->address, this->size_in_bytes, data);
 
     drv_log.log_info("Allocated int on device at " + intToHex(this->address));
@@ -137,10 +167,33 @@ uint32_t MUIntDeviceMemory::getValue()
 {
     drv_log.log_info("Reading UInt from device at " + intToHex(this->address));
 
-    uint8_t* data = presm_device->read_from_device_memory(this->address, this->size_in_bytes);
+    char* data = presm_device->read_from_device_memory(this->address, this->size_in_bytes);
 
     uint32_t rval = 0;
-    rval = rval | (data[0]) | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+    rval = rval | (255 & data[0]) | ((255 & data[1]) << 8) | ((255 & data[2]) << 16) | ((255 & data[3]) << 24);
+
+    return rval;
+}
+
+MIntDeviceMemory::MIntDeviceMemory(int32_t source)
+{
+    this->size_in_bytes = 4;
+    this->address = presm_device->allocate_device_memory(this->size_in_bytes);
+
+    char data[4] = { source & 255, (source & (255 << 8)) >> 8, (source & (255 << 16)) >> 16, (source & (255 << 24)) >> 24 };
+    presm_device->write_to_device_memory(this->address, this->size_in_bytes, data);
+
+    drv_log.log_info("Allocated int on device at " + intToHex(this->address));
+}
+
+int32_t MIntDeviceMemory::getValue()
+{
+    drv_log.log_info("Reading UInt from device at " + intToHex(this->address));
+
+    char* data = presm_device->read_from_device_memory(this->address, this->size_in_bytes);
+
+    int32_t rval = 0;
+    rval = rval | (255 & data[0]) | ((255 & data[1]) << 8) | ((255 & data[2]) << 16) | ((255 & data[3]) << 24);
 
     return rval;
 }

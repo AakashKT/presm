@@ -48,12 +48,12 @@ uint32_t SerialImpl::allocate_device_memory(uint32_t size_in_bytes)
     return this->device_memory->allocate(size_in_bytes);
 }
 
-void SerialImpl::write_to_device_memory(uint32_t address, uint32_t size_in_bytes, const uint8_t* data)
+void SerialImpl::write_to_device_memory(uint32_t address, uint32_t size_in_bytes, const char* data)
 {
     this->device_memory->write(address, size_in_bytes, data);
 }
 
-uint8_t* SerialImpl::read_from_device_memory(uint32_t address, uint32_t size_in_bytes)
+char* SerialImpl::read_from_device_memory(uint32_t address, uint32_t size_in_bytes)
 {
     return this->device_memory->read(address, size_in_bytes);
 }
@@ -64,7 +64,7 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
         this->log->log_info("[SerialImpl] Device requested read, payload ->");
         this->log->log_info(payload.print());
 
-        uint8_t* mem_val = this->read_from_device_memory(payload.fields32.body, 4);
+        char* mem_val = this->read_from_device_memory(payload.fields32.body, 4);
 
         DevicePayload mem_response;
         mem_response.fields.id = payload.fields.id;
@@ -89,7 +89,7 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
             this->log->log_info("[SerialImpl] Device requested write value to above address, payload ->");
             this->log->log_info(payload.print());
 
-            uint8_t data[4] = { payload.fields.body_1, payload.fields.body_2, payload.fields.body_3, payload.fields.body_4 };
+            char data[4] = { payload.fields.body_1, payload.fields.body_2, payload.fields.body_3, payload.fields.body_4 };
             this->write_to_device_memory(this->mem_write_addr_scratch, 4, data);
 
             DevicePayload mem_response;

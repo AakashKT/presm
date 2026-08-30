@@ -3,9 +3,9 @@
 HostResidentMemory::HostResidentMemory(uint32_t size_in_bytes)
     : DeviceMemory(size_in_bytes)
 {
-    this->log.log_info("HostResidentMemory constructor called");
+    this->log.log_info("[HostResidentMemory] constructor called");
 
-    this->contents = (uint8_t*) malloc(this->size_in_bytes);
+    this->contents = (char*) malloc(this->size_in_bytes);
 }
 
 uint32_t HostResidentMemory::allocate(uint32_t size_in_bytes)
@@ -16,15 +16,15 @@ uint32_t HostResidentMemory::allocate(uint32_t size_in_bytes)
     return address;
 }
 
-void HostResidentMemory::write(uint32_t start_address, uint32_t num_bytes, const uint8_t* data)
+void HostResidentMemory::write(uint32_t start_address, uint32_t num_bytes, const char* data)
 {
     for(uint32_t i=0; i<num_bytes; i++)
         this->contents[start_address + i] = data[i];
 }
 
-uint8_t* HostResidentMemory::read(uint32_t start_address, uint32_t num_bytes)
+char* HostResidentMemory::read(uint32_t start_address, uint32_t num_bytes)
 {
-    uint8_t* data = (uint8_t*) malloc(sizeof(uint8_t) * num_bytes);
+    char* data = (char*) malloc(sizeof(char) * num_bytes);
 
     for(uint32_t i=0; i<num_bytes; i++)
         data[i] = this->contents[start_address + i];

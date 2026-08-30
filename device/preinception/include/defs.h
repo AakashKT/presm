@@ -4,14 +4,14 @@
 union DevicePayload {
 
     struct Fields {
-        uint8_t id;
-        uint8_t type;
-        uint8_t cmd;
-        uint8_t sub_cmd;
-        uint8_t body_1;
-        uint8_t body_2;
-        uint8_t body_3;
-        uint8_t body_4;
+        char id;
+        char type;
+        char cmd;
+        char sub_cmd;
+        char body_1;
+        char body_2;
+        char body_3;
+        char body_4;
     } fields;
 
     struct Fields32 {
@@ -19,18 +19,18 @@ union DevicePayload {
         uint32_t body;
     } fields32;
 
-    uint8_t packet[8];
+    char packet[8];
 
     std::string print()
     {
         std::stringstream ss;
 
         ss << "[DevicePayload]" << std::endl;
-        ss << "\tID: 0x" << std::hex << std::to_string(fields.id) << ", [INT] " << std::to_string(fields.id) << std::endl;
-        ss << "\tType: 0x" << std::hex << std::to_string(fields.type) << ", [INT] " << std::to_string(fields.type) << std::endl;
-        ss << "\tCMD: 0x" << std::hex << std::to_string(fields.cmd) << ", [INT] " << std::to_string(fields.cmd) << std::endl;
-        ss << "\tSUB_CMD: 0x" << std::hex << std::to_string(fields.sub_cmd) << ", [INT] " << std::to_string(fields.sub_cmd) << std::endl;
-        ss << "\tBODY: 0x" << std::hex << std::to_string(fields32.body) << ", [INT] " << std::to_string(fields32.body);
+        ss << "\tID: " << std::to_string(fields.id) << std::endl;
+        ss << "\tType: " << std::to_string(fields.type) << std::endl;
+        ss << "\tCMD: " << std::to_string(fields.cmd) << std::endl;
+        ss << "\tSUB_CMD: " << std::to_string(fields.sub_cmd) << std::endl;
+        ss << "\tBODY: " << std::to_string(fields32.body);
 
         return ss.str();
     }

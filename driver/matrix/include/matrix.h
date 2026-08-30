@@ -5,8 +5,17 @@
 
 class MUIntDeviceMemory {
 public:
-    MUIntDeviceMemory(int source);
+    MUIntDeviceMemory(uint32_t source);
     uint32_t getValue();
+
+    uint32_t size_in_bytes;
+    uint32_t address;
+};
+
+class MIntDeviceMemory {
+public:
+    MIntDeviceMemory(int32_t source);
+    int32_t getValue();
 
     uint32_t size_in_bytes;
     uint32_t address;
@@ -21,6 +30,7 @@ public:
 
 void mInit();
 MCommandInfo mAdd(MUIntDeviceMemory& first, MUIntDeviceMemory& second, MUIntDeviceMemory& result);
+MCommandInfo mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
 void mSync(MCommandInfo& info);
 void mFree();
 

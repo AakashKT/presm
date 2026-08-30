@@ -51,9 +51,9 @@ module CommandProcessor
     
     reg [31:0] mem_fetch_addr;
     reg [31:0] mem_write_addr;
-    reg [31:0] mem_val;
+    reg signed [31:0] mem_val;
 
-    reg [31:0] op_1, op_2;
+    reg signed [31:0] op_1, op_2;
 
     always @(posedge extern_clock or posedge extern_reset)
     begin
@@ -223,7 +223,7 @@ module CommandProcessor
                         if(rx_packet[7:0] == tx_cmd_id && rx_packet[15:8] == 1 
                             && rx_packet[23:16] == 0 && rx_packet[31:24] == 0)
                         begin
-                            mem_val <= rx_packet[63:32];
+                            mem_val <= $signed(rx_packet[63:32]);
                             cp_state <= mem_op_restore_state;
                         end
                         else
@@ -283,7 +283,7 @@ module CommandProcessor
                     tx_packet[15:8] <= 0;
                     tx_packet[23:16] <= 0;
                     tx_packet[31:24] <= 1;
-                    tx_packet[63:32] <= mem_val;
+                    tx_packet[63:32] <= $signed(mem_val);
                     tx_packet_ready <= 1;
                     
                     wait_restore_state <= CP_MEM_WRITE_END;
