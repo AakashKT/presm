@@ -3,10 +3,10 @@
 
 #include <cstdint>
 
-class MIntDeviceMemory {
+class MUIntDeviceMemory {
 public:
-    MIntDeviceMemory(int source);
-    int getValue();
+    MUIntDeviceMemory(int source);
+    uint32_t getValue();
 
     uint32_t size_in_bytes;
     uint32_t address;
@@ -20,7 +20,7 @@ public:
 };
 
 void mInit();
-MCommandInfo mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
+MCommandInfo mAdd(MUIntDeviceMemory& first, MUIntDeviceMemory& second, MUIntDeviceMemory& result);
 void mSync(MCommandInfo& info);
 void mFree();
 

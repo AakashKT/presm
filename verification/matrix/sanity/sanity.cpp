@@ -5,9 +5,9 @@ void device_run()
 {
     mInit();
 
-    MIntDeviceMemory a(64);
-    MIntDeviceMemory b(20);
-    MIntDeviceMemory c(10);
+    MUIntDeviceMemory a(64);
+    MUIntDeviceMemory b(20);
+    MUIntDeviceMemory c(10);
 
     MCommandInfo addCmd = mAdd(a, b, c);
     mSync(addCmd);
@@ -19,9 +19,9 @@ void device_run()
 
 void host_run()
 {
-    int a = 64;
-    int b = 20;
-    int c = 10;
+    uint32_t a = 64;
+    uint32_t b = 20;
+    uint32_t c = 10;
 
     c = a + b;
 
