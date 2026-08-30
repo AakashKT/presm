@@ -5,6 +5,8 @@
 #include "host_resident_device_memory.h"
 #include "defs.h"
 
+#define SERIAL_WRITE_DELAY 1000
+
 enum MemWriteState {
     ADDR_RECV = 0,
     VAL_RECV
