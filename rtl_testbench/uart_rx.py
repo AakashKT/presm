@@ -5,7 +5,7 @@ from cocotb.clock import Clock
 @cocotb.test()
 async def uart_rx(dut):
     freq = 27000000 
-    baud_rate = 115200
+    baud_rate = 9600
 
     clk_ns = round(1e9 / freq, 2)
     bit_hold = round(clk_ns * float(freq) / baud_rate, 2)

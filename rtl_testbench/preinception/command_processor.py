@@ -5,7 +5,7 @@ from cocotb.clock import Clock
 @cocotb.test()
 async def command_processor(dut):
     freq = 27000000 
-    baud_rate = 115200
+    baud_rate = 9600
 
     clk_ns = round(1e9 / freq, 2)
     bit_hold = round(clk_ns * float(freq) / baud_rate, 2)
@@ -106,13 +106,13 @@ async def command_processor(dut):
     await Timer(8*clk_ns, unit='ns')
     
     assert dut.tx_packet_ready.value == 1
-    assert dut.tx_packet.value == 3 | 0 << 8 | 0 << 16 | 0 << 24 | ADDR_3 << 32
+    assert dut.tx_packet.value == 3 | 0 << 8 | 0 << 16 | 1 << 24 | ADDR_3 << 32
 
     dut.tx_packet_sent.value = 1
     await Timer(6*clk_ns, unit='ns')
 
     assert dut.tx_packet_ready.value == 1
-    assert dut.tx_packet.value == 3 | 0 << 8 | 0 << 16 | 0 << 24 | (VAL_1 + VAL_2) << 32
+    assert dut.tx_packet.value == 3 | 0 << 8 | 0 << 16 | 1 << 24 | (VAL_1 + VAL_2) << 32
 
     dut.tx_packet_sent.value = 1
     await Timer(2*clk_ns, unit='ns')
@@ -120,7 +120,7 @@ async def command_processor(dut):
     dut.rx_packet_ready.value = 0
     await Timer(clk_ns, unit='ns')
 
-    dut.rx_packet.value = 3 | 1 << 8 | 0 << 16 | 0 << 24
+    dut.rx_packet.value = 3 | 1 << 8 | 0 << 16 | 1 << 24
     dut.rx_packet_ready.value = 1
     await Timer(8*clk_ns, unit='ns')
 

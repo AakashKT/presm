@@ -17,6 +17,7 @@ public:
 
 private:
     std::ofstream error_file;
+    std::mutex mtx;
 };
 
 #endif

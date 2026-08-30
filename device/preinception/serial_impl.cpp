@@ -19,9 +19,10 @@ void SerialImpl::send_device_payload(void* payload)
     usleep(SERIAL_WRITE_DELAY);
     auto bytes_written = write(this->port_fd, (uint8_t*)sc->packet, 8);
     if (bytes_written != 8)
-        this->log->log_error_and_exit("Failed to send device payload.");
+        this->log->log_error_and_exit("[SerialImpl] Failed to send device payload");
 
-    this->log->log_info("[SerialImpl] Sent " + std::to_string(bytes_written) + " bytes to device.");
+    this->log->log_info("[SerialImpl] Sent device payload ->");
+    this->log->log_info(sc->print());
 }
 
 bool SerialImpl::receive_device_payload(void **payload)
@@ -35,7 +36,8 @@ bool SerialImpl::receive_device_payload(void **payload)
         *rval = *sc;
         *payload = rval;
 
-        this->log->log_info("[SerialImpl] Received 8 bytes from device.");
+        this->log->log_info("[SerialImpl] Received device payload ->");
+        this->log->log_info(rval->print());
 
         return true;
     }
@@ -58,10 +60,9 @@ uint8_t* SerialImpl::read_from_device_memory(uint32_t address, uint32_t size_in_
 
 void SerialImpl::process_mem_request(DevicePayload& payload)
 {
-    if(payload.fields.sub_cmd == 0) {
-        std::stringstream stream;
-        stream << std::hex << payload.fields32.body;
-        this->log->log_info("Device requested read from address: 0x" + stream.str());
+    if(payload.fields.sub_cmd == 0) {\
+        this->log->log_info("[SerialImpl] Device requested read, payload ->");
+        this->log->log_info(payload.print());
 
         uint8_t* mem_val = this->read_from_device_memory(payload.fields32.body, 4);
 
@@ -78,17 +79,15 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
     }
     else if(payload.fields.sub_cmd == 1) {
         if(this->mem_write_state == ADDR_RECV) {
-            std::stringstream stream;
-            stream << std::hex << payload.fields32.body;
-            this->log->log_info("Device requested write to address: 0x" + stream.str());
+            this->log->log_info("[SerialImpl] Device requested write to address, payload ->");
+            this->log->log_info(payload.print());
 
             this->mem_write_addr_scratch = payload.fields32.body;
             this->mem_write_state = VAL_RECV;
         }
         else if(this->mem_write_state == VAL_RECV) {
-            std::stringstream stream;
-            stream << std::hex << payload.fields32.body;
-            this->log->log_info("[Cont.] value: " + stream.str());
+            this->log->log_info("[SerialImpl] Device requested write value to above address, payload ->");
+            this->log->log_info(payload.print());
 
             uint8_t data[4] = { payload.fields.body_1, payload.fields.body_2, payload.fields.body_3, payload.fields.body_4 };
             this->write_to_device_memory(this->mem_write_addr_scratch, 4, data);
@@ -98,6 +97,7 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
             mem_response.fields.type = 1;
             mem_response.fields.cmd = payload.fields.cmd;
             mem_response.fields.sub_cmd = payload.fields.sub_cmd;
+            mem_response.fields32.body = 0;
             this->send_device_payload(&mem_response);
 
             this->mem_write_state = ADDR_RECV;
@@ -130,7 +130,7 @@ void SerialImpl::device_find()
 
         bool opened = this->open_serial_port(port_string);
         if(!opened) {
-            this->log->log_info("Failed to open serial port '" + port_string + "'.");
+            this->log->log_info("[SerialImpl] Failed to open serial port '" + port_string + "'.");
             continue;
         }
 
@@ -159,7 +159,7 @@ void SerialImpl::device_find()
 
                 if(total_bytes_read == 8) {
                     if(rx.fields.id == 1 && rx.fields.type == 1 && rx.fields.body_1 == 2 && rx.fields.body_2 == 1) {
-                        this->log->log_info("Found device in serial port '" + port_string + "'.");
+                        this->log->log_info("[SerialImpl] Found device in serial port '" + port_string + "'.");
                         found = true;
                     }
 
@@ -181,7 +181,7 @@ void SerialImpl::device_find()
     }
 
     if(!found)
-        this->log->log_error_and_exit("Could not find device over serial port.");
+        this->log->log_error_and_exit("[SerialImpl] Could not find device over serial port.");
 
     usleep(SERIAL_WRITE_DELAY);
 }

@@ -2,7 +2,7 @@
 
 module UARTTx
 #(
-    parameter DELAY_WAIT = 234
+    parameter DELAY_WAIT = 2812
 )
 (
     // Clock
@@ -27,7 +27,7 @@ module UARTTx
     localparam TX_WRITE = 2;
     localparam TX_STOP = 3;
 
-    reg [8:0] tx_counter;
+    reg [11:0] tx_counter;
     reg [2:0] tx_bit_number;
     reg [2:0] tx_state;
     

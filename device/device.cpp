@@ -11,5 +11,5 @@ Device::Device()
     this->top_config = nlohmann::json::parse(json_file);
     this->device_config = this->top_config["device"];
 
-    this->log->log_info("Device constructor called");
+    this->log->log_info("[Device] Constructor called");
 }

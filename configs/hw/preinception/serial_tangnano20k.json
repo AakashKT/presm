@@ -18,7 +18,7 @@
             "start_byte": 1,
             "identity_byte": 2,
             "reset_byte": 3,
-            "baud_rate": 115200
+            "baud_rate": 9600
         }
     },
 

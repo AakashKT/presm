@@ -17,17 +17,23 @@ void Logger::init(std::string name)
 
 void Logger::log_error(std::string op)
 {
-    this->error_file << "ERROR: " << op << std::endl;
+    std::unique_lock lock(this->mtx);
+
+    this->error_file << "ERROR:" << op << std::endl;
 }
 
 void Logger::log_error_and_exit(std::string op)
 {
+    std::unique_lock lock(this->mtx);
+
     this->log_error(op);
-    this->error_file << "EXITED." << std::endl;
+    this->error_file << "ERROR EXIT" << std::endl;
     exit(1);
 }
 
 void Logger::log_info(std::string op)
 {
-    this->error_file << "INFO: " << op << std::endl;
+    std::unique_lock lock(this->mtx);
+
+    this->error_file << "INFO:\n" << op << std::endl;
 }

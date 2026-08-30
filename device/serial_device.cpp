@@ -3,12 +3,12 @@
 SerialDevice::SerialDevice()
     : Device()
 {
-    this->log->log_info("SerialDevice constructor called");
+    this->log->log_info("[SerialDevice] Constructor called");
 }
 
 SerialDevice::~SerialDevice()
 {
-    this->log->log_info("SerialDevice destructor called");
+    this->log->log_info("[SerialDevice] Destructor called");
 
     this->serial_port_listen_thread.detach();
     this->serial_port_read_process_thread.detach();
@@ -31,9 +31,7 @@ void SerialDevice::device_initialize()
                 uint8_t data = 0;
                 uint32_t bytes_read = read(current_device->port_fd, &data, 1);
 
-                if(bytes_read > 0) {
-                    this->log->log_info("[SerialDevice] Received " + std::to_string(bytes_read) + " bytes from serial port.");
-                    
+                if(bytes_read > 0) {                    
                     current_device->read_buffer[current_device->read_buffer_ptr_hi % 256] = data;
                     current_device->read_buffer_ptr_hi++;
                 }
@@ -61,7 +59,7 @@ bool SerialDevice::open_serial_port(std::string port_name)
     if (this->port_fd < 0)
         return false;
 
-    this->log->log_info("Serial port '" + port_name + "' opened.");
+    this->log->log_info("[SerialDevice] Serial port '" + port_name + "' opened.");
     return true;
 }
 
@@ -69,14 +67,18 @@ void SerialDevice::configure_serial_port(uint32_t baud_rate)
 {
     struct termios tty;
     if (tcgetattr(this->port_fd, &tty) != 0)
-        this->log->log_error_and_exit("Error from tcgetattr: " + std::string(strerror(errno)));
+        this->log->log_error_and_exit("[SerialDevice] Error from tcgetattr: " + std::string(strerror(errno)));
 
     if(baud_rate == 115200) {
         cfsetospeed(&tty, B115200);
         cfsetispeed(&tty, B115200);
     }
+    else if(baud_rate == 9600) {
+        cfsetospeed(&tty, B9600);
+        cfsetispeed(&tty, B9600);
+    }
     else {
-        this->log->log_error_and_exit("No rule for baud rate " + std::to_string(baud_rate));
+        this->log->log_error_and_exit("[SerialDevice] No rule for baud rate " + std::to_string(baud_rate));
     }
 
     tty.c_cflag |= (CLOCAL | CREAD);    // Ignore modem lines, enable receiver
@@ -102,7 +104,7 @@ void SerialDevice::configure_serial_port(uint32_t baud_rate)
     tty.c_cc[VTIME] = 5;
 
     if (tcsetattr(this->port_fd, TCSANOW, &tty) != 0)
-        this->log->log_error_and_exit("Error from tcsetattr: " + std::string(strerror(errno)));
+        this->log->log_error_and_exit("[SerialDevice] Error from tcsetattr: " + std::string(strerror(errno)));
     
     tcflush(this->port_fd, TCIOFLUSH);
 }

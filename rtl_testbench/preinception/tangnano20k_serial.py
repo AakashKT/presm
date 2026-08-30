@@ -19,7 +19,7 @@ async def send_rx_bits(dut, bit_hold, bits, num_bits):
 @cocotb.test()
 async def uart_interface_test(dut):
     freq = 27000000 
-    baud_rate = 115200
+    baud_rate = 9600
 
     clk_ns = round(1e9 / freq, 2)
     bit_hold = round(clk_ns * float(freq) / baud_rate, 2)

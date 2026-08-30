@@ -20,6 +20,20 @@ union DevicePayload {
     } fields32;
 
     uint8_t packet[8];
+
+    std::string print()
+    {
+        std::stringstream ss;
+
+        ss << "[DevicePayload]" << std::endl;
+        ss << "\tID: 0x" << std::hex << std::to_string(fields.id) << ", [INT] " << std::to_string(fields.id) << std::endl;
+        ss << "\tType: 0x" << std::hex << std::to_string(fields.type) << ", [INT] " << std::to_string(fields.type) << std::endl;
+        ss << "\tCMD: 0x" << std::hex << std::to_string(fields.cmd) << ", [INT] " << std::to_string(fields.cmd) << std::endl;
+        ss << "\tSUB_CMD: 0x" << std::hex << std::to_string(fields.sub_cmd) << ", [INT] " << std::to_string(fields.sub_cmd) << std::endl;
+        ss << "\tBODY: 0x" << std::hex << std::to_string(fields32.body) << ", [INT] " << std::to_string(fields32.body);
+
+        return ss.str();
+    }
 };
 
 template<typename T>
