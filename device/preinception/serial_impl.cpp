@@ -180,6 +180,4 @@ void SerialImpl::device_find()
 
     if(!found)
         this->log->log_error_and_exit("[SerialImpl] Could not find device over serial port.");
-
-    usleep(1000);
 }
