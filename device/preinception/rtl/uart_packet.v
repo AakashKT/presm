@@ -22,7 +22,6 @@ module UARTPacket
     input wire tx_packet_ready,
     output reg tx_packet_sent
 );
-
     reg [7:0] rx_packet[8];
     assign rx_packet_flat[7:0] = rx_packet[0];
     assign rx_packet_flat[15:8] = rx_packet[1];
@@ -86,6 +85,15 @@ module UARTPacket
                 begin
                     if(rx_data_en == 0)
                     begin
+                        rx_packet[0] <= 0;
+                        rx_packet[1] <= 0;
+                        rx_packet[2] <= 0;
+                        rx_packet[3] <= 0;
+                        rx_packet[4] <= 0;
+                        rx_packet[5] <= 0;
+                        rx_packet[6] <= 0;
+                        rx_packet[7] <= 0;
+                        
                         rx_state <= RX_RECEIVE;
                         rx_packet_idx <= 0;
                     end
@@ -130,8 +138,9 @@ module UARTPacket
                 begin
                     if(rx_data_en == 0)
                     begin
+                        rx_state <= RX_RECEIVE;
                         rx_packet_ready <= 0;
-                        rx_state <= RX_IDLE;
+                        rx_packet_idx <= 0;
                     end
                     else
                     begin
@@ -168,6 +177,7 @@ module UARTPacket
     begin
         if(extern_reset)
         begin
+            tx_data <= 0;
             tx_data_en <= 0;
 
             tx_state <= TX_IDLE;
@@ -222,14 +232,23 @@ module UARTPacket
                             tx_state <= TX_SEND;
                         end
                     end
+                    else
+                    begin
+                        tx_state <= TX_SEND_WAIT;
+                    end
                 end
 
                 TX_END:
                 begin
-                    tx_packet_sent <= 1;
                     if(tx_packet_ready == 0)
                     begin
+                        tx_packet_sent <= 0;
                         tx_state <= TX_IDLE;
+                    end
+                    else
+                    begin
+                        tx_packet_sent <= 1;
+                        tx_state <= TX_END;
                     end
                 end
     

@@ -9,8 +9,10 @@ Logger drv_log;
 
 uint8_t global_command_id = 0;
 
+std::list<DevicePayload> recorded_commands;
+
 ThreadSafeList<DevicePayload> command_buffer;
-ThreadSafeList<DevicePayload> command_status_readback;
+ThreadSafeList<std::pair<DevicePayload, bool>> command_status_readback;
 
 std::thread command_process_thread;
 std::thread device_payload_receive_thread;
@@ -23,21 +25,24 @@ std::string intToHex(const int& num)
     return "0x" + ss.str();
 }
 
-void cmdSync(uint8_t id)
+void cmdSync(char id)
 {
     bool finished = false;
     while(true) {
         if(!command_status_readback.empty()) {
             command_status_readback.for_each(
-                [&](DevicePayload item) {
-                    if(item.fields.id == id && item.fields.type == 1)
+                [&](std::pair<DevicePayload, bool>& item) {
+                    if(item.second == false && item.first.fields.id == id && item.first.fields.type == 1) {
                         finished = true;
+                        item.second = true;
+                    }
                 }
             );
         }
 
-        if(finished)
+        if(finished) {
             break;
+        }
     }
 }
 
@@ -58,7 +63,6 @@ void mInit()
                     drv_log.log_info("Sending packet with ID: " + std::to_string(payload.fields.id));
 
                     presm_device->send_device_payload(&payload);
-                    cmdSync(payload.fields.id);
                 }
             }
         }
@@ -70,7 +74,7 @@ void mInit()
             while(true) {
                 if(presm_device->receive_device_payload((void**)&scratch)) {
                     drv_log.log_info("Received packet with ID: " + std::to_string(scratch->fields.id));
-                    command_status_readback.push_back(*scratch);
+                    command_status_readback.push_back(std::pair(*scratch, false));
                 }
             }
         }
@@ -79,67 +83,87 @@ void mInit()
 
 MCommandInfo mAdd(MUIntDeviceMemory& first, MUIntDeviceMemory& second, MUIntDeviceMemory& result)
 {
+    // [NOTE:]
+    // This is strange - on and after ID of 13, the FPGA (TangNano20k) behaves weird, thorwing the sync off
+    // No idea why, testbenches with ID=13 and above work fine - maybe this particular FPGA piece has a hardware error?
+    global_command_id = global_command_id % 10;
+
     DevicePayload add_op_1;
-    add_op_1.fields.id = (uint8_t) global_command_id++;
-    add_op_1.fields.type = (uint8_t) 0;
-    add_op_1.fields.cmd = (uint8_t) 2;
-    add_op_1.fields.sub_cmd = (uint8_t) 0;
+    add_op_1.fields.id = static_cast<char>(global_command_id++);
+    add_op_1.fields.type = static_cast<char>(0);
+    add_op_1.fields.cmd = static_cast<char>(2);
+    add_op_1.fields.sub_cmd = static_cast<char>(0);
     add_op_1.fields32.body = first.address;
     
     DevicePayload add_op_2;
-    add_op_2.fields.id = (uint8_t) global_command_id++;
-    add_op_2.fields.type = (uint8_t) 0;
-    add_op_2.fields.cmd = (uint8_t) 2;
-    add_op_2.fields.sub_cmd = (uint8_t) 1;
+    add_op_2.fields.id = static_cast<char>(global_command_id++);
+    add_op_2.fields.type = static_cast<char>(0);
+    add_op_2.fields.cmd = static_cast<char>(2);
+    add_op_2.fields.sub_cmd = static_cast<char>(1);
     add_op_2.fields32.body = second.address;
 
     DevicePayload add_op_3;
-    add_op_3.fields.id = (uint8_t) global_command_id++;
-    add_op_3.fields.type = (uint8_t) 0;
-    add_op_3.fields.cmd = (uint8_t) 2;
-    add_op_3.fields.sub_cmd = (uint8_t) 2;
+    add_op_3.fields.id = static_cast<char>(global_command_id++);
+    add_op_3.fields.type = static_cast<char>(0);
+    add_op_3.fields.cmd = static_cast<char>(2);
+    add_op_3.fields.sub_cmd = static_cast<char>(2);
     add_op_3.fields32.body = result.address;
 
-    command_buffer.push_back(add_op_1);
-    command_buffer.push_back(add_op_2);
-    command_buffer.push_back(add_op_3);
+    recorded_commands.push_back(add_op_1);
+    recorded_commands.push_back(add_op_2);
+    recorded_commands.push_back(add_op_3);
     
     return MCommandInfo(add_op_3.fields.id);
 }
 
 MCommandInfo mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result)
 {
+    // [NOTE:]
+    // This is strange - on and after ID of 13, the FPGA (TangNano20k) behaves weird, thorwing the sync off
+    // No idea why, testbenches with ID=13 and above work fine - maybe this particular FPGA piece has a hardware error?
+    global_command_id = global_command_id % 10;
+
     DevicePayload add_op_1;
-    add_op_1.fields.id = (uint8_t) global_command_id++;
-    add_op_1.fields.type = (uint8_t) 0;
-    add_op_1.fields.cmd = (uint8_t) 2;
-    add_op_1.fields.sub_cmd = (uint8_t) 0;
+    add_op_1.fields.id = static_cast<char>(global_command_id++);
+    add_op_1.fields.type = static_cast<char>(0);
+    add_op_1.fields.cmd = static_cast<char>(2);
+    add_op_1.fields.sub_cmd = static_cast<char>(0);
     add_op_1.fields32.body = first.address;
     
     DevicePayload add_op_2;
-    add_op_2.fields.id = (uint8_t) global_command_id++;
-    add_op_2.fields.type = (uint8_t) 0;
-    add_op_2.fields.cmd = (uint8_t) 2;
-    add_op_2.fields.sub_cmd = (uint8_t) 1;
+    add_op_2.fields.id = static_cast<char>(global_command_id++);
+    add_op_2.fields.type = static_cast<char>(0);
+    add_op_2.fields.cmd = static_cast<char>(2);
+    add_op_2.fields.sub_cmd = static_cast<char>(1);
     add_op_2.fields32.body = second.address;
 
     DevicePayload add_op_3;
-    add_op_3.fields.id = (uint8_t) global_command_id++;
-    add_op_3.fields.type = (uint8_t) 0;
-    add_op_3.fields.cmd = (uint8_t) 2;
-    add_op_3.fields.sub_cmd = (uint8_t) 2;
+    add_op_3.fields.id = static_cast<char>(global_command_id++);
+    add_op_3.fields.type = static_cast<char>(0);
+    add_op_3.fields.cmd = static_cast<char>(2);
+    add_op_3.fields.sub_cmd = static_cast<char>(2);
     add_op_3.fields32.body = result.address;
 
-    command_buffer.push_back(add_op_1);
-    command_buffer.push_back(add_op_2);
-    command_buffer.push_back(add_op_3);
+    recorded_commands.push_back(add_op_1);
+    recorded_commands.push_back(add_op_2);
+    recorded_commands.push_back(add_op_3);
     
     return MCommandInfo(add_op_3.fields.id);
 }
 
 void mSync(MCommandInfo& info)
 {
-    cmdSync(info.id);
+    while(true) {
+        if(recorded_commands.empty())
+            break;
+
+        auto payload = recorded_commands.front();
+
+        command_buffer.push_back(payload);
+        cmdSync(payload.fields.id);
+
+        recorded_commands.pop_front();
+    }
 
     drv_log.log_info("mSync finished for ID: " + std::to_string(info.id));
 }

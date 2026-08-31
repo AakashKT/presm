@@ -1,6 +1,3 @@
-`include "registers.v"
-
-`default_nettype none
 
 module UARTRx
 #(
@@ -30,9 +27,24 @@ module UARTRx
     localparam RX_STOP = 3;
 
     reg [11:0] rx_counter;
-    reg [2:0] rx_bit_number;
+    reg [3:0] rx_bit_number;
 
     reg [2:0] rx_state;
+
+    (* ASYNC_REG = "TRUE" *) reg rx_r1, rx_r2;
+    always @(posedge extern_clock or posedge async_reset) 
+    begin
+        if (async_reset) 
+        begin
+            rx_r1 <= 1;
+            rx_r2 <= 1;
+        end 
+        else 
+        begin
+            rx_r1 <= extern_uart_rx;
+            rx_r2 <= rx_r1;
+        end
+    end
 
     always @(posedge extern_clock or posedge async_reset)
     begin
@@ -52,7 +64,7 @@ module UARTRx
 
                 RX_IDLE:
                 begin
-                    if(extern_uart_rx == 0)
+                    if(rx_r2 == 0)
                     begin
                         rx_counter <= 0;
                         rx_bit_number <= 0;
@@ -64,6 +76,7 @@ module UARTRx
                     else
                     begin
                         data_en <= 1;
+                        rx_state <= RX_IDLE;
                     end
                 end
 
@@ -72,12 +85,12 @@ module UARTRx
                     if(rx_counter == HALF_DELAY_WAIT)
                     begin
                         rx_counter <= 0;
-                        
                         rx_state <= RX_READ;
                     end
                     else
                     begin
                         rx_counter <= rx_counter + 1;
+                        rx_state <= RX_START;
                     end
                 end
 
@@ -85,18 +98,23 @@ module UARTRx
                 begin
                     if(rx_counter == DELAY_WAIT)
                     begin
-                        data <= {extern_uart_rx, data[7:1]};
-                        rx_bit_number <= rx_bit_number + 1;
-                        rx_counter <= 0;
-
-                        if(rx_bit_number == 3'b111)
+                        if(rx_bit_number == 4'b1000)
                         begin
                             rx_state <= RX_STOP;
+                        end
+                        else
+                        begin
+                            data <= {rx_r2, data[7:1]};
+                            rx_bit_number <= rx_bit_number + 1;
+                            rx_counter <= 0;
+
+                            rx_state <= RX_READ;
                         end
                     end
                     else
                     begin
                         rx_counter <= rx_counter + 1;
+                        rx_state <= RX_READ;
                     end
                 end
 
@@ -110,6 +128,7 @@ module UARTRx
                     else
                     begin
                         rx_counter <= rx_counter + 1;
+                        rx_state <= RX_STOP;
                     end
                 end
 

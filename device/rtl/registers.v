@@ -1,6 +1,5 @@
 `include "flip_flops.v"
 
-
 module RegisterDFFRst
 #(
     parameter NUM_BITS=32

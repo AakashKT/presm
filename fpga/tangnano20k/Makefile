@@ -22,7 +22,7 @@ $(TOP_MODULE).fs: $(TOP_MODULE)_PNR.json
 
 $(TOP_MODULE)_PNR.json: $(TOP_MODULE)_SYNTH.json
 	@echo "Generating place-and-route $(TOP_MODULE)_PNR.json"
-	$(NEXTPNR_EXEC) --json $(TOP_MODULE)_SYNTH.json --write $(TOP_MODULE)_PNR.json --device $(DEVICE) --vopt cst=$(CST_SRC) --vopt family=$(DEVICE_FAMILY)
+	$(NEXTPNR_EXEC) --freq 27 --json $(TOP_MODULE)_SYNTH.json --write $(TOP_MODULE)_PNR.json --device $(DEVICE) --vopt cst=$(CST_SRC) --vopt family=$(DEVICE_FAMILY)
 
 $(TOP_MODULE)_SYNTH.json: 
 	@echo "Synthesizing: $(TOP_MODULE)_SYNTH.json"

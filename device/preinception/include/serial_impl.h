@@ -5,8 +5,6 @@
 #include "host_resident_device_memory.h"
 #include "defs.h"
 
-#define SERIAL_WRITE_DELAY 1000
-
 enum MemWriteState {
     ADDR_RECV = 0,
     VAL_RECV
@@ -18,7 +16,7 @@ public:
 
     void process_mem_request(DevicePayload& payload);
 
-    void serial_read_process(uint8_t data) override;
+    void serial_read_process(char data) override;
     void device_find() override;
 
     void send_device_payload(void* payload) override;

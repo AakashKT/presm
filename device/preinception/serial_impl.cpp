@@ -16,8 +16,7 @@ void SerialImpl::send_device_payload(void* payload)
 {
     DevicePayload* sc = (DevicePayload*) payload;
 
-    usleep(SERIAL_WRITE_DELAY);
-    auto bytes_written = write(this->port_fd, (uint8_t*)sc->packet, 8);
+    auto bytes_written = write(this->port_fd, (char*)sc->packet, 8);
     if (bytes_written != 8)
         this->log->log_error_and_exit("[SerialImpl] Failed to send device payload");
 
@@ -105,7 +104,7 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
     }
 }
 
-void SerialImpl::serial_read_process(uint8_t data)
+void SerialImpl::serial_read_process(char data)
 {
     this->scratch.packet[this->scratch_ptr++] = data;
 
@@ -135,7 +134,6 @@ void SerialImpl::device_find()
         }
 
         this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
-        usleep(SERIAL_WRITE_DELAY);
         tcflush(this->port_fd, TCIOFLUSH);
 
         DevicePayload tx;
@@ -183,5 +181,5 @@ void SerialImpl::device_find()
     if(!found)
         this->log->log_error_and_exit("[SerialImpl] Could not find device over serial port.");
 
-    usleep(SERIAL_WRITE_DELAY);
+    usleep(1000);
 }

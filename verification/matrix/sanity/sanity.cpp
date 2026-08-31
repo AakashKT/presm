@@ -40,6 +40,28 @@ void device_run()
         std::cout << a.getValue() << " + " << b.getValue() << " = " << c.getValue() << std::endl;
     }
 
+    {
+        MIntDeviceMemory a(64);
+        MIntDeviceMemory b(-80);
+        MIntDeviceMemory c(10);
+
+        MCommandInfo addCmd = mAdd(a, b, c);
+        mSync(addCmd);
+
+        std::cout << a.getValue() << " + " << b.getValue() << " = " << c.getValue() << std::endl;
+    }
+
+    {
+        MIntDeviceMemory a(64);
+        MIntDeviceMemory b(80);
+        MIntDeviceMemory c(10);
+
+        MCommandInfo addCmd = mAdd(a, b, c);
+        mSync(addCmd);
+
+        std::cout << a.getValue() << " + " << b.getValue() << " = " << c.getValue() << std::endl;
+    }
+
     mFree();
 }
 
@@ -69,6 +91,26 @@ void host_run()
 
     {
         int a = -64;
+        int b = 80;
+        int c = 10;
+
+        c = a + b;
+
+        std::cout << std::to_string(a) << " + " << std::to_string(b) << " = " << std::to_string(c) << std::endl;
+    }
+
+    {
+        int a = 64;
+        int b = -80;
+        int c = 10;
+
+        c = a + b;
+
+        std::cout << std::to_string(a) << " + " << std::to_string(b) << " = " << std::to_string(c) << std::endl;
+    }
+
+    {
+        int a = 64;
         int b = 80;
         int c = 10;
 

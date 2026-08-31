@@ -1,4 +1,3 @@
-`default_nettype none
 
 module UARTTx
 #(
@@ -28,6 +27,7 @@ module UARTTx
     localparam TX_STOP = 3;
 
     reg [11:0] tx_counter;
+    reg [7:0] tx_data;
     reg [2:0] tx_bit_number;
     reg [2:0] tx_state;
     
@@ -37,6 +37,7 @@ module UARTTx
         begin
             tx_state <= TX_IDLE;
             data_sent <= 0;
+            tx_data <= 0;
 
             extern_uart_tx <= 1;
 
@@ -53,6 +54,7 @@ module UARTTx
                     begin
                         tx_bit_number <= 0;
                         tx_counter <= 0;
+                        tx_data <= data;
 
                         tx_state <= TX_START;
                     end
@@ -81,7 +83,7 @@ module UARTTx
 
                 TX_WRITE:
                 begin
-                    extern_uart_tx <= data[tx_bit_number];
+                    extern_uart_tx <= tx_data[tx_bit_number];
 
                     if(tx_counter == DELAY_WAIT)
                     begin

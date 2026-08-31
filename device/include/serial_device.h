@@ -14,7 +14,7 @@ public:
     SerialDevice();
     ~SerialDevice();
     
-    virtual void serial_read_process(uint8_t data) = 0;
+    virtual void serial_read_process(char data) = 0;
     virtual void device_find() = 0;
 
     void device_initialize() override;
@@ -22,7 +22,7 @@ public:
     bool open_serial_port(std::string port_name);
     void configure_serial_port(uint32_t baud_rate = 115200);
     
-    uint8_t read_buffer[256];
+    char read_buffer[256];
     uint32_t read_buffer_ptr_lo = 0;
     uint32_t read_buffer_ptr_hi = 0;
     

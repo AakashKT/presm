@@ -24,8 +24,6 @@ void Logger::log_error(std::string op)
 
 void Logger::log_error_and_exit(std::string op)
 {
-    std::unique_lock lock(this->mtx);
-
     this->log_error(op);
     this->error_file << "ERROR EXIT" << std::endl;
     exit(1);

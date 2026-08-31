@@ -1,5 +1,3 @@
-`default_nettype none
-
 `include "uart_packet.v"
 `include "command_processor.v"
 
@@ -21,9 +19,9 @@ module Tangnano20kUart
     wire [63:0] rx_packet;
     wire rx_packet_ready;
 
-    reg [63:0] tx_packet;
-    reg tx_packet_ready;
-    reg tx_packet_sent;
+    wire [63:0] tx_packet;
+    wire tx_packet_ready;
+    wire tx_packet_sent;
 
     UARTPacket uartPacket(
         extern_clock,
@@ -44,8 +42,7 @@ module Tangnano20kUart
         rx_packet_ready,
         tx_packet,
         tx_packet_ready,
-        tx_packet_sent,
-        extern_led
+        tx_packet_sent
     );
 
 endmodule

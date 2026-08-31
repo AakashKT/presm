@@ -103,9 +103,9 @@ public:
 
     // Safe iteration: apply a function to all elements while holding the lock
     template<typename Function>
-    void for_each(Function f) const {
+    void for_each(Function f) {
         std::shared_lock<std::shared_mutex> lock(mutex_);
-        for (const auto& item : list_) {
+        for (auto& item : list_) {
             f(item);
         }
     }

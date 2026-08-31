@@ -1,4 +1,3 @@
-`default_nettype none
 
 module CommandProcessor
 (
@@ -14,11 +13,8 @@ module CommandProcessor
 
     output reg [63:0] tx_packet,
     output reg tx_packet_ready,
-    input wire tx_packet_sent,
-
-    input wire [5:0] extern_led
+    input wire tx_packet_sent
 );
-
     localparam CP_IDLE = 0;
     localparam CP_PACKET_DECODE = 1;
     localparam CP_HANDSHAKE_PREP = 2;
@@ -45,14 +41,12 @@ module CommandProcessor
     localparam CP_ADD_END_PREP = 20;
     localparam CP_ADD_END = 21;
 
-    reg [7:0] delay_cycles, delay_counter;
+    reg [2:0] delay_cycles, delay_counter;
 
     reg [5:0] cp_state, delay_restore_state, wait_restore_state, mem_op_restore_state;
     reg [7:0] pkt_id, pkt_type, pkt_cmd, pkt_sub_cmd;
     reg [7:0] tx_cmd_id;
 
-    // assign extern_led = ~cp_state;
-    
     reg [31:0] mem_fetch_addr;
     reg [31:0] mem_write_addr;
     reg signed [31:0] mem_val;
@@ -136,6 +130,10 @@ module CommandProcessor
                             cp_state <= CP_ADD_OP3;
                         end
                     end
+                    else
+                    begin
+                        cp_state <= CP_PACKET_DECODE;
+                    end
                 end
 
                 CP_HANDSHAKE_PREP:
@@ -191,6 +189,7 @@ module CommandProcessor
                 begin
                     if(rx_packet_ready == 0)
                     begin
+                        tx_cmd_id <= 0;
                         cp_state <= CP_IDLE;
                     end
                     else
@@ -204,7 +203,10 @@ module CommandProcessor
                     tx_packet_ready <= 0;
                     tx_cmd_id <= tx_cmd_id + 1;
 
-                    cp_state <= CP_MEM_FETCH;
+                    delay_counter <= 0;
+                    delay_cycles <= 2;
+                    delay_restore_state <= CP_MEM_FETCH;
+                    cp_state <= CP_DELAY;
                 end
 
                 CP_MEM_FETCH:
@@ -224,8 +226,8 @@ module CommandProcessor
                 begin
                     if(rx_packet_ready == 1)
                     begin
-                        if(rx_packet[7:0] == tx_cmd_id && rx_packet[15:8] == 1 
-                            && rx_packet[23:16] == 0 && rx_packet[31:24] == 0)
+                        if(rx_packet[7:0] == tx_cmd_id && rx_packet[15:8] == 8'd1 
+                            && rx_packet[23:16] == 8'd0 && rx_packet[31:24] == 8'd0)
                         begin
                             mem_val <= $signed(rx_packet[63:32]);
                             cp_state <= mem_op_restore_state;
@@ -269,6 +271,7 @@ module CommandProcessor
                     if(tx_packet_sent == 1)
                     begin
                         tx_packet_ready <= 0;
+                        tx_cmd_id <= tx_cmd_id + 1;
 
                         delay_counter <= 0;
                         delay_cycles <= 2;
@@ -370,6 +373,8 @@ module CommandProcessor
                     wait_restore_state <= CP_STOP;
                     cp_state <= CP_TX_PACKET_SENT_WAIT;
                 end
+
+                default: cp_state <= CP_IDLE;
             endcase 
         end
     end

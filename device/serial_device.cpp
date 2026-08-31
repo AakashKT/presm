@@ -28,7 +28,7 @@ void SerialDevice::device_initialize()
     this->serial_port_listen_thread = std::thread(
         [&](SerialDevice* current_device) {
             while(true) {
-                uint8_t data = 0;
+                char data = 0;
                 uint32_t bytes_read = read(current_device->port_fd, &data, 1);
 
                 if(bytes_read > 0) {                    
@@ -55,7 +55,7 @@ void SerialDevice::device_initialize()
 
 bool SerialDevice::open_serial_port(std::string port_name)
 {
-    this->port_fd = open(port_name.c_str(), O_RDWR | O_NOCTTY);
+    this->port_fd = open(port_name.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
     if (this->port_fd < 0)
         return false;
 
