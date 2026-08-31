@@ -9,5 +9,6 @@ public:
 };
 
 void run_sanity(std::vector<std::string> args);
+void run_addition(std::vector<std::string> args);
 
 #endif

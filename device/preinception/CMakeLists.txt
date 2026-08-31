@@ -4,6 +4,7 @@ if(${DEVICE_TYPE} STREQUAL "functional")
 
     SET(DEVICE_CODE
         functional_impl.cpp
+        functional_hw_modules.cpp
     )
 
 elseif(${DEVICE_TYPE} STREQUAL "serial")

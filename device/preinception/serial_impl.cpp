@@ -8,7 +8,6 @@ Device* get_device()
 SerialImpl::SerialImpl()
     : SerialDevice()
 {
-    this->device_initialize();
     this->device_memory = new HostResidentMemory(this->device_config["memory_size_in_bytes"]);
 }
 

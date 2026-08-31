@@ -3,7 +3,6 @@
 Device::Device()
 {
     this->log = new Logger();
-    
     this->log->init("device");
 
     std::ifstream json_file("hw_config.json");

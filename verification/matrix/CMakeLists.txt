@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.15...4.0)
 SET(VERIFICATION_SOURCES
     matrix_app.cpp
     sanity/sanity.cpp
+    addition/addition.cpp
 )
 
 target_sources(verification PUBLIC
