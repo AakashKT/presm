@@ -84,44 +84,47 @@ void mInit()
 
 MCommandInfo mAdd(MUIntDeviceMemory& first, MUIntDeviceMemory& second, MUIntDeviceMemory& result)
 {
-    DevicePayload add_op_1;
-    add_op_1.fields.id = 12;
-
-    presm_device->send_device_payload((void*)&add_op_1);
-    usleep(10);
-
-    return MCommandInfo(0);
-    // // [NOTE:]
-    // // This is strange - on and after ID of 13, the FPGA (TangNano20k) behaves weird, thorwing the sync off
-    // // No idea why, testbenches with ID=13 and above work fine - maybe this particular FPGA piece has a hardware error?
-    // global_command_id = global_command_id % 10;
-
     // DevicePayload add_op_1;
-    // add_op_1.fields.id = static_cast<char>(global_command_id++);
-    // add_op_1.fields.type = static_cast<char>(0);
-    // add_op_1.fields.cmd = static_cast<char>(2);
-    // add_op_1.fields.sub_cmd = static_cast<char>(0);
-    // add_op_1.fields32.body = first.address;
-    
-    // DevicePayload add_op_2;
-    // add_op_2.fields.id = static_cast<char>(global_command_id++);
-    // add_op_2.fields.type = static_cast<char>(0);
-    // add_op_2.fields.cmd = static_cast<char>(2);
-    // add_op_2.fields.sub_cmd = static_cast<char>(1);
-    // add_op_2.fields32.body = second.address;
+    // add_op_1.fields.id = 12;
 
-    // DevicePayload add_op_3;
-    // add_op_3.fields.id = static_cast<char>(global_command_id++);
-    // add_op_3.fields.type = static_cast<char>(0);
-    // add_op_3.fields.cmd = static_cast<char>(2);
-    // add_op_3.fields.sub_cmd = static_cast<char>(2);
-    // add_op_3.fields32.body = result.address;
+    // presm_device->send_device_payload((void*)&add_op_1);
+    // usleep(10);
 
-    // recorded_commands.push_back(add_op_1);
-    // recorded_commands.push_back(add_op_2);
-    // recorded_commands.push_back(add_op_3);
+    // return MCommandInfo(0);
+
+
     
-    // return MCommandInfo(add_op_3.fields.id);
+    // [NOTE:]
+    // This is strange - on and after ID of 13, the FPGA (TangNano20k) behaves weird, thorwing the sync off
+    // No idea why, testbenches with ID=13 and above work fine - maybe this particular FPGA piece has a hardware error?
+    global_command_id = global_command_id % 10;
+
+    DevicePayload add_op_1;
+    add_op_1.fields.id = static_cast<char>(global_command_id++);
+    add_op_1.fields.type = static_cast<char>(0);
+    add_op_1.fields.cmd = static_cast<char>(2);
+    add_op_1.fields.sub_cmd = static_cast<char>(0);
+    add_op_1.fields32.body = first.address;
+    
+    DevicePayload add_op_2;
+    add_op_2.fields.id = static_cast<char>(global_command_id++);
+    add_op_2.fields.type = static_cast<char>(0);
+    add_op_2.fields.cmd = static_cast<char>(2);
+    add_op_2.fields.sub_cmd = static_cast<char>(1);
+    add_op_2.fields32.body = second.address;
+
+    DevicePayload add_op_3;
+    add_op_3.fields.id = static_cast<char>(global_command_id++);
+    add_op_3.fields.type = static_cast<char>(0);
+    add_op_3.fields.cmd = static_cast<char>(2);
+    add_op_3.fields.sub_cmd = static_cast<char>(2);
+    add_op_3.fields32.body = result.address;
+
+    recorded_commands.push_back(add_op_1);
+    recorded_commands.push_back(add_op_2);
+    recorded_commands.push_back(add_op_3);
+    
+    return MCommandInfo(add_op_3.fields.id);
 }
 
 MCommandInfo mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result)

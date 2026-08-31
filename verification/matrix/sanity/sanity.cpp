@@ -11,9 +11,9 @@ void device_run()
         MUIntDeviceMemory c(10);
 
         MCommandInfo addCmd = mAdd(a, b, c);
-        // mSync(addCmd);
+        mSync(addCmd);
 
-        // std::cout << a.getValue() << " + " << b.getValue() << " = " << c.getValue() << std::endl;
+        std::cout << a.getValue() << " + " << b.getValue() << " = " << c.getValue() << std::endl;
     }
 
     mFree();
