@@ -19,11 +19,10 @@ def build_presm(args, config):
     device_name = config['device']['name']
     device_type = config['device']['type']
 
-    os.system(f'cmake .. -DDRIVER={driver_name} -DDEVICE={device_name} \
-                -DDEVICE_TYPE={device_type}')
+    utils._execute(f'cmake .. -DDRIVER={driver_name} -DDEVICE={device_name} -DDEVICE_TYPE={device_type}')
 
-    os.system('cmake --build . --config Release -- -j 4')
-    os.system('cmake --build . --config Release --target install -- -j 4')
+    utils._execute('cmake --build . --config Release -- -j 4')
+    utils._execute('cmake --build . --config Release --target install -- -j 4')
 
 def build_fpga_toolchain(args, config):
     if len(os.listdir('extern')) == 0:
@@ -57,11 +56,11 @@ def build_fpga_toolchain(args, config):
     utils._chdir('../../../')
 
 def install_ubuntu_packages():
-    os.system('sudo apt update')
+    utils._execute('sudo apt update')
 
-    os.system('sudo apt-get install iverilog')
+    utils._execute('sudo apt-get install iverilog')
 
-    os.system('sudo apt-get install autoconf automake autotools-dev \
+    utils._execute('sudo apt-get install autoconf automake autotools-dev \
                 make lld libffi-dev libfl-dev pkg-config tcl-dev graphviz xdot libeigen3-dev \
                 gzip libftdi1-2 libftdi1-dev libhidapi-hidraw0 libhidapi-dev libudev-dev g++ \
                 curl python3 python3-pip python3-tomli libmpc-dev libmpfr-dev \
@@ -69,7 +68,7 @@ def install_ubuntu_packages():
                 patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake \
                 libglib2.0-dev libslirp-dev libncurses-dev libreadline-dev \
                 libboost-all-dev')
-    os.system('pip install apycula cocotb')
+    utils._execute('pip install apycula cocotb')
 
 def get_or_build_extern_tools(args, config):
     system_name = platform.system()
