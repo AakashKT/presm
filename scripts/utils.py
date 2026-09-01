@@ -157,7 +157,7 @@ def sanitize_presm_config(config):
             utils.error_exit(f"'rtl_testbench' should be defined for deivce of type 'rtl_testbench'")
         
         try:
-            sim = config["device"]["rtl_testbench"]["simulator"]
-            lang = config["device"]["rtl_testbench"]["language"]
+            sim = config["device"]["rtl_testbench_config"]["simulator"]
+            lang = config["device"]["rtl_testbench_config"]["language"]
         except:
             utils.error_exit(f"'device' should have a 'rtl_testbench' config for deivce of type 'rtl_testbench'")

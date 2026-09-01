@@ -1,4 +1,4 @@
-# PRESM - <b>PRE S</b>ilicon <b>M</b>odelling framework
+# PRESM - <b>PRE S</b>ilicon <b>M</b>odelling framework for hardware accelerators
 
 PRESM is a modular framework to help in research, development and testing of hardware accelerators (think GPUs, NPUs). The core of PRESM is written in C/C++.
 

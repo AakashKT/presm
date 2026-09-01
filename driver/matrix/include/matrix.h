@@ -2,36 +2,23 @@
 #define MATRIX_H
 
 #include <cstdint>
-
-class MUIntDeviceMemory {
-public:
-    MUIntDeviceMemory(uint32_t source);
-    uint32_t getValue();
-
-    uint32_t size_in_bytes;
-    uint32_t address;
-};
+#include <cmath>
 
 class MIntDeviceMemory {
 public:
     MIntDeviceMemory(int32_t source);
     int32_t getValue();
+    void setValue(int32_t new_val);
 
     uint32_t size_in_bytes;
     uint32_t address;
 };
 
-class MCommandInfo {
-public:
-    MCommandInfo(uint8_t id) : id(id) {};
-
-    uint8_t id;
-};
-
 void mInit();
-MCommandInfo mAdd(MUIntDeviceMemory& first, MUIntDeviceMemory& second, MUIntDeviceMemory& result);
-MCommandInfo mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
-void mSync(MCommandInfo& info);
+void mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
+void mMultiply(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
+void mDivPow2(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
+void mSync();
 void mFree();
 
 #endif

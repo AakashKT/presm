@@ -66,7 +66,7 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
 
         DevicePayload mem_response;
         mem_response.fields.id = payload.fields.id;
-        mem_response.fields.type = 1;
+        mem_response.fields.type = static_cast<char>(TYPE::RESPONSE);
         mem_response.fields.cmd = payload.fields.cmd;
         mem_response.fields.sub_cmd = payload.fields.sub_cmd;
         mem_response.fields.body_1 = mem_val[0];
@@ -92,7 +92,7 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
 
             DevicePayload mem_response;
             mem_response.fields.id = payload.fields.id;
-            mem_response.fields.type = 1;
+            mem_response.fields.type = static_cast<char>(TYPE::RESPONSE);
             mem_response.fields.cmd = payload.fields.cmd;
             mem_response.fields.sub_cmd = payload.fields.sub_cmd;
             mem_response.fields32.body = 0;
@@ -132,14 +132,14 @@ void SerialImpl::device_find()
             continue;
         }
 
-        this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
+        this->configure_serial_port(this->device_config["serial_config"]["baud_rate"]);
         tcflush(this->port_fd, TCIOFLUSH);
 
         DevicePayload tx;
         tx.fields.id = 1;
-        tx.fields.type = 0;
-        tx.fields.cmd = 1;
-        tx.fields.sub_cmd = 0;
+        tx.fields.type = static_cast<char>(TYPE::REQUEST);
+        tx.fields.cmd = static_cast<char>(CMD::HANDSHAKE);
+        tx.fields.sub_cmd = static_cast<char>(HANDSHAKE::OP);
         tx.fields32.body = 0;
         this->send_device_payload(&tx);
 
@@ -155,7 +155,8 @@ void SerialImpl::device_find()
                 total_bytes_read += 1;
 
                 if(total_bytes_read == 8) {
-                    if(rx.fields.id == 1 && rx.fields.type == 1 && rx.fields.body_1 == 2 && rx.fields.body_2 == 1) {
+                    if(rx.fields.id == 1 && rx.fields.type == static_cast<char>(TYPE::RESPONSE)
+                        && rx.fields.body_1 == 2 && rx.fields.body_2 == 1) {
                         this->log->log_info("[SerialImpl] Found device in serial port '" + port_string + "'.");
                         found = true;
                     }

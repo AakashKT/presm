@@ -1,0 +1,91 @@
+{
+    "driver": {
+        "name": "matrix"
+    },
+
+    "device": {
+        "name": "preinception",
+        "type": "serial",
+        "memory_size_in_bytes": 1e10,
+
+        "rtl": {
+            "top_module_src": "tangnano20k_serial.v",
+            "top_module": "Tangnano20kUart"
+        },
+
+        "rtl_testbench_config": {
+            "simulator": "icarus",
+            "language": "verilog"
+        },
+
+        "fpga": {
+            "name": "tangnano20k"
+        },
+
+        "serial_config": {
+            "baud_rate": 9600
+        }
+    },
+
+    "verification": [
+        {
+            "name": "sanity",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        },
+        {
+            "name": "addition",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        },
+        {
+            "name": "multiplication",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        },
+        {
+            "name": "divide_power_2",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        },
+        {
+            "name": "multiple_commands",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        }
+    ],
+
+    "rtl_testbench": [
+        {
+            "name": "Tang Nano 20K FPGA top-level",
+            "rtl_src": "tangnano20k_serial.v",
+            "rtl_top_level": "Tangnano20kUart",
+            "testbench_src": "tangnano20k_serial.py",
+            "enable": true
+        },
+        {
+            "name": "UART Packet",
+            "rtl_src": "uart_packet.v",
+            "rtl_top_level": "UARTPacket",
+            "testbench_src": "uart_packet.py",
+            "enable": true
+        },
+        {
+            "name": "Command Processor (CP)",
+            "rtl_src": "command_processor.v",
+            "rtl_top_level": "CommandProcessor",
+            "testbench_src": "command_processor.py",
+            "enable": true
+        }
+    ]
+}

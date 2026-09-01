@@ -1,6 +1,40 @@
 #ifndef DEVICE_DEFS_H
 #define DEVICE_DEFS_H
 
+enum class TYPE : char {
+    REQUEST = 0,
+    RESPONSE = 1
+};
+
+enum class CMD : char {
+    HANDSHAKE = 1,
+    ADD = 2,
+    MUL = 3,
+    DIVP2 = 4
+};
+
+enum class ADD : char {
+    OP_1 = 0,
+    OP_2 = 1,
+    OP_3 = 2
+};
+
+enum class MUL : char {
+    OP_1 = 0,
+    OP_2 = 1,
+    OP_3 = 2
+};
+
+enum class DIVP2 : char {
+    OP_1 = 0,
+    OP_2 = 1,
+    OP_3 = 2
+};
+
+enum class HANDSHAKE : char {
+    OP = 0
+};
+
 union DevicePayload {
 
     struct Fields {

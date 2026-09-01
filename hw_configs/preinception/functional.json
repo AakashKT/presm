@@ -1,0 +1,49 @@
+{
+    "driver": {
+        "name": "matrix"
+    },
+
+    "device": {
+        "name": "preinception",
+        "type": "functional",
+        "memory_size_in_bytes": 1e10
+    },
+
+    "verification": [
+        {
+            "name": "sanity",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        },
+        {
+            "name": "addition",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        },
+        {
+            "name": "multiplication",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        },
+        {
+            "name": "divide_power_2",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        },
+        {
+            "name": "multiple_commands",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        }
+    ]
+}
