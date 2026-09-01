@@ -4,6 +4,9 @@ SET(VERIFICATION_SOURCES
     matrix_app.cpp
     sanity/sanity.cpp
     addition/addition.cpp
+    multiplication/multiplication.cpp
+    divide_power_2/divide_power_2.cpp
+    multiple_commands/multiple_commands.cpp
 )
 
 target_sources(verification PUBLIC

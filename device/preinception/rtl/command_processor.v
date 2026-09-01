@@ -33,13 +33,17 @@ module CommandProcessor
     localparam CP_MEM_WRITE_VAL = 13;
     localparam CP_MEM_WRITE_END = 14;
 
-    localparam CP_ADD_OP1 = 15;
-    localparam CP_ADD_OP1_END = 16;
-    localparam CP_ADD_OP2 = 17;
-    localparam CP_ADD_OP2_END = 18;
-    localparam CP_ADD_OP3 = 19;
-    localparam CP_ADD_END_PREP = 20;
-    localparam CP_ADD_END = 21;
+    localparam CP_FETCH_OP1 = 15;
+    localparam CP_FETCH_OP1_END = 16;
+    localparam CP_FETCH_OP2 = 17;
+    localparam CP_FETCH_OP2_END = 18;
+
+    localparam CP_CMD_END_PREP = 19;
+    localparam CP_CMD_END = 20;
+
+    localparam CP_ADD = 21;
+    localparam CP_MUL = 22;
+    localparam CP_DIVP2 = 23;
 
     reg [2:0] delay_cycles, delay_counter;
 
@@ -119,15 +123,45 @@ module CommandProcessor
                     begin
                         if(pkt_sub_cmd == 0)
                         begin
-                            cp_state <= CP_ADD_OP1;
+                            cp_state <= CP_FETCH_OP1;
                         end
                         else if(pkt_sub_cmd == 1)
                         begin
-                            cp_state <= CP_ADD_OP2;
+                            cp_state <= CP_FETCH_OP2;
                         end
                         else if(pkt_sub_cmd == 2)
                         begin
-                            cp_state <= CP_ADD_OP3;
+                            cp_state <= CP_ADD;
+                        end
+                    end
+                    else if(pkt_cmd == 3)
+                    begin
+                        if(pkt_sub_cmd == 0)
+                        begin
+                            cp_state <= CP_FETCH_OP1;
+                        end
+                        else if(pkt_sub_cmd == 1)
+                        begin
+                            cp_state <= CP_FETCH_OP2;
+                        end
+                        else if(pkt_sub_cmd == 2)
+                        begin
+                            cp_state <= CP_MUL;
+                        end
+                    end
+                    else if(pkt_cmd == 4)
+                    begin
+                        if(pkt_sub_cmd == 0)
+                        begin
+                            cp_state <= CP_FETCH_OP1;
+                        end
+                        else if(pkt_sub_cmd == 1)
+                        begin
+                            cp_state <= CP_FETCH_OP2;
+                        end
+                        else if(pkt_sub_cmd == 2)
+                        begin
+                            cp_state <= CP_DIVP2;
                         end
                     end
                     else
@@ -313,55 +347,45 @@ module CommandProcessor
                     end
                 end
 
-                CP_ADD_OP1:
+                CP_FETCH_OP1:
                 begin
                     mem_fetch_addr <= rx_packet[63:32];
 
-                    mem_op_restore_state <= CP_ADD_OP1_END;
+                    mem_op_restore_state <= CP_FETCH_OP1_END;
                     cp_state <= CP_MEM_FETCH_PREP;
                 end
 
-                CP_ADD_OP1_END:
+                CP_FETCH_OP1_END:
                 begin
                     op_1 <= mem_val;
-                    cp_state <= CP_ADD_END_PREP;
+                    cp_state <= CP_CMD_END_PREP;
                 end
 
-                CP_ADD_OP2:
+                CP_FETCH_OP2:
                 begin
                     mem_fetch_addr <= rx_packet[63:32];
 
-                    mem_op_restore_state <= CP_ADD_OP2_END;
+                    mem_op_restore_state <= CP_FETCH_OP2_END;
                     cp_state <= CP_MEM_FETCH_PREP;
                 end
 
-                CP_ADD_OP2_END:
+                CP_FETCH_OP2_END:
                 begin
                     op_2 <= mem_val;
-                    cp_state <= CP_ADD_END_PREP;
+                    cp_state <= CP_CMD_END_PREP;
                 end
 
-                CP_ADD_OP3:
-                begin
-                    mem_write_addr <= rx_packet[63:32];
-
-                    mem_val <= op_1 + op_2;
-
-                    mem_op_restore_state <= CP_ADD_END_PREP;
-                    cp_state <= CP_MEM_WRITE_ADDR_PREP;
-                end
-
-                CP_ADD_END_PREP:
+                CP_CMD_END_PREP:
                 begin
                     tx_packet_ready <= 0;
                     
                     delay_counter <= 0;
                     delay_cycles <= 2;
-                    delay_restore_state <= CP_ADD_END;
+                    delay_restore_state <= CP_CMD_END;
                     cp_state <= CP_DELAY;
                 end
 
-                CP_ADD_END:
+                CP_CMD_END:
                 begin
                     tx_packet[7:0] <= pkt_id;
                     tx_packet[15:8] <= 1;
@@ -372,6 +396,36 @@ module CommandProcessor
 
                     wait_restore_state <= CP_STOP;
                     cp_state <= CP_TX_PACKET_SENT_WAIT;
+                end
+
+                CP_ADD:
+                begin
+                    mem_write_addr <= rx_packet[63:32];
+
+                    mem_val <= op_1 + op_2;
+
+                    mem_op_restore_state <= CP_CMD_END_PREP;
+                    cp_state <= CP_MEM_WRITE_ADDR_PREP;
+                end
+
+                CP_MUL:
+                begin
+                    mem_write_addr <= rx_packet[63:32];
+
+                    mem_val <= op_1 * op_2;
+
+                    mem_op_restore_state <= CP_CMD_END_PREP;
+                    cp_state <= CP_MEM_WRITE_ADDR_PREP;
+                end
+
+                CP_DIVP2:
+                begin
+                    mem_write_addr <= rx_packet[63:32];
+
+                    mem_val <= op_1 >>> op_2;
+
+                    mem_op_restore_state <= CP_CMD_END_PREP;
+                    cp_state <= CP_MEM_WRITE_ADDR_PREP;
                 end
 
                 default: cp_state <= CP_IDLE;

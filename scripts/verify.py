@@ -42,28 +42,29 @@ if __name__ == '__main__':
     executable, driver_lib = setup(args, config, execution_dir)
 
     for app in config['verification']:
-        app_args = [app['name']] + app['args_device_run']
-        source = utils.presm_execute(execution_dir, executable, driver_lib, \
-                            app_args, config['driver']['name'])
+        if app['enabled']:
+            app_args = [app['name']] + app['args_device_run']
+            source = utils.presm_execute(execution_dir, executable, driver_lib, \
+                                app_args, config['driver']['name'])
 
-        if app['verify']:
-            app_args = [app['name']] + app['args_host_run']
-            target = utils.execute(execution_dir, executable, app_args)
+            if app['verify']:
+                app_args = [app['name']] + app['args_host_run']
+                target = utils.execute(execution_dir, executable, app_args)
 
-            result = verify_output(source, target)
-            if result:
-                utils.print_green(f'Verification of {app["name"]} succeeded.')
-                print('')
+                result = verify_output(source, target)
+                if result:
+                    utils.print_green(f'Verification of \"{app["name"]}\" succeeded.')
+                    print('')
+                else:
+                    utils.print_red(f'Verification of \"{app["name"]}\" failed.')
+                    print('\nPRESM output:')
+                    print(source)
+
+                    print('\nHost output:')
+                    print(target)
+                    print('')
+                    exit(1)
+            
             else:
-                utils.print_red(f'Verification of {app["name"]} failed.')
-                print('\nPRESM output:')
+                utils.print_green('Execution output ==>')
                 print(source)
-
-                print('\nHost output:')
-                print(target)
-                print('')
-                exit(1)
-        
-        else:
-            utils.print_green('Execution output ==>')
-            print(source)
