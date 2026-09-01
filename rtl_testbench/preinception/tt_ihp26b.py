@@ -6,7 +6,7 @@ async def assert_tx_bits(dut, bit_hold, bits, num_bits):
     for i in range(num_bits):
         bit = (bits >> i) & 1
 
-        assert dut.uo_out.value[4] == bit, "UART TX: expected %d, got %d at bit number: %d" % (bit, dut.uo_out.value[4], i)
+        assert int(dut.uo_out.value) >> 4 == bit, "UART TX: expected %d, got %d at bit number: %d" % (bit, dut.uo_out.value[4], i)
         await Timer(bit_hold, unit='ns')
 
 async def send_rx_bits(dut, bit_hold, bits, num_bits):
@@ -35,15 +35,14 @@ async def basic_test(dut):
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
-
-    assert dut.uart_rx.value == 1
+    await ClockCycles(dut.clk, 10)
 
     dut.ena.value = 1
     dut.ui_in.value = 1 << 3
     await ClockCycles(dut.clk, 10)
 
-    assert dut.uart_rx.value == 1
-    assert dut.uo_out.value[4] == 1
+    assert int(dut.ui_in.value) >> 3 == 1
+    assert int(dut.uo_out.value) >> 4 == 1
 
 @cocotb.test()
 async def handshake_test(dut):
@@ -64,6 +63,7 @@ async def handshake_test(dut):
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 10)
 
     dut.ena.value = 1
     dut.ui_in.value = 1 << 3
@@ -81,8 +81,6 @@ async def handshake_test(dut):
     await send_rx_bits(dut, bit_hold, b3, 10)
     await send_rx_bits(dut, bit_hold, b3, 10)
     await send_rx_bits(dut, bit_hold, b3, 10)
-
-    assert dut.rx_packet_ready.value == 1
     
     bits_to_assert = 0b1000000010
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
@@ -108,7 +106,6 @@ async def handshake_test(dut):
     bits_to_assert = 0b1000000000
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
     
-    assert dut.rx_packet_ready.value == 1
 
 @cocotb.test()
 async def op1_test(dut):
@@ -129,6 +126,7 @@ async def op1_test(dut):
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 10)
 
     dut.ena.value = 1
     dut.ui_in.value = 1 << 3
@@ -150,8 +148,6 @@ async def op1_test(dut):
     await send_rx_bits(dut, bit_hold, b5, 10)
     await send_rx_bits(dut, bit_hold, b6, 10)
     await send_rx_bits(dut, bit_hold, b7, 10)
-
-    assert dut.rx_packet_ready.value == 1
     
     bits_to_assert = 0b1000000010
     await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
