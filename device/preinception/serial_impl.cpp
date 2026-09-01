@@ -132,7 +132,7 @@ void SerialImpl::device_find()
             continue;
         }
 
-        this->configure_serial_port(this->device_config["fpga"]["baud_rate"]);
+        this->configure_serial_port(this->device_config["serial_config"]["baud_rate"]);
         tcflush(this->port_fd, TCIOFLUSH);
 
         DevicePayload tx;

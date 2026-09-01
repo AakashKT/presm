@@ -5,9 +5,9 @@
 
     "device": {
         "name": "",
-        "type": "rtl_testbench",
+        "type": "",
 
-        "rtl_testbench": {
+        "rtl_testbench_config": {
             "simulator": "icarus",
             "language": "verilog"
         }

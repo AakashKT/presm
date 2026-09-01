@@ -4,16 +4,13 @@ def setup(args, config, testbench, execution_dir):
     try:
         device_name = config['device']['name']
         device_type = config['device']['type']
-        
-        if device_type != 'rtl_testbench':
-            raise
 
         utils._copy_file('rtl_testbench/Makefile', execution_dir)
 
         rtl_dir = f'device/rtl/'
         utils._copy_recursive(rtl_dir, execution_dir)
         
-        if device_name != 'presm':
+        if device_name != '':
             rtl_dir = f'device/{device_name}/rtl/'
             utils._copy_recursive(rtl_dir, execution_dir)
 
@@ -34,6 +31,8 @@ if __name__ == '__main__':
 
     try:
         tests = config['rtl_testbench']
+        sim = config["device"]["rtl_testbench_config"]["simulator"]
+        lang = config["device"]["rtl_testbench_config"]["language"]
     except:
         utils.error_exit('No RTL testbenches defined')
     

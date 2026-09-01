@@ -4,6 +4,9 @@
 `include "uart_tx.v"
 
 module UARTPacket 
+#(
+    parameter DELAY_WAIT = 2812
+)
 (
     // Clock
     input extern_clock,
@@ -45,7 +48,7 @@ module UARTPacket
     wire [7:0] rx_data;
     wire rx_data_en;
 
-    UARTRx #(.DELAY_WAIT(2812)) receiver(
+    UARTRx #(.DELAY_WAIT(DELAY_WAIT)) receiver(
         extern_clock,
         extern_reset,
         extern_uart_rx,
@@ -156,7 +159,7 @@ module UARTPacket
     reg tx_data_en;
     wire tx_data_sent;
 
-    UARTTx #(.DELAY_WAIT(2812)) transmitter(
+    UARTTx #(.DELAY_WAIT(DELAY_WAIT)) transmitter(
         extern_clock,
         extern_reset,
         extern_uart_tx,

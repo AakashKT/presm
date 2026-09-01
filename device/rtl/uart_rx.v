@@ -26,7 +26,7 @@ module UARTRx
     localparam RX_READ = 2;
     localparam RX_STOP = 3;
 
-    reg [11:0] rx_counter;
+    reg [13:0] rx_counter;
     reg [3:0] rx_bit_number;
 
     reg [2:0] rx_state;

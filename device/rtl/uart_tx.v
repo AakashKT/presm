@@ -26,7 +26,7 @@ module UARTTx
     localparam TX_WRITE = 2;
     localparam TX_STOP = 3;
 
-    reg [11:0] tx_counter;
+    reg [13:0] tx_counter;
     reg [7:0] tx_data;
     reg [2:0] tx_bit_number;
     reg [2:0] tx_state;
