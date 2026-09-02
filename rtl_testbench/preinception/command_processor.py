@@ -3,7 +3,7 @@ from cocotb.triggers import RisingEdge, FallingEdge, Timer
 from cocotb.clock import Clock
 
 @cocotb.test()
-async def command_processor(dut):
+async def command_processor_handshake(dut):
     freq = 27000000 
     baud_rate = 9600
 
@@ -21,7 +21,6 @@ async def command_processor(dut):
     dut.extern_reset.value = 0
     await Timer(clk_ns, unit='ns')
 
-    # Handshake command
     dut.rx_packet.value = 1 | 0 << 8 | 1 << 16 | 0 << 24
     dut.rx_packet_ready.value = 1
     await Timer(8*clk_ns, unit='ns')
@@ -30,11 +29,27 @@ async def command_processor(dut):
     assert dut.tx_packet_ready.value == 1
 
     dut.tx_packet_sent.value = 1
-    await Timer(2*clk_ns, unit='ns')
+
+@cocotb.test()
+async def command_processor_add(dut):
+    freq = 27000000 
+    baud_rate = 9600
+
+    clk_ns = round(1e9 / freq, 2)
+    bit_hold = round(clk_ns * float(freq) / baud_rate, 2)
+
+    clk = Clock(dut.extern_clock, clk_ns, unit='ns')
+    clk.start(start_high=False)
+
+    await RisingEdge(dut.extern_clock)
+    await Timer(clk_ns, unit='ns')
     
-    ##########
-    # Add 1
-    ##########
+    dut.extern_reset.value = 1
+    dut.rx_packet_ready.value = 0
+    await Timer(clk_ns, unit='ns')
+    dut.extern_reset.value = 0
+    await Timer(clk_ns, unit='ns')
+
     VAL_1 = 65
     ADDR_1 = 10
 

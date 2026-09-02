@@ -1,5 +1,3 @@
-`default_nettype none
-
 `include "uart_rx.v"
 `include "uart_tx.v"
 
@@ -18,42 +16,23 @@ module UARTPacket
     // Hardware reset signal
     input extern_reset,
 
-    output wire [63:0] rx_packet_flat,
+    output reg [63:0] rx_packet_flat,
     output reg rx_packet_ready,
 
     input wire [63:0] tx_packet_flat,
     input wire tx_packet_ready,
     output reg tx_packet_sent
 );
-    reg [7:0] rx_packet[8];
-    assign rx_packet_flat[7:0] = rx_packet[0];
-    assign rx_packet_flat[15:8] = rx_packet[1];
-    assign rx_packet_flat[23:16] = rx_packet[2];
-    assign rx_packet_flat[31:24] = rx_packet[3];
-    assign rx_packet_flat[39:32] = rx_packet[4];
-    assign rx_packet_flat[47:40] = rx_packet[5];
-    assign rx_packet_flat[55:48] = rx_packet[6];
-    assign rx_packet_flat[63:56] = rx_packet[7];
-
-    wire [7:0] tx_packet[8];
-    assign tx_packet[0] = tx_packet_flat[7:0];
-    assign tx_packet[1] = tx_packet_flat[15:8];
-    assign tx_packet[2] = tx_packet_flat[23:16];
-    assign tx_packet[3] = tx_packet_flat[31:24];
-    assign tx_packet[4] = tx_packet_flat[39:32];
-    assign tx_packet[5] = tx_packet_flat[47:40];
-    assign tx_packet[6] = tx_packet_flat[55:48];
-    assign tx_packet[7] = tx_packet_flat[63:56];
 
     wire [7:0] rx_data;
     wire rx_data_en;
 
     UARTRx #(.DELAY_WAIT(DELAY_WAIT)) receiver(
-        extern_clock,
-        extern_reset,
-        extern_uart_rx,
-        rx_data,
-        rx_data_en
+        .extern_clock(extern_clock),
+        .async_reset(extern_reset),
+        .extern_uart_rx(extern_uart_rx),
+        .data(rx_data),
+        .data_en(rx_data_en)
     );
 
     reg [1:0] rx_state;
@@ -68,14 +47,7 @@ module UARTPacket
     begin
         if(extern_reset)
         begin
-            rx_packet[0] <= 0;
-            rx_packet[1] <= 0;
-            rx_packet[2] <= 0;
-            rx_packet[3] <= 0;
-            rx_packet[4] <= 0;
-            rx_packet[5] <= 0;
-            rx_packet[6] <= 0;
-            rx_packet[7] <= 0;
+            rx_packet_flat <= 0;
             rx_packet_ready <= 0;
 
             rx_state <= RX_IDLE;
@@ -88,14 +60,7 @@ module UARTPacket
                 begin
                     if(rx_data_en == 0)
                     begin
-                        rx_packet[0] <= 0;
-                        rx_packet[1] <= 0;
-                        rx_packet[2] <= 0;
-                        rx_packet[3] <= 0;
-                        rx_packet[4] <= 0;
-                        rx_packet[5] <= 0;
-                        rx_packet[6] <= 0;
-                        rx_packet[7] <= 0;
+                        rx_packet_flat <= 0;
                         
                         rx_state <= RX_RECEIVE;
                         rx_packet_idx <= 0;
@@ -126,9 +91,19 @@ module UARTPacket
                 begin
                     if(rx_data_en == 1)
                     begin
-                        rx_packet[rx_packet_idx] <= rx_data;
-                        rx_packet_idx <= rx_packet_idx + 1;
+                        case(rx_packet_idx)
+                            4'd0: rx_packet_flat[7:0] <= rx_data;
+                            4'd1: rx_packet_flat[15:8] <= rx_data;
+                            4'd2: rx_packet_flat[23:16] <= rx_data;
+                            4'd3: rx_packet_flat[31:24] <= rx_data;
+                            4'd4: rx_packet_flat[39:32] <= rx_data;
+                            4'd5: rx_packet_flat[47:40] <= rx_data;
+                            4'd6: rx_packet_flat[55:48] <= rx_data;
+                            4'd7: rx_packet_flat[63:56] <= rx_data;
+                            default: rx_packet_flat <= 0;
+                        endcase
 
+                        rx_packet_idx <= rx_packet_idx + 1;
                         rx_state <= RX_RECEIVE_WAIT;
                     end
                     else
@@ -160,12 +135,12 @@ module UARTPacket
     wire tx_data_sent;
 
     UARTTx #(.DELAY_WAIT(DELAY_WAIT)) transmitter(
-        extern_clock,
-        extern_reset,
-        extern_uart_tx,
-        tx_data,
-        tx_data_en,
-        tx_data_sent
+        .extern_clock(extern_clock),
+        .async_reset(extern_reset),
+        .extern_uart_tx(extern_uart_tx),
+        .data(tx_data),
+        .data_en(tx_data_en),
+        .data_sent(tx_data_sent)
     );
 
     reg [2:0] tx_state;
@@ -209,7 +184,18 @@ module UARTPacket
                 begin
                     if(tx_data_sent == 0)
                     begin
-                        tx_data <= tx_packet[tx_packet_idx];
+                        case(tx_packet_idx)
+                            4'd0: tx_data <= tx_packet_flat[7:0];
+                            4'd1: tx_data <= tx_packet_flat[15:8];
+                            4'd2: tx_data <= tx_packet_flat[23:16];
+                            4'd3: tx_data <= tx_packet_flat[31:24];
+                            4'd4: tx_data <= tx_packet_flat[39:32];
+                            4'd5: tx_data <= tx_packet_flat[47:40];
+                            4'd6: tx_data <= tx_packet_flat[55:48];
+                            4'd7: tx_data <= tx_packet_flat[63:56];
+                            default: tx_data <= 0;
+                        endcase
+
                         tx_data_en <= 1;
                         tx_packet_idx <= tx_packet_idx + 1;
 
