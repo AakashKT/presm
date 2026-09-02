@@ -1,3 +1,5 @@
+`default_nettype none
+
 `include "command_processor.v"
 `include "uart_packet.v"
 
@@ -30,50 +32,32 @@ module tt_um_preinception_top (
     wire tx_packet_ready;
     wire tx_packet_sent;
 
-    reg rst_p;
-    reg uart_rx;
+    wire rst_p;
+    assign rst_p = ~rst_n;
+
+    wire uart_tx_wire;
+    assign uo_out[4] = rst_p ? 0 : uart_tx_wire;
 
     UARTPacket #(.DELAY_WAIT(5208)) uartPacket(
-        clk,
-        uart_rx,
-        uo_out[4],
-        rst_p,
-        rx_packet,
-        rx_packet_ready,
-        tx_packet,
-        tx_packet_ready,
-        tx_packet_sent
+        .extern_clock(clk),
+        .extern_uart_rx(ui_in[3]),
+        .extern_uart_tx(uart_tx_wire),
+        .extern_reset(rst_p),
+        .rx_packet_flat(rx_packet),
+        .rx_packet_ready(rx_packet_ready),
+        .tx_packet_flat(tx_packet),
+        .tx_packet_ready(tx_packet_ready),
+        .tx_packet_sent(tx_packet_sent)
     );
 
     CommandProcessor cp(
-        clk,
-        rst_p,
-        rx_packet,
-        rx_packet_ready,
-        tx_packet,
-        tx_packet_ready,
-        tx_packet_sent
+        .extern_clock(clk),
+        .extern_reset(rst_p),
+        .rx_packet(rx_packet),
+        .rx_packet_ready(rx_packet_ready),
+        .tx_packet(tx_packet),
+        .tx_packet_ready(tx_packet_ready),
+        .tx_packet_sent(tx_packet_sent)
     );
-
-    always @(posedge clk or negedge rst_n)
-    begin
-        if(!rst_n)
-        begin
-            uart_rx <= 1;
-            rst_p <= 1;
-        end
-        else
-        begin
-            rst_p <= 0;
-            if(ena)
-            begin
-                uart_rx <= ui_in[3];
-            end
-            else
-            begin
-                uart_rx <= 1;
-            end
-        end
-    end
 
 endmodule

@@ -35,15 +35,7 @@ async def uart_packet_transmit(dut):
     dut.extern_reset.value = 0
     await Timer(clk_ns, unit='ns')
 
-    dut.tx_packet[0].value = 1
-    dut.tx_packet[1].value = 2
-    dut.tx_packet[2].value = 0
-    dut.tx_packet[3].value = 2
-    
-    dut.tx_packet[4].value = 2
-    dut.tx_packet[5].value = 4
-    dut.tx_packet[6].value = 0
-    dut.tx_packet[7].value = 0
+    dut.tx_packet_flat.value = 1 | 2 << 8 | 0 << 16 | 2 << 24 | 2 << 32 | 4 << 40 | 0 << 48 | 0 << 56
 
     dut.tx_packet_ready.value = 1
     await Timer(3*clk_ns, unit='ns')
@@ -124,14 +116,7 @@ async def uart_packet_receive(dut):
     await send_rx_bits(dut, bit_hold, b3, 10)
 
     assert dut.rx_packet_ready.value == 1
-    assert dut.rx_packet[0].value == 1
-    assert dut.rx_packet[1].value == 8
-    assert dut.rx_packet[2].value == 2
-    assert dut.rx_packet[3].value == 4
-    assert dut.rx_packet[4].value == 8
-    assert dut.rx_packet[5].value == 9
-    assert dut.rx_packet[6].value == 5
-    assert dut.rx_packet[7].value == 3
+    assert dut.rx_packet_flat.value == 1 | 8 << 8 | 2 << 16 | 4 << 24 | 8 << 32 | 9 << 40 | 5 << 48 | 3 << 56 
 
     # Packet 2
     b0 = 0b1000000100
@@ -152,11 +137,4 @@ async def uart_packet_receive(dut):
     await send_rx_bits(dut, bit_hold, b0, 10)
 
     assert dut.rx_packet_ready.value == 1
-    assert dut.rx_packet[0].value == 2
-    assert dut.rx_packet[1].value == 3
-    assert dut.rx_packet[2].value == 0
-    assert dut.rx_packet[3].value == 1
-    assert dut.rx_packet[4].value == 11
-    assert dut.rx_packet[5].value == 11
-    assert dut.rx_packet[6].value == 11
-    assert dut.rx_packet[7].value == 11
+    assert dut.rx_packet_flat.value == 2 | 3 << 8 | 0 << 16 | 1 << 24 | 11 << 32 | 11 << 40 | 11 << 48 | 11 << 56

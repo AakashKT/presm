@@ -1,3 +1,5 @@
+`default_nettype none
+
 `include "uart_packet.v"
 `include "command_processor.v"
 
