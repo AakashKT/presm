@@ -16,8 +16,29 @@ async def send_rx_bits(dut, bit_hold, bits, num_bits):
         dut.ui_in.value = bit << 3
         await Timer(bit_hold, unit='ns')
 
-@cocotb.test()
-async def basic_test(dut):
+async def send_packet(dut, bit_hold, packet):
+    for item in packet:
+        await send_rx_bits(dut, bit_hold, item, 10)
+
+async def assert_packet(dut, bit_hold, packet):
+    for item in packet:
+        await assert_tx_bits(dut, bit_hold, item, 10)
+
+async def rx_pin(dut):
+    dut.ena.value = 1
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 10)
+
+async def reset(dut):
+    dut.ena.value = 0
+    dut.ui_in.value = 0
+    dut.uio_in.value = 0
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 10)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 10)
+
+def init(dut):
     freq = 50000000 
     baud_rate = 9600
 
@@ -27,189 +48,363 @@ async def basic_test(dut):
     clk = Clock(dut.clk, clk_ns, unit='ns')
     cocotb.start_soon(clk.start())
 
-    # Reset
-    dut._log.info("Reset")
-    dut.ena.value = 0
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 10)
+    return bit_hold
 
-    dut.ena.value = 1
-    dut.ui_in.value = 1 << 3
-    await ClockCycles(dut.clk, 10)
+@cocotb.test()
+async def reset_test(dut):
+    init(dut)
+    await reset(dut)
+    await rx_pin(dut)
+
+    assert dut.uo_out.value == 0b00010000
+    assert dut.uio_out.value == 0
+    assert dut.uio_oe.value == 0
+
+@cocotb.test()
+async def handshake_test(dut):
+    init(dut)
+    await reset(dut)
+    await rx_pin(dut)
 
     assert int(dut.ui_in.value) >> 3 == 1
     assert int(dut.uo_out.value) >> 4 == 1
 
 @cocotb.test()
 async def handshake_test(dut):
-    freq = 50000000 
-    baud_rate = 9600
+    bit_hold = init(dut)
+    await reset(dut)
+    await rx_pin(dut)
 
-    clk_ns = round(1e9 / freq, 2)
-    bit_hold = round(clk_ns * float(freq) / baud_rate, 2)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000010, 0b1000000000,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
 
-    clk = Clock(dut.clk, clk_ns, unit='ns')
-    cocotb.start_soon(clk.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.ena.value = 0
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 10)
-
-    dut.ena.value = 1
-    dut.ui_in.value = 1 << 3
-    await ClockCycles(dut.clk, 10)
-
-    b0 = 0b1000000010
-    b1 = 0b1000000000
-    b2 = 0b1000000010
-    b3 = 0b1000000000
-    await send_rx_bits(dut, bit_hold, b0, 10)
-    await send_rx_bits(dut, bit_hold, b1, 10)
-    await send_rx_bits(dut, bit_hold, b2, 10)
-    await send_rx_bits(dut, bit_hold, b3, 10)
-    await send_rx_bits(dut, bit_hold, b3, 10)
-    await send_rx_bits(dut, bit_hold, b3, 10)
-    await send_rx_bits(dut, bit_hold, b3, 10)
-    await send_rx_bits(dut, bit_hold, b3, 10)
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000010, 0b1000000000,
+        0b1000000100, 0b1000000010, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
     
-    bits_to_assert = 0b1000000010
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    bits_to_assert = 0b1000000010
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    bits_to_assert = 0b1000000010
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    bits_to_assert = 0b1000000100
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    bits_to_assert = 0b1000000010
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
-    
-
 @cocotb.test()
 async def op1_test(dut):
-    freq = 50000000 
-    baud_rate = 9600
+    bit_hold = init(dut)
+    await reset(dut)
+    await rx_pin(dut)
 
-    clk_ns = round(1e9 / freq, 2)
-    bit_hold = round(clk_ns * float(freq) / baud_rate, 2)
-
-    clk = Clock(dut.clk, clk_ns, unit='ns')
-    cocotb.start_soon(clk.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.ena.value = 0
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 10)
-
-    dut.ena.value = 1
-    dut.ui_in.value = 1 << 3
-    await ClockCycles(dut.clk, 10)
-
-    b0 = 0b1000000010
-    b1 = 0b1000000000
-    b2 = 0b1000000100
-    b3 = 0b1000000000
-    b4 = 0b1101001010
-    b5 = 0b1010100110
-    b6 = 0b1001011110
-    b7 = 0b1111111110
-    await send_rx_bits(dut, bit_hold, b0, 10)
-    await send_rx_bits(dut, bit_hold, b1, 10)
-    await send_rx_bits(dut, bit_hold, b2, 10)
-    await send_rx_bits(dut, bit_hold, b3, 10)
-    await send_rx_bits(dut, bit_hold, b4, 10)
-    await send_rx_bits(dut, bit_hold, b5, 10)
-    await send_rx_bits(dut, bit_hold, b6, 10)
-    await send_rx_bits(dut, bit_hold, b7, 10)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000100, 0b1000000000,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
     
-    bits_to_assert = 0b1000000010
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000000, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000000, 0b1000000000, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000100, 0b1000000000,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+@cocotb.test()
+async def op2_test(dut):
+    bit_hold = init(dut)
+    await reset(dut)
+    await rx_pin(dut)
 
-    bits_to_assert = 0b1101001010
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000100, 0b1000000010,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
+    
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000000, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1010100110
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000000, 0b1000000000, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1001011110
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000100, 0b1000000010,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1111111110
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+@cocotb.test()
+async def add_cmd_test(dut):
+    bit_hold = init(dut)
+    await reset(dut)
+    await rx_pin(dut)
 
-    b0 = 0b1000000010
-    b1 = 0b1000000010
-    b2 = 0b1000000000
-    b3 = 0b1000000000
-    b4 = 0b1101001010
-    b5 = 0b1010100110
-    b6 = 0b1001011110
-    b7 = 0b1111111110
-    await send_rx_bits(dut, bit_hold, b0, 10)
-    await send_rx_bits(dut, bit_hold, b1, 10)
-    await send_rx_bits(dut, bit_hold, b2, 10)
-    await send_rx_bits(dut, bit_hold, b3, 10)
-    await send_rx_bits(dut, bit_hold, b4, 10)
-    await send_rx_bits(dut, bit_hold, b5, 10)
-    await send_rx_bits(dut, bit_hold, b6, 10)
-    await send_rx_bits(dut, bit_hold, b7, 10)
+    ######################
+    # OP 1
+    ######################
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000100, 0b1000000000,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000000, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1000000010
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000000, 0b1000000000, 
+        0b1000000110, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000100, 0b1000000000,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1000000010
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    ######################
+    # OP 2
+    ######################
+    packet = [
+        0b1000000100, 0b1000000000, 0b1000000100, 0b1000000010,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000000, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1000000100
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000000, 0b1000000000, 
+        0b1000000110, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000100, 0b1000000010, 0b1000000100, 0b1000000010,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    ######################
+    # OP 3
+    ######################
+    packet = [
+        0b1000000110, 0b1000000000, 0b1000000100, 0b1000000100,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000010, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000100, 0b1000000000, 0b1000000000, 0b1000000010, 
+        0b1000001100, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    packet = [
+        0b1000000100, 0b1000000010, 0b1000000000, 0b1000000010, 
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000110, 0b1000000010, 0b1000000100, 0b1000000100,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
 
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+@cocotb.test()
+async def mul_cmd_test(dut):
+    bit_hold = init(dut)
+    await reset(dut)
+    await rx_pin(dut)
 
-    bits_to_assert = 0b1000000000
-    await assert_tx_bits(dut, bit_hold, bits_to_assert, 10)
+    ######################
+    # OP 1
+    ######################
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000110, 0b1000000000,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000000, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000000, 0b1000000000, 
+        0b1000000110, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000110, 0b1000000000,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    ######################
+    # OP 2
+    ######################
+    packet = [
+        0b1000000100, 0b1000000000, 0b1000000110, 0b1000000010,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000000, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000000, 0b1000000000, 
+        0b1000000110, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000100, 0b1000000010, 0b1000000110, 0b1000000010,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    ######################
+    # OP 3
+    ######################
+    packet = [
+        0b1000000110, 0b1000000000, 0b1000000110, 0b1000000100,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
+
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000010, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000100, 0b1000000000, 0b1000000000, 0b1000000010, 
+        0b1000010010, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    packet = [
+        0b1000000100, 0b1000000010, 0b1000000000, 0b1000000010, 
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000110, 0b1000000010, 0b1000000110, 0b1000000100,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+@cocotb.test()
+async def divp2_cmd_test(dut):
+    bit_hold = init(dut)
+    await reset(dut)
+    await rx_pin(dut)
+
+    ######################
+    # OP 1
+    ######################
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000001000, 0b1000000000,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000000, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000000, 0b1000000000, 
+        0b1000100000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000001000, 0b1000000000,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    ######################
+    # OP 2
+    ######################
+    packet = [
+        0b1000000100, 0b1000000000, 0b1000001000, 0b1000000010,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000000, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    packet = [
+        0b1000000010, 0b1000000010, 0b1000000000, 0b1000000000, 
+        0b1000000110, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000100, 0b1000000010, 0b1000001000, 0b1000000010,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    ######################
+    # OP 3
+    ######################
+    packet = [
+        0b1000000110, 0b1000000000, 0b1000001000, 0b1000000100,
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await send_packet(dut, bit_hold, packet)
+
+    packet = [
+        0b1000000010, 0b1000000000, 0b1000000000, 0b1000000010, 
+        0b1101001010, 0b1010100110, 0b1001011110, 0b1111111110
+    ]
+    await assert_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000100, 0b1000000000, 0b1000000000, 0b1000000010, 
+        0b1000000100, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    packet = [
+        0b1000000100, 0b1000000010, 0b1000000000, 0b1000000010, 
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+    packet = [
+        0b1000000110, 0b1000000010, 0b1000001000, 0b1000000100,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
+    

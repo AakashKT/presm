@@ -60,4 +60,6 @@ module tt_um_preinception_top (
         .tx_packet_sent(tx_packet_sent)
     );
 
+    wire _unused_pins = &{ui_in, uio_in, ena};
+
 endmodule
