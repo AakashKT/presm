@@ -19,6 +19,10 @@ else()
     return()
 endif()
 
+set(DEVICE_NAME ${DEVICE}) 
+set(HOST_RESIDENT_MEM_SIZE ${DEVICE_MEM_SIZE_IN_BYTES})
+set(SERIAL_PORT_BAUD_RATE ${BAUD_RATE})
+configure_file("${PROJECT_SOURCE_DIR}/device/include/config.h.in" "${PROJECT_SOURCE_DIR}/device/include/config.h")
 
 target_sources(device PUBLIC
     ${DEVICE_CODE}

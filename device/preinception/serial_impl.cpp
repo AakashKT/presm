@@ -8,7 +8,7 @@ Device* get_device()
 SerialImpl::SerialImpl()
     : SerialDevice()
 {
-    this->device_memory = new HostResidentMemory(this->device_config["memory_size_in_bytes"]);
+    this->device_memory = new HostResidentMemory(std::atoi(HOST_RESIDENT_MEM_SIZE));
 }
 
 void SerialImpl::send_device_payload(void* payload)
@@ -132,7 +132,7 @@ void SerialImpl::device_find()
             continue;
         }
 
-        this->configure_serial_port(this->device_config["serial_config"]["baud_rate"]);
+        this->configure_serial_port(std::atoi(SERIAL_PORT_BAUD_RATE));
         tcflush(this->port_fd, TCIOFLUSH);
 
         DevicePayload tx;

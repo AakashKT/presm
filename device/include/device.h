@@ -4,14 +4,14 @@
 #include "common.h"
 #include "logging.h"
 #include "device_memory.h"
-#include <nlohmann/json.hpp>
+#include "config.h"
 
 class Device {
 public:
     Device();
     virtual ~Device() {};
     
-    std::string get_name() { return std::string(this->device_config["name"]); };
+    std::string get_name() { return std::string(DEVICE_NAME); };
 
     virtual void device_initialize() = 0;
 
@@ -24,8 +24,6 @@ public:
 
 protected:
     Logger* log;
-    nlohmann::json top_config, device_config;
-
     DeviceMemory* device_memory;
 };
 

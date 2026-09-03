@@ -3,7 +3,6 @@
 
 #include "common.h"
 #include "logging.h"
-#include <nlohmann/json.hpp>
 
 class DeviceMemory {
 public:
@@ -20,7 +19,6 @@ protected:
     uint32_t size_in_bytes; 
     
     Logger log;
-    nlohmann::json top_config, device_config;
 };
 
 #endif

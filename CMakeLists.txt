@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15...4.0)
 
 project(presm VERSION 0.1
-        DESCRIPTION "PRE-Silicon Modelling for hardware accelerators"
+        DESCRIPTION "Pre-Silicon Modelling for hardware accelerators"
         LANGUAGES C CXX CUDA)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -13,6 +13,9 @@ set(PRESM_SHARED_LIB TRUE CACHE STRING "PRESM as a shared or a static library?")
 set(DEVICE "preinception" CACHE STRING "Which device to use? (default: 'preinception', see device/ folder)")
 set(DEVICE_TYPE "functional" CACHE STRING "Device type? (default: 'functional')")
 set(DRIVER "matrix" CACHE STRING "Which driver to use? (default: 'matrix', see driver/ folder)")
+
+set(DEVICE_MEM_SIZE_IN_BYTES 10000000000 CACHE STRING "Device memory size")
+set(BAUD_RATE 9600 CACHE STRING "Host-device communication rate")
 
 set(DRIVER_LIB ${DRIVER}_${DEVICE_TYPE})
 
