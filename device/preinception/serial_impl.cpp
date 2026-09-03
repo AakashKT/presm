@@ -154,6 +154,8 @@ void SerialImpl::device_find()
                 rx_ptr += 1;
 
                 if(rx_ptr == 6) {
+                    this->log->log_info("[SerialImpl] Received device payload ->");
+                    this->log->log_info(rx.print());
                     if(rx.id() == 1 && rx.type() == static_cast<uint32_t>(TYPE::RESPONSE)
                         && rx.fields.body_1 == 2 && rx.fields.body_2 == 1) {
                         this->log->log_info("[SerialImpl] Found device in serial port '" + port_string + "'.");

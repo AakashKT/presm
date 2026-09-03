@@ -16,7 +16,7 @@ public:
 
 void mInit();
 void mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
-void mMultiply(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
+void mMulPow2(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
 void mDivPow2(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result);
 void mSync();
 void mFree();

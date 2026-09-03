@@ -25,10 +25,13 @@ module Tangnano20kUart
     wire tx_packet_ready;
     wire tx_packet_sent;
 
+    wire uart_tx_wire;
+    assign extern_uart_tx = extern_reset ? 0 : uart_tx_wire;
+
     UARTPacket uartPacket(
         .extern_clock(extern_clock),
         .extern_uart_rx(extern_uart_rx),
-        .extern_uart_tx(extern_uart_tx),
+        .extern_uart_tx(uart_tx_wire),
         .extern_reset(extern_reset),
         .rx_packet_flat(rx_packet),
         .rx_packet_ready(rx_packet_ready),

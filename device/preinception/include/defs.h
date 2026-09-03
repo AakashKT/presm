@@ -9,7 +9,7 @@ enum class TYPE : uint32_t {
 enum class CMD : uint32_t {
     HANDSHAKE = 1,
     ADD = 2,
-    MUL = 3,
+    MULP2 = 3,
     DIVP2 = 4
 };
 
@@ -19,7 +19,7 @@ enum class ADD : uint32_t {
     OP_3 = 2
 };
 
-enum class MUL : uint32_t {
+enum class MULP2 : uint32_t {
     OP_1 = 0,
     OP_2 = 1,
     OP_3 = 2

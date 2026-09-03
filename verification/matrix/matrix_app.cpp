@@ -11,8 +11,8 @@ bool MatrixTestHandler::run_test(std::string test_name, std::vector<std::string>
         run_sanity(args);
     else if(test_name == "addition")
         run_addition(args);
-    else if(test_name == "multiplication")
-        run_multiplication(args);
+    else if(test_name == "multiply_power_2")
+        run_mulp2(args);
     else if(test_name == "divide_power_2")
         run_divp2(args);
     else if(test_name == "multiple_commands")

@@ -43,7 +43,7 @@
             "enabled": true
         },
         {
-            "name": "multiplication",
+            "name": "multiply_power_2",
             "args_host_run": ["host"],
             "args_device_run": ["device"],
             "verify": true,

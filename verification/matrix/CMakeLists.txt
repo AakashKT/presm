@@ -4,7 +4,7 @@ SET(VERIFICATION_SOURCES
     matrix_app.cpp
     sanity/sanity.cpp
     addition/addition.cpp
-    multiplication/multiplication.cpp
+    multiply_power_2/multiply_power_2.cpp
     divide_power_2/divide_power_2.cpp
     multiple_commands/multiple_commands.cpp
 )

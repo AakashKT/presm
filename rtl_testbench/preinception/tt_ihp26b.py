@@ -226,7 +226,7 @@ async def add_cmd_test(dut):
     await assert_packet(dut, bit_hold, packet)
 
 @cocotb.test()
-async def mul_cmd_test(dut):
+async def mulp2_cmd_test(dut):
     bit_hold = init(dut)
     await reset(dut)
     await rx_pin(dut)
@@ -297,7 +297,7 @@ async def mul_cmd_test(dut):
     await assert_packet(dut, bit_hold, packet)
     packet = [
         ((2 | 0 << 4) | (1 << 8)) << 1, ((0 | 1 << 4) | (1 << 8)) << 1, 
-        0b1000010010, 0b1000000000, 0b1000000000, 0b1000000000
+        0b1000110000, 0b1000000000, 0b1000000000, 0b1000000000
     ]
     await assert_packet(dut, bit_hold, packet)
 

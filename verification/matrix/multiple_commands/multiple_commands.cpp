@@ -13,7 +13,7 @@ void multiple_device_run()
         mAdd(a, b, add);
 
         MIntDeviceMemory mul(10);
-        mMultiply(a, b, mul);
+        mMulPow2(a, b, mul);
 
         MIntDeviceMemory div(10);
         mDivPow2(a, b, div);
@@ -33,7 +33,7 @@ void multiple_device_run()
         mAdd(a, b, add1);
 
         MIntDeviceMemory mul1(10);
-        mMultiply(a, b, mul1);
+        mMulPow2(a, b, mul1);
 
         MIntDeviceMemory div1(10);
         mDivPow2(a, b, div1);
@@ -47,7 +47,7 @@ void multiple_device_run()
         mAdd(c, d, add2);
 
         MIntDeviceMemory mul2(10);
-        mMultiply(c, d, mul2);
+        mMulPow2(c, d, mul2);
 
         MIntDeviceMemory div2(10);
         mDivPow2(c, d, div2);
@@ -61,7 +61,7 @@ void multiple_device_run()
         mAdd(e, f, add3);
 
         MIntDeviceMemory mul3(10);
-        mMultiply(e, f, mul3);
+        mMulPow2(e, f, mul3);
 
         MIntDeviceMemory div3(10);
         mDivPow2(e, f, div3);
@@ -75,7 +75,7 @@ void multiple_device_run()
         mAdd(g, h, add4);
 
         MIntDeviceMemory mul4(10);
-        mMultiply(g, h, mul4);
+        mMulPow2(g, h, mul4);
 
         MIntDeviceMemory div4(10);
         mDivPow2(g, h, div4);
@@ -110,7 +110,7 @@ void multiple_host_run()
         int b = 4;
 
         int add = a + b;
-        int mul = a * b;
+        int mul = a * std::pow(2, b);
         int div = a / std::pow(2, b);
 
         std::cout << add  << std::endl;
@@ -123,25 +123,25 @@ void multiple_host_run()
         int b = 4;
 
         int add1 = a + b;
-        int mul1 = a * b;
+        int mul1 = a * std::pow(2, b);
         int div1 = a / std::pow(2, b);
         
         a = 4325;
         b = 6;
         int add2 = a + b;
-        int mul2 = a * b;
+        int mul2 = a * std::pow(2, b);
         int div2 = a / std::pow(2, b);
 
         a = 324;
         b = 9;
         int add3 = a + b;
-        int mul3 = a * b;
+        int mul3 = a * std::pow(2, b);
         int div3 = a / std::pow(2, b);
         
         a = 665;
         b = 3;
         int add4 = a + b;
-        int mul4 = a * b;
+        int mul4 = a * std::pow(2, b);
         int div4 = a / std::pow(2, b);
 
         std::cout << add1  << std::endl;

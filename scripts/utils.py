@@ -96,6 +96,7 @@ def _execute(command : list, env=None):
     op = subprocess.run(command.split(' '), env=env, capture_output=True, text=True, errors='ignore')
     if op.returncode != 0:
         print_red(op.stderr)
+        exit(1)
 
     return op        
 

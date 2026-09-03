@@ -42,14 +42,14 @@ module CommandProcessor
     localparam CP_CMD_END = 20;
 
     localparam CP_ADD = 21;
-    localparam CP_MUL = 22;
+    localparam CP_MULP2 = 22;
     localparam CP_DIVP2 = 23;
 
     reg [2:0] delay_cycles, delay_counter;
 
     reg [5:0] cp_state, delay_restore_state, wait_restore_state, mem_op_restore_state;
     reg [3:0] pkt_id, pkt_cmd, pkt_sub_cmd;
-    reg [7:0] tx_cmd_id;
+    reg [3:0] tx_cmd_id;
 
     reg [31:0] mem_fetch_addr;
     reg [31:0] mem_write_addr;
@@ -145,7 +145,7 @@ module CommandProcessor
                         end
                         else if(pkt_sub_cmd == 2)
                         begin
-                            cp_state <= CP_MUL;
+                            cp_state <= CP_MULP2;
                         end
                     end
                     else if(pkt_cmd == 4)
@@ -259,8 +259,8 @@ module CommandProcessor
                 begin
                     if(rx_packet_ready == 1)
                     begin
-                        if(rx_packet[3:0] == tx_cmd_id && rx_packet[7:4] == 8'd1 
-                            && rx_packet[11:8] == 8'd0 && rx_packet[15:12] == 8'd0)
+                        if(rx_packet[3:0] == tx_cmd_id && rx_packet[7:4] == 1 
+                            && rx_packet[11:8] == 0 && rx_packet[15:12] == 0)
                         begin
                             mem_val <= $signed(rx_packet[47:16]);
                             cp_state <= mem_op_restore_state;
@@ -407,11 +407,11 @@ module CommandProcessor
                     cp_state <= CP_MEM_WRITE_ADDR_PREP;
                 end
 
-                CP_MUL:
+                CP_MULP2:
                 begin
                     mem_write_addr <= rx_packet[47:16];
 
-                    mem_val <= op_1 * op_2;
+                    mem_val <= op_1 << op_2;
 
                     mem_op_restore_state <= CP_CMD_END_PREP;
                     cp_state <= CP_MEM_WRITE_ADDR_PREP;

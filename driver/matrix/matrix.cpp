@@ -123,29 +123,33 @@ void mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& r
     return;
 }
 
-void mMultiply(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result)
+void mMulPow2(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& result)
 {
     drv_preproc();
+
+    // Power cannot be negative
+    if(second.getValue() < 0)
+        drv_log.log_error_and_exit("Seond operand (power of 2) cannot be negative.");
 
     DevicePayload mul_op_1;
     mul_op_1.id(global_command_id++);
     mul_op_1.type((uint32_t)TYPE::REQUEST);
-    mul_op_1.cmd((uint32_t)CMD::MUL);
-    mul_op_1.sub_cmd((uint32_t)MUL::OP_1);
+    mul_op_1.cmd((uint32_t)CMD::MULP2);
+    mul_op_1.sub_cmd((uint32_t)MULP2::OP_1);
     mul_op_1.fields32.body = first.address;
 
     DevicePayload mul_op_2;
     mul_op_2.id(global_command_id++);
     mul_op_2.type((uint32_t)TYPE::REQUEST);
-    mul_op_2.cmd((uint32_t)CMD::MUL);
-    mul_op_2.sub_cmd((uint32_t)MUL::OP_2);
+    mul_op_2.cmd((uint32_t)CMD::MULP2);
+    mul_op_2.sub_cmd((uint32_t)MULP2::OP_2);
     mul_op_2.fields32.body = second.address;
 
     DevicePayload mul_op_3;
     mul_op_3.id(global_command_id++);
     mul_op_3.type((uint32_t)TYPE::REQUEST);
-    mul_op_3.cmd((uint32_t)CMD::MUL);
-    mul_op_3.sub_cmd((uint32_t)MUL::OP_3);
+    mul_op_3.cmd((uint32_t)CMD::MULP2);
+    mul_op_3.sub_cmd((uint32_t)MULP2::OP_3);
     mul_op_3.fields32.body = result.address;
 
     recorded_commands.push_back(mul_op_1);
