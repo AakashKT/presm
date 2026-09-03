@@ -84,14 +84,6 @@ def get_or_build_extern_tools(args, config):
     install_ubuntu_packages()
     build_fpga_toolchain(args, config)
 
-def check_external_tools(args, config):
-    yosys_linux_path = os.path.exists('extern/yosys')
-    nextpnr_linux_path = os.path.exists('extern/nextpnr/build')
-    openFPGALoader_linux_path = os.path.exists('extern/openFPGALoader/build')
-
-    if (not yosys_linux_path) or (not nextpnr_linux_path) or (not openFPGALoader_linux_path):
-        utils.error_exit('Did not find FPGA tools. Please run with --get_extern_tools to get/build them.')
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', required=True)
@@ -104,8 +96,6 @@ if __name__ == '__main__':
 
     if args.get_extern_tools:
         get_or_build_extern_tools(args, config)
-        
-    check_external_tools(args, config)
 
     build_presm(args, config)
 
