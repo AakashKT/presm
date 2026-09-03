@@ -6,14 +6,22 @@ async def assert_tx_bits(dut, bit_hold, bits, num_bits):
     for i in range(num_bits):
         bit = (bits >> i) & 1
 
-        assert int(dut.uo_out.value) >> 4 == bit, "UART TX: expected %d, got %d at bit number: %d" % (bit, dut.uo_out.value[4], i)
+        if dut.ui_in.value[0] == 0:
+            assert (int(dut.uo_out.value) >> 4) & 1 == bit, "UART TX: expected %d, got %d at bit number: %d" % (bit, dut.uo_out.value[4], i)
+        else:
+            assert (int(dut.uo_out.value) >> 7) & 1 == bit, "UART TX: expected %d, got %d at bit number: %d" % (bit, dut.uo_out.value[4], i)
+        
         await Timer(bit_hold, unit='ns')
 
 async def send_rx_bits(dut, bit_hold, bits, num_bits):
     for i in range(num_bits):
         bit = (bits >> i) & 1
+        
+        if dut.ui_in.value[0] == 0:
+            dut.ui_in.value = bit << 3
+        else:
+            dut.ui_in.value = bit << 7
 
-        dut.ui_in.value = bit << 3
         await Timer(bit_hold, unit='ns')
 
 async def send_packet(dut, bit_hold, packet):
@@ -56,7 +64,14 @@ async def reset_test(dut):
     await reset(dut)
     await rx_pin(dut)
 
-    assert dut.uo_out.value == 0b00010000
+    assert dut.uo_out.value == 0b01010000
+    assert dut.uio_out.value == 0
+    assert dut.uio_oe.value == 0
+
+    dut.ui_in.value = 1
+    await ClockCycles(dut.clk, 10)
+
+    assert dut.uo_out.value == 0b11000000
     assert dut.uio_out.value == 0
     assert dut.uio_oe.value == 0
 
@@ -65,6 +80,39 @@ async def handshake_test(dut):
     bit_hold = init(dut)
     await reset(dut)
     await rx_pin(dut)
+
+    packet = [
+        ((1 | 0 << 4) | (1 << 8)) << 1, ((1 | 0 << 4) | (1 << 8)) << 1,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+
+    packet = [
+        ((1 | 1 << 4) | (1 << 8)) << 1, ((1 | 0 << 4) | (1 << 8)) << 1,
+        0b1000000100, 0b1000000010, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+@cocotb.test()
+async def uart_select_test(dut):
+    bit_hold = init(dut)
+    await reset(dut)
+    await rx_pin(dut)
+
+    packet = [
+        ((1 | 0 << 4) | (1 << 8)) << 1, ((1 | 0 << 4) | (1 << 8)) << 1,
+        0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
+    ]
+    await send_packet(dut, bit_hold, packet)
+
+    packet = [
+        ((1 | 1 << 4) | (1 << 8)) << 1, ((1 | 0 << 4) | (1 << 8)) << 1,
+        0b1000000100, 0b1000000010, 0b1000000000, 0b1000000000
+    ]
+    await assert_packet(dut, bit_hold, packet)
+
+    dut.ui_in.value = 1
+    await ClockCycles(dut.clk, 10)
 
     packet = [
         ((1 | 0 << 4) | (1 << 8)) << 1, ((1 | 0 << 4) | (1 << 8)) << 1,

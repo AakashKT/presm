@@ -19,8 +19,7 @@ module tt_um_preinception_top (
     assign uo_out[2] = 1'b0;
     assign uo_out[3] = 1'b0;
     assign uo_out[5] = 1'b0;
-    assign uo_out[6] = 1'b0;
-    assign uo_out[7] = 1'b0;
+    assign uo_out[6] = 1'b1;
 
     assign uio_out = 8'b00000000;
     assign uio_oe  = 8'b00000000;
@@ -35,12 +34,16 @@ module tt_um_preinception_top (
     wire rst_p;
     assign rst_p = ~rst_n;
 
+    wire uart_rx_wire;
+    assign uart_rx_wire = ui_in[0] ? ui_in[7] : ui_in[3];
+
     wire uart_tx_wire;
-    assign uo_out[4] = rst_p ? 0 : uart_tx_wire;
+    assign uo_out[4] = rst_p ? 0 : (ui_in[0] ? 0 : uart_tx_wire);
+    assign uo_out[7] = rst_p ? 0 : (ui_in[0] ? uart_tx_wire : 0);
 
     UARTPacket #(.DELAY_WAIT(5208)) uartPacket(
         .extern_clock(clk),
-        .extern_uart_rx(ui_in[3]),
+        .extern_uart_rx(uart_rx_wire),
         .extern_uart_tx(uart_tx_wire),
         .extern_reset(rst_p),
         .rx_packet_flat(rx_packet),
