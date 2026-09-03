@@ -75,14 +75,14 @@
             "rtl_src": "uart_packet.v",
             "rtl_top_level": "UARTPacket",
             "testbench_src": "uart_packet.py",
-            "enable": false
+            "enable": true
         },
         {
             "name": "Command Processor (CP)",
             "rtl_src": "command_processor.v",
             "rtl_top_level": "CommandProcessor",
             "testbench_src": "command_processor.py",
-            "enable": false
+            "enable": true
         }
     ]
 }

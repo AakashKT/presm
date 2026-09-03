@@ -33,15 +33,15 @@ void drv_preproc()
     global_command_id = global_command_id % 10;
 }
 
-void cmdSync(char id)
+void cmdSync(uint32_t id)
 {
     bool finished = false;
     while(true) {
         if(!command_status_readback.empty()) {
             command_status_readback.for_each(
                 [&](std::pair<DevicePayload, bool>& item) {
-                    if(item.second == false && item.first.fields.id == id 
-                        && item.first.fields.type == static_cast<char>(TYPE::RESPONSE)) {
+                    if(item.second == false && item.first.id() == id 
+                        && item.first.type() == static_cast<uint32_t>(TYPE::RESPONSE)) {
                         finished = true;
                         item.second = true;
                     }
@@ -70,7 +70,7 @@ void mInit()
 
                 if(payload_opt != std::nullopt) {
                     DevicePayload payload = *payload_opt;
-                    drv_log.log_info("Sending packet with ID: " + std::to_string(payload.fields.id));
+                    drv_log.log_info("Sending packet with ID: " + std::to_string(payload.id()));
 
                     presm_device->send_device_payload(&payload);
                 }
@@ -83,7 +83,7 @@ void mInit()
             DevicePayload* scratch;
             while(true) {
                 if(presm_device->receive_device_payload((void**)&scratch)) {
-                    drv_log.log_info("Received packet with ID: " + std::to_string(scratch->fields.id));
+                    drv_log.log_info("Received packet with ID: " + std::to_string(scratch->id()));
                     command_status_readback.push_back(std::pair(*scratch, false));
                 }
             }
@@ -96,24 +96,24 @@ void mAdd(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemory& r
     drv_preproc();
 
     DevicePayload add_op_1;
-    add_op_1.fields.id = static_cast<char>(global_command_id++);
-    add_op_1.fields.type = static_cast<char>(TYPE::REQUEST);
-    add_op_1.fields.cmd = static_cast<char>(CMD::ADD);
-    add_op_1.fields.sub_cmd = static_cast<char>(ADD::OP_1);
+    add_op_1.id(global_command_id++);
+    add_op_1.type((uint32_t)TYPE::REQUEST);
+    add_op_1.cmd((uint32_t)CMD::ADD);
+    add_op_1.sub_cmd((uint32_t)ADD::OP_1);
     add_op_1.fields32.body = first.address;
     
     DevicePayload add_op_2;
-    add_op_2.fields.id = static_cast<char>(global_command_id++);
-    add_op_2.fields.type = static_cast<char>(TYPE::REQUEST);
-    add_op_2.fields.cmd = static_cast<char>(CMD::ADD);
-    add_op_2.fields.sub_cmd = static_cast<char>(ADD::OP_2);
+    add_op_2.id(global_command_id++);
+    add_op_2.type((uint32_t)TYPE::REQUEST);
+    add_op_2.cmd((uint32_t)CMD::ADD);
+    add_op_2.sub_cmd((uint32_t)ADD::OP_2);
     add_op_2.fields32.body = second.address;
 
     DevicePayload add_op_3;
-    add_op_3.fields.id = static_cast<char>(global_command_id++);
-    add_op_3.fields.type = static_cast<char>(TYPE::REQUEST);
-    add_op_3.fields.cmd = static_cast<char>(CMD::ADD);
-    add_op_3.fields.sub_cmd = static_cast<char>(ADD::OP_3);
+    add_op_3.id(global_command_id++);
+    add_op_3.type((uint32_t)TYPE::REQUEST);
+    add_op_3.cmd((uint32_t)CMD::ADD);
+    add_op_3.sub_cmd((uint32_t)ADD::OP_3);
     add_op_3.fields32.body = result.address;
 
     recorded_commands.push_back(add_op_1);
@@ -128,24 +128,24 @@ void mMultiply(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemo
     drv_preproc();
 
     DevicePayload mul_op_1;
-    mul_op_1.fields.id = static_cast<char>(global_command_id++);
-    mul_op_1.fields.type = static_cast<char>(TYPE::REQUEST);
-    mul_op_1.fields.cmd = static_cast<char>(CMD::MUL);
-    mul_op_1.fields.sub_cmd = static_cast<char>(MUL::OP_1);
+    mul_op_1.id(global_command_id++);
+    mul_op_1.type((uint32_t)TYPE::REQUEST);
+    mul_op_1.cmd((uint32_t)CMD::MUL);
+    mul_op_1.sub_cmd((uint32_t)MUL::OP_1);
     mul_op_1.fields32.body = first.address;
 
     DevicePayload mul_op_2;
-    mul_op_2.fields.id = static_cast<char>(global_command_id++);
-    mul_op_2.fields.type = static_cast<char>(TYPE::REQUEST);
-    mul_op_2.fields.cmd = static_cast<char>(CMD::MUL);
-    mul_op_2.fields.sub_cmd = static_cast<char>(MUL::OP_2);
+    mul_op_2.id(global_command_id++);
+    mul_op_2.type((uint32_t)TYPE::REQUEST);
+    mul_op_2.cmd((uint32_t)CMD::MUL);
+    mul_op_2.sub_cmd((uint32_t)MUL::OP_2);
     mul_op_2.fields32.body = second.address;
 
     DevicePayload mul_op_3;
-    mul_op_3.fields.id = static_cast<char>(global_command_id++);
-    mul_op_3.fields.type = static_cast<char>(TYPE::REQUEST);
-    mul_op_3.fields.cmd = static_cast<char>(CMD::MUL);
-    mul_op_3.fields.sub_cmd = static_cast<char>(MUL::OP_3);
+    mul_op_3.id(global_command_id++);
+    mul_op_3.type((uint32_t)TYPE::REQUEST);
+    mul_op_3.cmd((uint32_t)CMD::MUL);
+    mul_op_3.sub_cmd((uint32_t)MUL::OP_3);
     mul_op_3.fields32.body = result.address;
 
     recorded_commands.push_back(mul_op_1);
@@ -164,24 +164,24 @@ void mDivPow2(MIntDeviceMemory& first, MIntDeviceMemory& second, MIntDeviceMemor
         drv_log.log_error_and_exit("Seond operand (power of 2) cannot be negative.");
 
     DevicePayload divp2_op_1;
-    divp2_op_1.fields.id = static_cast<char>(global_command_id++);
-    divp2_op_1.fields.type = static_cast<char>(TYPE::REQUEST);
-    divp2_op_1.fields.cmd = static_cast<char>(CMD::DIVP2);
-    divp2_op_1.fields.sub_cmd = static_cast<char>(DIVP2::OP_1);
+    divp2_op_1.id(global_command_id++);
+    divp2_op_1.type((uint32_t)TYPE::REQUEST);
+    divp2_op_1.cmd((uint32_t)CMD::DIVP2);
+    divp2_op_1.sub_cmd((uint32_t)DIVP2::OP_1);
     divp2_op_1.fields32.body = first.address;
 
     DevicePayload divp2_op_2;
-    divp2_op_2.fields.id = static_cast<char>(global_command_id++);
-    divp2_op_2.fields.type = static_cast<char>(TYPE::REQUEST);
-    divp2_op_2.fields.cmd = static_cast<char>(CMD::DIVP2);
-    divp2_op_2.fields.sub_cmd = static_cast<char>(DIVP2::OP_2);
+    divp2_op_2.id(global_command_id++);
+    divp2_op_2.type((uint32_t)TYPE::REQUEST);
+    divp2_op_2.cmd((uint32_t)CMD::DIVP2);
+    divp2_op_2.sub_cmd((uint32_t)DIVP2::OP_2);
     divp2_op_2.fields32.body = second.address;
 
     DevicePayload divp2_op_3;
-    divp2_op_3.fields.id = static_cast<char>(global_command_id++);
-    divp2_op_3.fields.type = static_cast<char>(TYPE::REQUEST);
-    divp2_op_3.fields.cmd = static_cast<char>(CMD::DIVP2);
-    divp2_op_3.fields.sub_cmd = static_cast<char>(DIVP2::OP_3);
+    divp2_op_3.id(global_command_id++);
+    divp2_op_3.type((uint32_t)TYPE::REQUEST);
+    divp2_op_3.cmd((uint32_t)CMD::DIVP2);
+    divp2_op_3.sub_cmd((uint32_t)DIVP2::OP_3);
     divp2_op_3.fields32.body = result.address;
 
     recorded_commands.push_back(divp2_op_1);
@@ -200,7 +200,7 @@ void mSync()
         auto payload = recorded_commands.front();
 
         command_buffer.push_back(payload);
-        cmdSync(payload.fields.id);
+        cmdSync(payload.id());
 
         recorded_commands.pop_front();
     }

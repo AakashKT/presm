@@ -18,33 +18,33 @@ module Tangnano20kUart
     output reg [5:0] extern_led
 );
 
-    wire [63:0] rx_packet;
+    wire [47:0] rx_packet;
     wire rx_packet_ready;
 
-    wire [63:0] tx_packet;
+    wire [47:0] tx_packet;
     wire tx_packet_ready;
     wire tx_packet_sent;
 
     UARTPacket uartPacket(
-        extern_clock,
-        extern_uart_rx,
-        extern_uart_tx,
-        extern_reset,
-        rx_packet,
-        rx_packet_ready,
-        tx_packet,
-        tx_packet_ready,
-        tx_packet_sent
+        .extern_clock(extern_clock),
+        .extern_uart_rx(extern_uart_rx),
+        .extern_uart_tx(extern_uart_tx),
+        .extern_reset(extern_reset),
+        .rx_packet_flat(rx_packet),
+        .rx_packet_ready(rx_packet_ready),
+        .tx_packet_flat(tx_packet),
+        .tx_packet_ready(tx_packet_ready),
+        .tx_packet_sent(tx_packet_sent)
     );
 
     CommandProcessor cp(
-        extern_clock,
-        extern_reset,
-        rx_packet,
-        rx_packet_ready,
-        tx_packet,
-        tx_packet_ready,
-        tx_packet_sent
+        .extern_clock(extern_clock),
+        .extern_reset(extern_reset),
+        .rx_packet(rx_packet),
+        .rx_packet_ready(rx_packet_ready),
+        .tx_packet(tx_packet),
+        .tx_packet_ready(tx_packet_ready),
+        .tx_packet_sent(tx_packet_sent)
     );
 
 endmodule

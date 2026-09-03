@@ -8,10 +8,10 @@ module CommandProcessor
     input extern_reset,
 
     // Host Communication
-    input wire [63:0] rx_packet,
+    input wire [47:0] rx_packet,
     input wire rx_packet_ready,
 
-    output reg [63:0] tx_packet,
+    output reg [47:0] tx_packet,
     output reg tx_packet_ready,
     input wire tx_packet_sent
 );
@@ -48,7 +48,7 @@ module CommandProcessor
     reg [2:0] delay_cycles, delay_counter;
 
     reg [5:0] cp_state, delay_restore_state, wait_restore_state, mem_op_restore_state;
-    reg [7:0] pkt_id, pkt_type, pkt_cmd, pkt_sub_cmd;
+    reg [3:0] pkt_id, pkt_cmd, pkt_sub_cmd;
     reg [7:0] tx_cmd_id;
 
     reg [31:0] mem_fetch_addr;
@@ -70,7 +70,6 @@ module CommandProcessor
             delay_restore_state <= CP_IDLE;
 
             pkt_id <= 0;
-            pkt_type <= 0;
             pkt_cmd <= 0;
             pkt_sub_cmd <= 0;
 
@@ -100,10 +99,10 @@ module CommandProcessor
                         wait_restore_state <= CP_IDLE;
                         delay_restore_state <= CP_IDLE;
 
-                        pkt_id <= rx_packet[7:0];
-                        pkt_type <= rx_packet[15:8];
-                        pkt_cmd <= rx_packet[23:16];
-                        pkt_sub_cmd <= rx_packet[31:24];
+                        pkt_id <= rx_packet[3:0];
+                        // pkt_type <= rx_packet[7:4];
+                        pkt_cmd <= rx_packet[11:8];
+                        pkt_sub_cmd <= rx_packet[15:12];
                         
                         cp_state <= CP_PACKET_DECODE;
                     end
@@ -182,13 +181,13 @@ module CommandProcessor
 
                 CP_HANDSHAKE:
                 begin
-                    tx_packet[7:0] <= pkt_id;
-                    tx_packet[15:8] <= 1;
-                    tx_packet[23:16] <= pkt_cmd;
-                    tx_packet[31:24] <= pkt_sub_cmd;
-                    tx_packet[39:32] <= 8'd2;
-                    tx_packet[47:40] <= 8'd1;
-                    tx_packet[63:48] <= 0;
+                    tx_packet[3:0] <= pkt_id;
+                    tx_packet[7:4] <= 1;
+                    tx_packet[11:8] <= pkt_cmd;
+                    tx_packet[15:12] <= pkt_sub_cmd;
+                    tx_packet[23:16] <= 8'd2;
+                    tx_packet[31:24] <= 8'd1;
+                    tx_packet[47:32] <= 0;
                     tx_packet_ready <= 1;
 
                     wait_restore_state <= CP_STOP;
@@ -245,11 +244,11 @@ module CommandProcessor
 
                 CP_MEM_FETCH:
                 begin
-                    tx_packet[7:0] <= tx_cmd_id;
-                    tx_packet[15:8] <= 0;
-                    tx_packet[23:16] <= 0;
-                    tx_packet[31:24] <= 0;
-                    tx_packet[63:32] <= mem_fetch_addr;
+                    tx_packet[3:0] <= tx_cmd_id;
+                    tx_packet[7:4] <= 0;
+                    tx_packet[11:8] <= 0;
+                    tx_packet[15:12] <= 0;
+                    tx_packet[47:16] <= mem_fetch_addr;
                     tx_packet_ready <= 1;
 
                     wait_restore_state <= CP_MEM_FETCH_END;
@@ -260,10 +259,10 @@ module CommandProcessor
                 begin
                     if(rx_packet_ready == 1)
                     begin
-                        if(rx_packet[7:0] == tx_cmd_id && rx_packet[15:8] == 8'd1 
-                            && rx_packet[23:16] == 8'd0 && rx_packet[31:24] == 8'd0)
+                        if(rx_packet[3:0] == tx_cmd_id && rx_packet[7:4] == 8'd1 
+                            && rx_packet[11:8] == 8'd0 && rx_packet[15:12] == 8'd0)
                         begin
-                            mem_val <= $signed(rx_packet[63:32]);
+                            mem_val <= $signed(rx_packet[47:16]);
                             cp_state <= mem_op_restore_state;
                         end
                         else
@@ -290,11 +289,11 @@ module CommandProcessor
 
                 CP_MEM_WRITE_ADDR:
                 begin
-                    tx_packet[7:0] <= tx_cmd_id;
-                    tx_packet[15:8] <= 0;
-                    tx_packet[23:16] <= 0;
-                    tx_packet[31:24] <= 1;
-                    tx_packet[63:32] <= mem_write_addr;
+                    tx_packet[3:0] <= tx_cmd_id;
+                    tx_packet[7:4] <= 0;
+                    tx_packet[11:8] <= 0;
+                    tx_packet[15:12] <= 1;
+                    tx_packet[47:16] <= mem_write_addr;
                     tx_packet_ready <= 1;
 
                     cp_state <= CP_MEM_WRITE_VAL_PREP;
@@ -320,11 +319,11 @@ module CommandProcessor
 
                 CP_MEM_WRITE_VAL:
                 begin
-                    tx_packet[7:0] <= tx_cmd_id;
-                    tx_packet[15:8] <= 0;
-                    tx_packet[23:16] <= 0;
-                    tx_packet[31:24] <= 1;
-                    tx_packet[63:32] <= $signed(mem_val);
+                    tx_packet[3:0] <= tx_cmd_id;
+                    tx_packet[7:4] <= 0;
+                    tx_packet[11:8] <= 0;
+                    tx_packet[15:12] <= 1;
+                    tx_packet[47:16] <= $signed(mem_val);
                     tx_packet_ready <= 1;
                     
                     wait_restore_state <= CP_MEM_WRITE_END;
@@ -335,8 +334,8 @@ module CommandProcessor
                 begin
                     if(rx_packet_ready == 1)
                     begin
-                        if(rx_packet[7:0] == tx_cmd_id && rx_packet[15:8] == 1 
-                            && rx_packet[23:16] == 0 && rx_packet[31:24] == 1)
+                        if(rx_packet[3:0] == tx_cmd_id && rx_packet[7:4] == 1 
+                            && rx_packet[11:8] == 0 && rx_packet[15:12] == 1)
                         begin
                             cp_state <= mem_op_restore_state;
                         end
@@ -349,7 +348,7 @@ module CommandProcessor
 
                 CP_FETCH_OP1:
                 begin
-                    mem_fetch_addr <= rx_packet[63:32];
+                    mem_fetch_addr <= rx_packet[47:16];
 
                     mem_op_restore_state <= CP_FETCH_OP1_END;
                     cp_state <= CP_MEM_FETCH_PREP;
@@ -363,7 +362,7 @@ module CommandProcessor
 
                 CP_FETCH_OP2:
                 begin
-                    mem_fetch_addr <= rx_packet[63:32];
+                    mem_fetch_addr <= rx_packet[47:16];
 
                     mem_op_restore_state <= CP_FETCH_OP2_END;
                     cp_state <= CP_MEM_FETCH_PREP;
@@ -387,11 +386,11 @@ module CommandProcessor
 
                 CP_CMD_END:
                 begin
-                    tx_packet[7:0] <= pkt_id;
-                    tx_packet[15:8] <= 1;
-                    tx_packet[23:16] <= pkt_cmd;
-                    tx_packet[31:24] <= pkt_sub_cmd;
-                    tx_packet[63:32] <= 0;
+                    tx_packet[3:0] <= pkt_id;
+                    tx_packet[7:4] <= 1;
+                    tx_packet[11:8] <= pkt_cmd;
+                    tx_packet[15:12] <= pkt_sub_cmd;
+                    tx_packet[47:16] <= 0;
                     tx_packet_ready <= 1;
 
                     wait_restore_state <= CP_STOP;
@@ -400,7 +399,7 @@ module CommandProcessor
 
                 CP_ADD:
                 begin
-                    mem_write_addr <= rx_packet[63:32];
+                    mem_write_addr <= rx_packet[47:16];
 
                     mem_val <= op_1 + op_2;
 
@@ -410,7 +409,7 @@ module CommandProcessor
 
                 CP_MUL:
                 begin
-                    mem_write_addr <= rx_packet[63:32];
+                    mem_write_addr <= rx_packet[47:16];
 
                     mem_val <= op_1 * op_2;
 
@@ -420,7 +419,7 @@ module CommandProcessor
 
                 CP_DIVP2:
                 begin
-                    mem_write_addr <= rx_packet[63:32];
+                    mem_write_addr <= rx_packet[47:16];
 
                     mem_val <= op_1 >>> op_2;
 

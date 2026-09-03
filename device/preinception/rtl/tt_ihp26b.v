@@ -25,10 +25,10 @@ module tt_um_preinception_top (
     assign uio_out = 8'b00000000;
     assign uio_oe  = 8'b00000000;
 
-    wire [63:0] rx_packet;
+    wire [47:0] rx_packet;
     wire rx_packet_ready;
 
-    wire [63:0] tx_packet;
+    wire [47:0] tx_packet;
     wire tx_packet_ready;
     wire tx_packet_sent;
 

@@ -1,47 +1,45 @@
 #ifndef DEVICE_DEFS_H
 #define DEVICE_DEFS_H
 
-enum class TYPE : char {
+enum class TYPE : uint32_t {
     REQUEST = 0,
     RESPONSE = 1
 };
 
-enum class CMD : char {
+enum class CMD : uint32_t {
     HANDSHAKE = 1,
     ADD = 2,
     MUL = 3,
     DIVP2 = 4
 };
 
-enum class ADD : char {
+enum class ADD : uint32_t {
     OP_1 = 0,
     OP_2 = 1,
     OP_3 = 2
 };
 
-enum class MUL : char {
+enum class MUL : uint32_t {
     OP_1 = 0,
     OP_2 = 1,
     OP_3 = 2
 };
 
-enum class DIVP2 : char {
+enum class DIVP2 : uint32_t {
     OP_1 = 0,
     OP_2 = 1,
     OP_3 = 2
 };
 
-enum class HANDSHAKE : char {
+enum class HANDSHAKE : uint32_t {
     OP = 0
 };
 
 union DevicePayload {
 
     struct Fields {
-        char id;
-        char type;
-        char cmd;
-        char sub_cmd;
+        char id_and_type;
+        char cmd_and_sub_cmd;
         char body_1;
         char body_2;
         char body_3;
@@ -49,21 +47,43 @@ union DevicePayload {
     } fields;
 
     struct Fields32 {
-        uint32_t header;
+        uint16_t header;
         uint32_t body;
     } fields32;
 
-    char packet[8];
+    char packet[6];
+
+    DevicePayload() 
+    {
+        fields.id_and_type = 0;
+        fields.cmd_and_sub_cmd = 0;
+        fields.body_1 = 0;
+        fields.body_2 = 0;
+        fields.body_3 = 0;
+        fields.body_4 = 0;
+    }
+
+    uint32_t id() { return (fields.id_and_type & 15); };
+    void id(uint32_t id) { fields.id_and_type = (id & 15) | ((fields.id_and_type >> 4) << 4); };
+
+    uint32_t type() { return (fields.id_and_type & (15 << 4)) >> 4; };
+    void type(uint32_t type) { fields.id_and_type = ((type & 15) << 4) | (fields.id_and_type & 15); };
+
+    uint32_t cmd() { return (fields.cmd_and_sub_cmd & 15); };
+    void cmd(uint32_t cmd) { fields.cmd_and_sub_cmd = (cmd & 15) | ((fields.cmd_and_sub_cmd >> 4) << 4); };
+
+    uint32_t sub_cmd() { return (fields.cmd_and_sub_cmd & (15 << 4)) >> 4; };
+    void sub_cmd(uint32_t sub_cmd) { fields.cmd_and_sub_cmd = ((sub_cmd & 15) << 4) | (fields.cmd_and_sub_cmd & 15); };
 
     std::string print()
     {
         std::stringstream ss;
 
         ss << "[DevicePayload]" << std::endl;
-        ss << "\tID: " << std::to_string(fields.id) << std::endl;
-        ss << "\tType: " << std::to_string(fields.type) << std::endl;
-        ss << "\tCMD: " << std::to_string(fields.cmd) << std::endl;
-        ss << "\tSUB_CMD: " << std::to_string(fields.sub_cmd) << std::endl;
+        ss << "\tID: " << std::to_string(id()) << std::endl;
+        ss << "\tType: " << std::to_string(type()) << std::endl;
+        ss << "\tCMD: " << std::to_string(cmd()) << std::endl;
+        ss << "\tSUB_CMD: " << std::to_string(sub_cmd()) << std::endl;
         ss << "\tBODY: " << std::to_string(fields32.body);
 
         return ss.str();

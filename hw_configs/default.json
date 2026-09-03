@@ -15,20 +15,6 @@
 
     "rtl_testbench": [
         {
-            "name": "D Flip Flop with Reset",
-            "rtl_src": "flip_flops.v",
-            "rtl_top_level": "DFlipFlopRst",
-            "testbench_src": "d_flip_flop_rst.py",
-            "enable": false
-        },
-        {
-            "name": "Register of D Flip Flop with Reset",
-            "rtl_src": "registers.v",
-            "rtl_top_level": "RegisterDFFRst",
-            "testbench_src": "register_dff_rst.py",
-            "enable": false
-        },
-        {
             "name": "UART RX",
             "rtl_src": "uart_rx.v",
             "rtl_top_level": "UARTRx",

@@ -16,10 +16,10 @@ module UARTPacket
     // Hardware reset signal
     input extern_reset,
 
-    output reg [63:0] rx_packet_flat,
+    output reg [47:0] rx_packet_flat,
     output reg rx_packet_ready,
 
-    input wire [63:0] tx_packet_flat,
+    input wire [47:0] tx_packet_flat,
     input wire tx_packet_ready,
     output reg tx_packet_sent
 );
@@ -73,7 +73,7 @@ module UARTPacket
 
                 RX_RECEIVE_WAIT:
                 begin
-                    if(rx_packet_idx == 8)
+                    if(rx_packet_idx == 6)
                     begin
                         rx_state <= RX_END;
                     end
@@ -92,14 +92,36 @@ module UARTPacket
                     if(rx_data_en == 1)
                     begin
                         case(rx_packet_idx)
-                            4'd0: rx_packet_flat[7:0] <= rx_data;
-                            4'd1: rx_packet_flat[15:8] <= rx_data;
-                            4'd2: rx_packet_flat[23:16] <= rx_data;
-                            4'd3: rx_packet_flat[31:24] <= rx_data;
-                            4'd4: rx_packet_flat[39:32] <= rx_data;
-                            4'd5: rx_packet_flat[47:40] <= rx_data;
-                            4'd6: rx_packet_flat[55:48] <= rx_data;
-                            4'd7: rx_packet_flat[63:56] <= rx_data;
+                            4'd0: 
+                            begin
+                                rx_packet_flat[7:0] <= rx_data;
+                            end
+
+                            4'd1:
+                            begin
+                                rx_packet_flat[15:8] <= rx_data;
+                            end
+
+                            4'd2:
+                            begin
+                                rx_packet_flat[23:16] <= rx_data;
+                            end
+
+                            4'd3:
+                            begin
+                                rx_packet_flat[31:24] <= rx_data;
+                            end
+
+                            4'd4:
+                            begin
+                                rx_packet_flat[39:32] <= rx_data;
+                            end
+
+                            4'd5:
+                            begin
+                                rx_packet_flat[47:40] <= rx_data;
+                            end
+
                             default: rx_packet_flat <= 0;
                         endcase
 
@@ -185,14 +207,37 @@ module UARTPacket
                     if(tx_data_sent == 0)
                     begin
                         case(tx_packet_idx)
-                            4'd0: tx_data <= tx_packet_flat[7:0];
-                            4'd1: tx_data <= tx_packet_flat[15:8];
-                            4'd2: tx_data <= tx_packet_flat[23:16];
-                            4'd3: tx_data <= tx_packet_flat[31:24];
-                            4'd4: tx_data <= tx_packet_flat[39:32];
-                            4'd5: tx_data <= tx_packet_flat[47:40];
-                            4'd6: tx_data <= tx_packet_flat[55:48];
-                            4'd7: tx_data <= tx_packet_flat[63:56];
+
+                            4'd0:
+                            begin
+                                tx_data <= tx_packet_flat[7:0];
+                            end
+
+                            4'd1:
+                            begin
+                                tx_data <= tx_packet_flat[15:8];
+                            end
+
+                            4'd2:
+                            begin
+                                tx_data <= tx_packet_flat[23:16];
+                            end
+
+                            4'd3:
+                            begin
+                                tx_data <= tx_packet_flat[31:24];
+                            end
+
+                            4'd4:
+                            begin
+                                tx_data <= tx_packet_flat[39:32];
+                            end
+
+                            4'd5:
+                            begin
+                                tx_data <= tx_packet_flat[47:40];
+                            end
+
                             default: tx_data <= 0;
                         endcase
 
@@ -211,7 +256,7 @@ module UARTPacket
                 begin
                     if(tx_data_sent == 1)
                     begin
-                        if(tx_packet_idx == 8)
+                        if(tx_packet_idx == 6)
                         begin
                             tx_state <= TX_END;
                         end

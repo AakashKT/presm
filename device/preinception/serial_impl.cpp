@@ -15,8 +15,8 @@ void SerialImpl::send_device_payload(void* payload)
 {
     DevicePayload* sc = (DevicePayload*) payload;
 
-    auto bytes_written = write(this->port_fd, (char*)sc->packet, 8);
-    if (bytes_written != 8)
+    auto bytes_written = write(this->port_fd, (char*)sc->packet, 6);
+    if (bytes_written != 6)
         this->log->log_error_and_exit("[SerialImpl] Failed to send device payload");
 
     this->log->log_info("[SerialImpl] Sent device payload ->");
@@ -58,24 +58,24 @@ char* SerialImpl::read_from_device_memory(uint32_t address, uint32_t size_in_byt
 
 void SerialImpl::process_mem_request(DevicePayload& payload)
 {
-    if(payload.fields.sub_cmd == 0) {\
+    if(payload.sub_cmd() == 0) {\
         this->log->log_info("[SerialImpl] Device requested read, payload ->");
         this->log->log_info(payload.print());
 
         char* mem_val = this->read_from_device_memory(payload.fields32.body, 4);
 
         DevicePayload mem_response;
-        mem_response.fields.id = payload.fields.id;
-        mem_response.fields.type = static_cast<char>(TYPE::RESPONSE);
-        mem_response.fields.cmd = payload.fields.cmd;
-        mem_response.fields.sub_cmd = payload.fields.sub_cmd;
+        mem_response.id(payload.id());
+        mem_response.type((uint32_t)TYPE::RESPONSE);
+        mem_response.cmd(payload.cmd());
+        mem_response.sub_cmd(payload.sub_cmd());
         mem_response.fields.body_1 = mem_val[0];
         mem_response.fields.body_2 = mem_val[1];
         mem_response.fields.body_3 = mem_val[2];
         mem_response.fields.body_4 = mem_val[3];
         this->send_device_payload(&mem_response);
     }
-    else if(payload.fields.sub_cmd == 1) {
+    else if(payload.sub_cmd() == 1) {
         if(this->mem_write_state == ADDR_RECV) {
             this->log->log_info("[SerialImpl] Device requested write to address, payload ->");
             this->log->log_info(payload.print());
@@ -91,10 +91,10 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
             this->write_to_device_memory(this->mem_write_addr_scratch, 4, data);
 
             DevicePayload mem_response;
-            mem_response.fields.id = payload.fields.id;
-            mem_response.fields.type = static_cast<char>(TYPE::RESPONSE);
-            mem_response.fields.cmd = payload.fields.cmd;
-            mem_response.fields.sub_cmd = payload.fields.sub_cmd;
+            mem_response.id(payload.id());
+            mem_response.type((uint32_t)TYPE::RESPONSE);
+            mem_response.cmd(payload.cmd());
+            mem_response.sub_cmd(payload.sub_cmd());
             mem_response.fields32.body = 0;
             this->send_device_payload(&mem_response);
 
@@ -107,8 +107,8 @@ void SerialImpl::serial_read_process(char data)
 {
     this->scratch.packet[this->scratch_ptr++] = data;
 
-    if(this->scratch_ptr == 8) {
-        if(this->scratch.fields.cmd == 0) 
+    if(this->scratch_ptr == 6) {
+        if(this->scratch.cmd() == 0) 
             this->process_mem_request(this->scratch);
         else {
             this->received_payloads.push_back(this->scratch);
@@ -136,26 +136,25 @@ void SerialImpl::device_find()
         tcflush(this->port_fd, TCIOFLUSH);
 
         DevicePayload tx;
-        tx.fields.id = 1;
-        tx.fields.type = static_cast<char>(TYPE::REQUEST);
-        tx.fields.cmd = static_cast<char>(CMD::HANDSHAKE);
-        tx.fields.sub_cmd = static_cast<char>(HANDSHAKE::OP);
+        tx.id(1);
+        tx.type((uint32_t)TYPE::REQUEST);
+        tx.cmd((uint32_t)CMD::HANDSHAKE);
+        tx.sub_cmd((uint32_t)HANDSHAKE::OP);
         tx.fields32.body = 0;
         this->send_device_payload(&tx);
 
         DevicePayload rx;
-        uint32_t total_bytes_read = 0;
         auto begin_time = std::chrono::high_resolution_clock::now();
         uint8_t rx_ptr = 0;
+        char temp;
         while(true) {
             ssize_t bytes_read = read(this->port_fd, &rx.packet[rx_ptr], 1);
 
             if(bytes_read == 1) {
                 rx_ptr += 1;
-                total_bytes_read += 1;
 
-                if(total_bytes_read == 8) {
-                    if(rx.fields.id == 1 && rx.fields.type == static_cast<char>(TYPE::RESPONSE)
+                if(rx_ptr == 6) {
+                    if(rx.id() == 1 && rx.type() == static_cast<uint32_t>(TYPE::RESPONSE)
                         && rx.fields.body_1 == 2 && rx.fields.body_2 == 1) {
                         this->log->log_info("[SerialImpl] Found device in serial port '" + port_string + "'.");
                         found = true;
