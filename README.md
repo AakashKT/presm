@@ -30,26 +30,26 @@ First, clone this repository with ```--recursive``` flag
 git clone --recursive https://github.com/AakashKT/presm.git
 ```
 
-The ```configs/``` directory contains various pre-configured devices with their drivers, including configurations of verification tests.
+The ```hw_configs/``` directory contains various pre-configured devices with their drivers, including configurations of verification tests.
 
 ### Building for the first time
-The following steps build the ```riscv_compute_accelerator``` configuration.
+The following steps build the ```preinception``` configuration.
 
 First run the following
 ```
-python scripts/build.py --config configs/riscv_compute_accelerator.json --get_extern_tools
+python scripts/build.py --config hw_configs/preinception/functional.json --get_extern_tools
 ```
 Note the ```--get_extern_tools``` flag, which is required when building for the first time. Subsequent builds should not include this flag.
 
 ### Rebuilding and Clean builds
 To rebuild, run
 ```
-python scripts/build.py --config configs/riscv_compute_accelerator.json
+python scripts/build.py --config hw_configs/preinception/functional.json
 ```
 
 For a clean build, run
 ```
-python scripts/build.py --config configs/riscv_compute_accelerator.json --clean
+python scripts/build.py --config hw_configs/preinception/functional.json --clean
 ```
 
 ## Verification Apps
@@ -62,7 +62,8 @@ Verification apps are listed in the device configuration file like so:
         "name": "sanity",
         "args_host_run": ["host"],
         "args_device_run": ["device"],
-        "verify": false
+        "verify": true,
+        "enabled": true
     }
 ]
 ```
@@ -78,7 +79,15 @@ If ```verify``` is ```false```, the app will only be run on PRESM and its output
 
 Verification can be run with the following script
 ```
-python scripts/verify.py --config configs/riscv_compute_accelerator.json
+python scripts/verify.py --config hw_configs/preinception/functional.json
+```
+
+## RTL testbenches
+RTL verification via simulation is important for debugging and initial design iteration.
+
+PRESM includes scripts to run RTL testbenches (written in ```cocotb```):
+```
+python scripts/rtl_testbench_run.py --config hw_configs/preinception/serial.json
 ```
 
 ## Running your own app on PRESM
