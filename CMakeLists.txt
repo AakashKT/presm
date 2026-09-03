@@ -50,6 +50,9 @@ else()
     return()
 endif()
 
+target_compile_definitions(device PUBLIC LOG_ENABLED=${LOG_ENABLED})
+target_compile_definitions(${DRIVER_LIB} PUBLIC LOG_ENABLED=${LOG_ENABLED})
+
 # Make packages
 set_target_properties(${DRIVER_LIB} PROPERTIES PUBLIC_HEADER ${PROJECT_SOURCE_DIR}/driver/${DRIVER}/include/${DRIVER}.h)
 install(TARGETS ${DRIVER_LIB} 

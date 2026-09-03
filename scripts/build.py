@@ -19,6 +19,11 @@ def build_presm(args, config):
     device_name = config['device']['name']
     device_type = config['device']['type']
 
+    if config['log_enabled']:
+        log_enabled = 1
+    else:
+        log_enabled = 0
+
     if device_type == 'serial':
         baud = config['device']['serial_config']['baud_rate']
         d_mem_sz = int(config['device']['memory_size_in_bytes'])
@@ -27,7 +32,7 @@ def build_presm(args, config):
         baud = 0
         d_mem_sz = 0
 
-    utils._execute(f'cmake .. -DDRIVER={driver_name} -DDEVICE={device_name} -DDEVICE_TYPE={device_type} -DDEVICE_MEM_SIZE_IN_BYTES=\"{d_mem_sz}\" -DBAUD_RATE=\"{baud}\"')
+    utils._execute(f'cmake .. -DDRIVER={driver_name} -DDEVICE={device_name} -DDEVICE_TYPE={device_type} -DLOG_ENABLED={log_enabled} -DDEVICE_MEM_SIZE_IN_BYTES=\"{d_mem_sz}\" -DBAUD_RATE=\"{baud}\"')
 
     utils._execute('cmake --build . --config Release -- -j 4')
     utils._execute('cmake --build . --config Release --target install -- -j 4')

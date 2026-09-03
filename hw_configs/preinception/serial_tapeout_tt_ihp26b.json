@@ -1,4 +1,6 @@
 {
+    "log_enabled": false,
+    
     "driver": {
         "name": "matrix"
     },
