@@ -3,4 +3,4 @@ build*/
 .vscode/
 packages/
 *_runs/
-device/include/config.h
+config_*.h

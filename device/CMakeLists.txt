@@ -16,6 +16,12 @@ if(PRESM_SHARED_LIB)
     set_property(TARGET device PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
+set(DEVICE_NAME ${DEVICE}) 
+configure_file(
+    "${PROJECT_SOURCE_DIR}/device/include/config_device.h.in" 
+    "${PROJECT_SOURCE_DIR}/device/include/config_device.h"
+)
+
 if(${DEVICE} STREQUAL "preinception")
     message(STATUS "PRESM: Building device 'preinception'")
     add_subdirectory(preinception/)

@@ -4,7 +4,7 @@
 #include "common.h"
 #include "logging.h"
 #include "device_memory.h"
-#include "config.h"
+#include "config_device.h"
 
 class Device {
 public:
