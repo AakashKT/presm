@@ -8,7 +8,7 @@ def setup(args, config, execution_dir):
     driver_lib_path, driver_lib, _ = utils.get_driver_lib(config)
     utils._copy_file(f'{driver_lib_path}/{driver_lib}', execution_dir)
 
-    utils._copy_file(args.config, execution_dir + '/presm_config.json')
+    utils._copy_file(args.config, execution_dir + '/hw_config.json')
 
     return executable, driver_lib
 
@@ -21,8 +21,6 @@ if __name__ == '__main__':
 
     utils.init()
     config = json.load(open(args.config))
-
-    utils.sanitize_presm_config(config)
 
     execution_dir = 'execute_runs'
     execution_dir = utils.make_numbered_execution_dir(execution_dir)

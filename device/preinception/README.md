@@ -66,7 +66,10 @@ python scripts/build.py --config hw_configs/preinception/serial_fpga_tangnano20k
 ```
 The ```--get_extern_tools``` flag can be ignored for the next run - it is only required the first time to setup the FPGA tools.
 
-Next, connect a Tang Nano 20k to your PC with a USB cable.
+Next, connect a Tang Nano 20k to your PC with a USB cable. You may also need to run the following command:
+```
+sudo modprobe ftdi_sio
+```
 
 Finally, run verification apps:
 ```python
@@ -127,7 +130,10 @@ Build the Tiny Tapeout config for Preinception:
 python scripts/build.py --config hw_configs/preinception/serial_tapeout_tt_ihp26b.json
 ```
 
-Next, we need to connect the chip to the PC.
+Next, we need to connect the chip to the PC. You may also need to run the following command:
+```
+sudo modprobe ftdi_sio
+```
 
 The chip can be connected in two ways:
 - Connect the demo board to the PC with USB

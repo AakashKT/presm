@@ -3,7 +3,15 @@ import urllib.request
 import zipfile
 
 def build_presm(args, config):
-    utils.sanitize_presm_config(config)
+    try:
+        driver_name = config['driver']['name']
+        device_name = config['device']['name']
+        device_type = config['device']['type']
+        log_enabled = config['log_enabled']
+        d_mem_sz = int(config['device']['memory_size_in_bytes'])
+
+    except KeyError as e:
+        utils.error_exit(f"Error: The key {e} does not exist in the configuration.")
 
     path_exists = os.path.exists('build')
     if args.clean and path_exists:
@@ -15,29 +23,25 @@ def build_presm(args, config):
 
     utils._chdir('build')
 
-    driver_name = config['driver']['name']
-    device_name = config['device']['name']
-    device_type = config['device']['type']
-
-    if config['log_enabled']:
+    if log_enabled:
         log_enabled = 1
     else:
         log_enabled = 0
 
     if device_type == 'serial':
-        baud = config['device']['serial_config']['baud_rate']
-        d_mem_sz = int(config['device']['memory_size_in_bytes'])
-
+        try:
+            baud = config['device']['serial_config']['baud_rate']
+        except KeyError as e:
+            utils.error_exit(f"Error: The key {e} does not exist in the configuration for a serial device.")
     else:
         baud = 0
-        d_mem_sz = 0
 
     utils._execute(f'cmake .. -DDRIVER={driver_name} -DDEVICE={device_name} -DDEVICE_TYPE={device_type} -DLOG_ENABLED={log_enabled} -DDEVICE_MEM_SIZE_IN_BYTES=\"{d_mem_sz}\" -DBAUD_RATE=\"{baud}\"')
 
     utils._execute('cmake --build . --config Release -- -j 4')
     utils._execute('cmake --build . --config Release --target install -- -j 4')
 
-def build_fpga_toolchain(args, config):
+def build_fpga_toolchain(args):
     if len(os.listdir('extern')) == 0:
         utils.print_red('No submodules found. Did you reun git clone --recursive-submodules?')
         exit()
@@ -83,11 +87,11 @@ def install_ubuntu_packages():
                 libboost-all-dev')
     utils._execute('pip install apycula cocotb')
 
-def get_or_build_extern_tools(args, config):
+def get_or_build_extern_tools(args):
     system_name = platform.system()
 
     install_ubuntu_packages()
-    build_fpga_toolchain(args, config)
+    build_fpga_toolchain(args)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -100,7 +104,7 @@ if __name__ == '__main__':
     config = json.load(open(args.config))
 
     if args.get_extern_tools:
-        get_or_build_extern_tools(args, config)
+        get_or_build_extern_tools(args)
 
     build_presm(args, config)
 

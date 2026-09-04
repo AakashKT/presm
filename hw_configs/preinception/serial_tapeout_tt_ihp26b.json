@@ -8,7 +8,7 @@
     "device": {
         "name": "preinception",
         "type": "serial",
-        "memory_size_in_bytes": 1e10,
+        "memory_size_in_bytes": 1e9,
 
         "rtl": {
             "top_module_src": "tangnano20k_serial.v",
@@ -19,9 +19,8 @@
             "simulator": "icarus",
             "language": "verilog"
         },
-
-        "fpga": {
-            "name": "tangnano20k",
+        
+        "serial_config": {
             "baud_rate": 9600
         }
     },

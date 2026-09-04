@@ -8,7 +8,7 @@
     "device": {
         "name": "preinception",
         "type": "functional",
-        "memory_size_in_bytes": 1e10
+        "memory_size_in_bytes": 1e9
     },
 
     "verification": [

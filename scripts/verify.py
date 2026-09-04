@@ -31,17 +31,18 @@ if __name__ == '__main__':
     utils.init()
     config = json.load(open(args.config))
 
-    if 'verification' not in config:
-        utils.error_exit('No verification apps defined!')
-    
-    utils.sanitize_presm_config(config)
+    try:
+        verification_apps = config['verification']
 
+    except KeyError as e:
+        utils.error_exit(f"Error: No verification apps found.")
+    
     execution_dir = 'verify_runs'
     execution_dir = utils.make_numbered_execution_dir(execution_dir)
 
     executable, driver_lib = setup(args, config, execution_dir)
 
-    for app in config['verification']:
+    for app in verification_apps:
         if app['enabled']:
             app_args = [app['name']] + app['args_device_run']
             source = utils.presm_execute(execution_dir, executable, driver_lib, \

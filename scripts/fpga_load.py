@@ -1,9 +1,6 @@
 import os, argparse, shutil, utils, json
 
-def setup(args, config, execution_dir):
-    device_name = config['device']['name']
-    fpga_name = config['device']['fpga']['name']
-
+def setup(args, device_name, fpga_name, execution_dir):
     os.mkdir(execution_dir + '/rtl/')
 
     fpga_file_dir = f'fpga/{fpga_name}/'
@@ -30,21 +27,26 @@ if __name__ == '__main__':
 
     utils.init()
     config = json.load(open(args.config))
-    
-    utils.sanitize_presm_config(config)
+
+    try:
+        device_name = config['device']['name']
+        fpga_name = config['device']['fpga']['name']
+        top_module = config['device']['rtl']['top_module']
+        top_module_src = config['device']['rtl']['top_module_src']
+
+    except KeyError as e:
+        utils.error_exit(f"Error: The key {e} does not exist in the configuration.")
+
     check_external_tools(args)
 
     execution_dir = 'fpga_load_runs'
     execution_dir = utils.make_numbered_execution_dir(execution_dir)
 
-    setup(args, config, execution_dir)
+    setup(args, device_name, fpga_name, execution_dir)
 
     yosys_exec = f'{os.getcwd()}/extern/yosys/yosys'
     nextpnr_exec = f'{os.getcwd()}/extern/nextpnr/build/nextpnr-himbaechel'
     openfpgaloader_exec = f'{os.getcwd()}/extern/openFPGALoader/build/openFPGALoader'
-
-    top_module = config['device']['rtl']['top_module']
-    top_module_src = config['device']['rtl']['top_module_src']
 
     os.chdir(execution_dir)
     os.system(f'make TOP_MODULE={top_module} \

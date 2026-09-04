@@ -1,10 +1,7 @@
 import os, argparse, shutil, utils, json
 
-def setup(args, config, testbench, execution_dir):
+def setup(args, device_name, device_type, testbench, execution_dir):
     try:
-        device_name = config['device']['name']
-        device_type = config['device']['type']
-
         utils._copy_file('rtl_testbench/Makefile', execution_dir)
 
         rtl_dir = f'device/rtl/'
@@ -30,25 +27,34 @@ if __name__ == '__main__':
     config = json.load(open(args.config))
 
     try:
+        device_name = config['device']['name']
+        device_type = config['device']['type']
+
         tests = config['rtl_testbench']
         sim = config["device"]["rtl_testbench_config"]["simulator"]
         lang = config["device"]["rtl_testbench_config"]["language"]
-    except:
-        utils.error_exit('No RTL testbenches defined')
+
+    except KeyError as e:
+        utils.error_exit(f"Error: The key {e} does not exist in the dictionary.")
     
-    utils.sanitize_presm_config(config)
     execution_dir_top = 'rtl_testbench_runs'
 
     for testbench in tests:
-        if not testbench['enable']:
+
+        try:
+            rtl_src = testbench['rtl_src']
+            testbench_src = testbench['testbench_src'].replace('.py', '')
+            rtl_top_level = testbench['rtl_top_level']
+            enable = testbench['enable']
+
+        except KeyError as e:
+            utils.error_exit(f"Error: The key {e} does not exist in rtl_testbench list.")
+
+        if not enable:
             continue
 
         execution_dir = utils.make_numbered_execution_dir(execution_dir_top)
-        setup(args, config, testbench, execution_dir)
-
-        rtl_src = testbench['rtl_src']
-        testbench_src = testbench['testbench_src'].replace('.py', '')
-        rtl_top_level = testbench['rtl_top_level']
+        setup(args, device_name, device_type, testbench, execution_dir)
 
         os.chdir(execution_dir)
         os.system(f'make VERILOG_SOURCES={rtl_src} \

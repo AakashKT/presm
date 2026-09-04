@@ -130,35 +130,3 @@ def presm_execute(working_directory, executable, driver_lib, app_args, driver_na
     print('')
 
     return op.stdout
-
-def sanitize_presm_config(config):
-    try:
-        driver = config["driver"]
-        device = config["device"]
-    except:
-        utils.error_exit(f"Both 'driver' and 'device' should be defined!")
-    
-    if device["type"] == "functional":
-        try:
-            verification = config["verification"]
-        except:
-            utils.error_exit(f"Verification tests not defined in 'verification'. Atleast one must be defined.")
-
-    elif device["type"] == "serial":
-        try:
-            rtl = device["rtl"]
-            fpga = device["fpga"]
-        except:
-            utils.error_exit(f"Both 'rtl' and 'fpga' should be defined for deivce of type 'serial'")
-    
-    elif device["type"] == "rtl_testbench":
-        try:
-            rtl_testbench = config["rtl_testbench"]
-        except:
-            utils.error_exit(f"'rtl_testbench' should be defined for deivce of type 'rtl_testbench'")
-        
-        try:
-            sim = config["device"]["rtl_testbench_config"]["simulator"]
-            lang = config["device"]["rtl_testbench_config"]["language"]
-        except:
-            utils.error_exit(f"'device' should have a 'rtl_testbench' config for deivce of type 'rtl_testbench'")
