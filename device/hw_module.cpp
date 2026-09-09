@@ -1,46 +1,50 @@
 #include "hw_module.h"
 
-HwModule::HwModule()
+HwModule::HwModule(uint32_t num_parallel_blocks)
 {
-    this->execute_thread = std::thread(
-        [](HwModule *hw_module) {
-            while(true) {
-                hw_module->execute();
-                // usleep(1000);
-            }
-        },
-        this
-    );
+    for(auto i=0; i<num_parallel_blocks; i++)
+        this->execute_thread_list.push_back(
+            std::thread(
+                [](HwModule *hw_module, uint32_t block_idx) {
+                    while(true) {
+                        hw_module->execute(block_idx);
+                    }
+                },
+                this, i
+            )
+        );
 }
 
 HwModule::~HwModule()
 {
-    this->execute_thread.detach();
+    for(auto& t : this->execute_thread_list)
+        t.detach();
 }
 
-void HwModule::push_message(void* payload)
+void HwModule::push_message(std::string module_name, void* payload)
 {
     std::unique_lock<std::shared_mutex> lock(this->mtx_messages);
-    this->messges.push_back(payload);
+
+    auto it = this->messges.find(module_name);
+    if(it != this->messges.end() && it->second != nullptr)
+        free(this->messges[module_name]);
+
+    this->messges[module_name] = payload;
 }
 
-void* HwModule::get_message()
+void* HwModule::get_message(std::string module_name)
 {
-    std::shared_lock<std::shared_mutex> lock(this->mtx_messages);
-    
+    std::unique_lock<std::shared_mutex> lock(this->mtx_messages);
+
     void* rval;
-    if(this->messges.empty()) {
+
+    auto it = this->messges.find(module_name);
+    if(it == this->messges.end())
         rval = nullptr;
-    }
-    else {
-        rval = this->messges.front();
-        this->messges.pop_front();
-    }
+    else
+        rval = it->second;
+    
+    this->messges[module_name] = nullptr;
 
     return rval;
-}
-
-void HwModule::connect_to(HwModule& module)
-{
-    this->connections.push_back(&module);
 }

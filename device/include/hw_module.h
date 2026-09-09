@@ -6,22 +6,22 @@
 
 class HwModule {
 public:
-    HwModule();
+    HwModule(uint32_t num_parallel_blocks);
     ~HwModule();
 
-    void push_message(void* payload);
-    void* get_message();
-    void connect_to(HwModule& module);
-
-    virtual void execute() = 0;
+    void push_message(std::string module_name, void* payload);
+    
+    virtual std::string module_name() = 0;
+    virtual void execute(uint32_t block_idx) = 0;
+    
+protected:
+    void* get_message(std::string module_name);
 
 private:
-    std::list<void*> messges;
+    std::map<std::string, void*> messges;
     std::shared_mutex mtx_messages;
     
-    std::list<HwModule*> connections;
-
-    std::thread execute_thread;
+    std::vector<std::thread> execute_thread_list;
 };
 
 #endif

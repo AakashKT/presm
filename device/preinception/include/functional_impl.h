@@ -3,14 +3,15 @@
 
 #include "device.h"
 #include "host_resident_device_memory.h"
-#include "functional_hw_modules.h"
+#include "hw_interface.h"
 #include "defs.h"
+#include "config_preinception.h"
 
 class FunctionalImpl : public Device {
 public:
     FunctionalImpl();
 
-    void device_initialize() {};
+    void device_initialize();
 
     void send_device_payload(void* payload) override;
     bool receive_device_payload(void **payload) override;
@@ -20,7 +21,7 @@ public:
     char* read_from_device_memory(uint32_t address, uint32_t size_in_bytes) override;
 
 private:
-    HwUartPacket hw_uart_packet;
+    HwInterface hw_interface;
 };
 
 #endif

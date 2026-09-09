@@ -85,6 +85,8 @@ void mInit()
                 if(presm_device->receive_device_payload((void**)&scratch)) {
                     drv_log.log_info("Received packet with ID: " + std::to_string(scratch->id()));
                     command_status_readback.push_back(std::pair(*scratch, false));
+                    
+                    free(scratch);
                 }
             }
         }

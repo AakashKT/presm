@@ -29,16 +29,15 @@ bool SerialImpl::receive_device_payload(void **payload)
 
     if(sc == std::nullopt)
         return false;
-    else {
-        DevicePayload* rval = (DevicePayload*) malloc(sizeof(DevicePayload));
-        *rval = *sc;
-        *payload = rval;
+    
+    DevicePayload* rval = (DevicePayload*) malloc(sizeof(DevicePayload));
+    *rval = *sc;
+    *payload = rval;
 
-        this->log->log_info("[SerialImpl] Received device payload ->");
-        this->log->log_info(rval->print());
+    this->log->log_info("[SerialImpl] Received device payload ->");
+    this->log->log_info(rval->print());
 
-        return true;
-    }
+    return true;
 }
 
 uint32_t SerialImpl::allocate_device_memory(uint32_t size_in_bytes)
