@@ -1,7 +1,7 @@
 #include "hw_cp.h"
 
 HwCp::HwCp(HwModule* hw_interface_module)
-    : HwModule(1),
+    : HwModule<DevicePayload>(1),
       hw_interface_module(hw_interface_module)
 {
     this->log = new Logger();
@@ -45,6 +45,22 @@ void HwCp::execute(uint32_t block_idx)
                 this->state = CP_STATE::FETCH_OP2;
             else if(this->pkt_sub_cmd == 2)
                 this->state = CP_STATE::ADD;
+        }
+        else if(this->pkt_cmd == 3) {
+            if(this->pkt_sub_cmd == 0)
+                this->state = CP_STATE::FETCH_OP1;
+            else if(this->pkt_sub_cmd == 1)
+                this->state = CP_STATE::FETCH_OP2;
+            else if(this->pkt_sub_cmd == 2)
+                this->state = CP_STATE::MULP2;
+        }
+        else if(this->pkt_cmd == 4) {
+            if(this->pkt_sub_cmd == 0)
+                this->state = CP_STATE::FETCH_OP1;
+            else if(this->pkt_sub_cmd == 1)
+                this->state = CP_STATE::FETCH_OP2;
+            else if(this->pkt_sub_cmd == 2)
+                this->state = CP_STATE::DIVP2;
         }
     }
 
@@ -175,6 +191,28 @@ void HwCp::execute(uint32_t block_idx)
                                                      + std::bit_cast<int>(this->op2));
         
         this->log->log_info("[HwCp] ADD -> " + std::bitset<32>(this->op1).to_string() + " + "  + std::bitset<32>(this->op2).to_string() + " = "  + std::bitset<32>(this->mem_val).to_string());
+        
+        this->mem_op_restore_state = CP_STATE::CMD_END;
+        this->state = CP_STATE::MEM_WRITE_ADDR;
+    }
+    else if(this->state == CP_STATE::MULP2) {
+        this->log->log_info("[HwCp] MULP2 command execute request");
+
+        this->mem_write_addr = this->pkt_body;
+        this->mem_val = std::bit_cast<uint32_t>(std::bit_cast<int>(this->op1) << this->op2);
+        
+        this->log->log_info("[HwCp] MULP2 -> " + std::bitset<32>(this->op1).to_string() + " * 2^"  + std::bitset<32>(this->op2).to_string() + " = "  + std::bitset<32>(this->mem_val).to_string());
+        
+        this->mem_op_restore_state = CP_STATE::CMD_END;
+        this->state = CP_STATE::MEM_WRITE_ADDR;
+    }
+    else if(this->state == CP_STATE::DIVP2) {
+        this->log->log_info("[HwCp] DIVp2 command execute request");
+
+        this->mem_write_addr = this->pkt_body;
+        this->mem_val = std::bit_cast<uint32_t>(std::bit_cast<int>(this->op1) >> this->op2);
+        
+        this->log->log_info("[HwCp] DIVP2 -> " + std::bitset<32>(this->op1).to_string() + " / 2^"  + std::bitset<32>(this->op2).to_string() + " = "  + std::bitset<32>(this->mem_val).to_string());
         
         this->mem_op_restore_state = CP_STATE::CMD_END;
         this->state = CP_STATE::MEM_WRITE_ADDR;

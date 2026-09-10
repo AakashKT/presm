@@ -1,8 +1,7 @@
 #ifndef DEVICE_DEFS_H
 #define DEVICE_DEFS_H
 
-#define PKT_TO_DEVICE "to_driver"
-#define PKT_FROM_DEVICE "from_device"
+#define PKT_TO_DEVICE "to_device"
 #define PKT_TO_CP "to_cp"
 #define PKT_FROM_CP "from_cp"
 

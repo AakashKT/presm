@@ -1,7 +1,7 @@
 #include "hw_interface.h"
 
 HwInterface::HwInterface()
-    : HwModule(2),
+    : HwModule<DevicePayload>(2),
       cp(this)
 {
     this->log = new Logger();
@@ -15,14 +15,22 @@ std::string HwInterface::module_name()
     return "HW_MODULE_INTERFACE";
 }
 
-HwMessage HwInterface::get_message_from_device()
+HwMessage<DevicePayload> HwInterface::get_message_from_device()
 {
-    return this->get_message(PKT_FROM_DEVICE);
+    HwMessage<DevicePayload> rval;
+    rval.ack = true;
+    rval.data = nullptr;
+
+    auto payload = this->driver_payload.pop_front();
+    if(payload != std::nullopt)
+        rval = *payload;
+
+    return rval;
 }
 
 void HwInterface::execute_rx()
 {
-    HwMessage msg = this->get_message(PKT_TO_DEVICE);
+    HwMessage<DevicePayload> msg = this->get_message(PKT_TO_DEVICE);
     if(msg.data == nullptr || msg.ack == true)
         return;
 
@@ -34,13 +42,13 @@ void HwInterface::execute_rx()
 
 void HwInterface::execute_tx()
 {
-    HwMessage msg = this->get_message(PKT_FROM_CP);
+    HwMessage<DevicePayload> msg = this->get_message(PKT_FROM_CP);
     if(msg.data == nullptr || msg.ack == true)
         return;
     
-    this->push_message(PKT_FROM_DEVICE, msg.data);
+    this->driver_payload.push_back(msg);
 
-    this->log->log_info("[HwInterface] Pushing PKT_FROM_DEVICE");
+    this->log->log_info("[HwInterface] Pushing driver payload");
     this->log->log_info(((DevicePayload*)msg.data.get())->print());
 }
 

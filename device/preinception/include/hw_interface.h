@@ -5,14 +5,14 @@
 #include "hw_cp.h"
 #include "defs.h"
 
-class HwInterface : public HwModule {
+class HwInterface : public HwModule<DevicePayload> {
 public:
     HwInterface();
 
     void execute_rx();
     void execute_tx();
 
-    HwMessage get_message_from_device();
+    HwMessage<DevicePayload> get_message_from_device();
     
     std::string module_name() override;
     void execute(uint32_t block_idx) override;
@@ -20,6 +20,8 @@ public:
 private:
     Logger* log;
     HwCp cp;
+
+    ThreadSafeList<HwMessage<DevicePayload>> driver_payload;
 };
 
 #endif

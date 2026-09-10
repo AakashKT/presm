@@ -24,11 +24,13 @@ enum class CP_STATE {
     FETCH_OP2_END,
 
     ADD,
+    MULP2,
+    DIVP2,
 
     CMD_END
 };
 
-class HwCp : public HwModule {
+class HwCp : public HwModule<DevicePayload> {
 public:
     HwCp(HwModule* hw_interface_module);
     
