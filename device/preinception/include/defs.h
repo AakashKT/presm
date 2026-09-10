@@ -51,7 +51,7 @@ union DevicePayload {
         char body_4;
     } fields;
 
-    struct Fields32 {
+    struct __attribute__((packed)) Fields32 {
         uint16_t header;
         uint32_t body;
     } fields32;
@@ -67,6 +67,15 @@ union DevicePayload {
         fields.body_3 = 0;
         fields.body_4 = 0;
     }
+
+    void copy(DevicePayload& p) {
+        fields.id_and_type = p.fields.id_and_type;
+        fields.cmd_and_sub_cmd = p.fields.cmd_and_sub_cmd;
+        fields.body_1 = p.fields.body_1;
+        fields.body_2 = p.fields.body_2;
+        fields.body_3 = p.fields.body_3;
+        fields.body_4 = p.fields.body_4;
+    };
 
     uint32_t id() { return (fields.id_and_type & 15); };
     void id(uint32_t id) { fields.id_and_type = (id & 15) | ((fields.id_and_type >> 4) << 4); };
@@ -89,7 +98,7 @@ union DevicePayload {
         ss << "\tType: " << std::to_string(type()) << std::endl;
         ss << "\tCMD: " << std::to_string(cmd()) << std::endl;
         ss << "\tSUB_CMD: " << std::to_string(sub_cmd()) << std::endl;
-        ss << "\tBODY: " << std::to_string(fields32.body);
+        ss << "\tBODY: " << std::bitset<32>(fields32.body).to_string();
 
         return ss.str();
     }

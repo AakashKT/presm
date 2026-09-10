@@ -4,21 +4,28 @@
 #include "common.h"
 #include "logging.h"
 
+struct HwMessage {
+    std::shared_ptr<void> data;
+    bool ack = false;
+};
+
 class HwModule {
 public:
     HwModule(uint32_t num_parallel_blocks);
     ~HwModule();
 
-    void push_message(std::string module_name, void* payload);
+    void push_message(std::string module_name, std::shared_ptr<void> payload);
+    
+    bool get_message_ack(std::string module_name);
     
     virtual std::string module_name() = 0;
-    virtual void execute(uint32_t block_idx) = 0;
+    virtual void execute(uint32_t block_idx) {};
     
 protected:
-    void* get_message(std::string module_name);
+    HwMessage get_message(std::string module_name);
 
 private:
-    std::map<std::string, void*> messges;
+    std::map<std::string, HwMessage> messages;
     std::shared_mutex mtx_messages;
     
     std::vector<std::thread> execute_thread_list;

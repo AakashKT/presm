@@ -80,13 +80,11 @@ void mInit()
 
     device_payload_receive_thread = std::thread(
         [&]() {
-            DevicePayload* scratch;
+            DevicePayload* scratch = (DevicePayload*) malloc(sizeof(DevicePayload));
             while(true) {
-                if(presm_device->receive_device_payload((void**)&scratch)) {
+                if(presm_device->receive_device_payload((void*)scratch)) {
                     drv_log.log_info("Received packet with ID: " + std::to_string(scratch->id()));
                     command_status_readback.push_back(std::pair(*scratch, false));
-                    
-                    free(scratch);
                 }
             }
         }
@@ -235,7 +233,7 @@ MIntDeviceMemory::MIntDeviceMemory(int32_t source)
 
 int32_t MIntDeviceMemory::getValue()
 {
-    drv_log.log_info("Reading Int from device at 0x" + intToHex(this->address));
+    drv_log.log_info("Reading Int from device at " + intToHex(this->address));
 
     char* data = presm_device->read_from_device_memory(this->address, this->size_in_bytes);
 
@@ -247,7 +245,7 @@ int32_t MIntDeviceMemory::getValue()
 
 void MIntDeviceMemory::setValue(int32_t new_val)
 {
-    drv_log.log_info("Overwriting Int at 0x" + intToHex(this->address));
+    drv_log.log_info("Overwriting Int at " + intToHex(this->address));
 
     char data[4] = { new_val & 255, (new_val & (255 << 8)) >> 8, (new_val & (255 << 16)) >> 16, (new_val & (255 << 24)) >> 24 };
     presm_device->write_to_device_memory(this->address, this->size_in_bytes, data);

@@ -4,6 +4,30 @@
 #include "hw_module.h"
 #include "defs.h"
 
+enum class CP_STATE {
+    IDLE = 0,
+    DECODE,
+
+    HANDSHAKE,
+
+    MEM_FETCH,
+    MEM_FETCH_WAIT,
+
+    MEM_WRITE_ADDR,
+    MEM_WRITE_VAL_PREP,
+    MEM_WRITE_VAL,
+    MEM_WRITE_WAIT,
+
+    FETCH_OP1,
+    FETCH_OP1_END,
+    FETCH_OP2,
+    FETCH_OP2_END,
+
+    ADD,
+
+    CMD_END
+};
+
 class HwCp : public HwModule {
 public:
     HwCp(HwModule* hw_interface_module);
@@ -15,7 +39,16 @@ private:
     Logger* log;
     HwModule* hw_interface_module;
 
-    uint8_t tx_id = 0;
+    uint8_t pkt_id, pkt_type, pkt_cmd, pkt_sub_cmd;
+    uint32_t pkt_body;
+
+    uint32_t mem_fetch_addr, mem_write_addr, mem_val;
+    uint32_t op1, op2;
+
+    uint8_t tx_cmd_id = 0;
+
+    CP_STATE state = CP_STATE::IDLE;
+    CP_STATE mem_op_restore_state = CP_STATE::IDLE;
 };
 
 #endif

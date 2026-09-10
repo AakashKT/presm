@@ -10,6 +10,29 @@ FunctionalImpl::FunctionalImpl()
 {
     this->log->log_info("[FunctionalImpl] 'Preinception Device' constructor called");
     this->device_memory = new HostResidentMemory(std::atoi(HOST_RESIDENT_MEM_SIZE));
+
+    this->device_receive_thread = std::thread(
+        [&](FunctionalImpl* impl) {
+            while(true) {
+                auto msg = impl->hw_interface.get_message_from_device();
+
+                if(msg.data != nullptr && msg.ack == false) {
+                    DevicePayload* pld = (DevicePayload*) msg.data.get();
+
+                    if(pld->cmd() == 0)
+                        impl->process_mem_request(*pld);
+                    else
+                        impl->received_payloads.push_back(*pld);
+                }
+            }
+        },
+        this
+    );
+}
+
+FunctionalImpl::~FunctionalImpl()
+{
+    this->device_receive_thread.detach();
 }
 
 void FunctionalImpl::device_initialize()
@@ -25,18 +48,17 @@ void FunctionalImpl::device_initialize()
     this->send_device_payload(&tx);
 
     auto begin_time = std::chrono::high_resolution_clock::now();
+    DevicePayload rx;
     while(true) {
-        DevicePayload* rx = (DevicePayload*) this->hw_interface.get_message_from_device();
-        
-        if(rx != nullptr) {
-            if(rx->id() == 1 && rx->type() == static_cast<uint32_t>(TYPE::RESPONSE)
-                && rx->fields.body_1 == 2 && rx->fields.body_2 == 1) {
+        if(this->receive_device_payload(&rx)) {
+            if(rx.id() == 1 && rx.type() == static_cast<uint32_t>(TYPE::RESPONSE)
+                && rx.fields.body_1 == 2 && rx.fields.body_2 == 1) {
                 this->log->log_info("[FunctionalImpl] Found device.");
                 found = true;
             }
             else {
                 this->log->log_info("[FunctionalImpl] Received packet does not match handshake signature");
-                this->log->log_info(rx->print());
+                this->log->log_info(rx.print());
             }
         }
 
@@ -46,7 +68,7 @@ void FunctionalImpl::device_initialize()
     }
 
     if(!found)
-        this->log->log_error_and_exit("[SerialImpl] Could not find device over serial port.");
+        this->log->log_error_and_exit("[FunctionalImpl] Could not find device.");
 }
 
 uint32_t FunctionalImpl::allocate_device_memory(uint32_t size_in_bytes)
@@ -66,23 +88,73 @@ char* FunctionalImpl::read_from_device_memory(uint32_t address, uint32_t size_in
 
 void FunctionalImpl::send_device_payload(void* payload)
 {
-    this->hw_interface.push_message(PKT_TO_DEVICE, payload);
+    auto payload_ = std::make_shared<DevicePayload>();
+    payload_->copy(*((DevicePayload*)payload));
+
+    this->hw_interface.push_message(PKT_TO_DEVICE, payload_);
 
     this->log->log_info("[FunctionalImpl] Sent device payload ->");
-    this->log->log_info(((DevicePayload*)payload)->print());
+    this->log->log_info(payload_->print());
 }
 
-bool FunctionalImpl::receive_device_payload(void **payload)
+void FunctionalImpl::process_mem_request(DevicePayload& payload)
 {
-    void* msg = this->hw_interface.get_message_from_device();
+    if(payload.sub_cmd() == 0) {
+        this->log->log_info("[FunctionalImpl] Device requested read, payload ->");
+        this->log->log_info(payload.print());
 
-    if(msg == nullptr)
+        char* mem_val = this->read_from_device_memory(payload.fields32.body, 4);
+
+        DevicePayload mem_response;
+        mem_response.id(payload.id());
+        mem_response.type((uint32_t)TYPE::RESPONSE);
+        mem_response.cmd(payload.cmd());
+        mem_response.sub_cmd(payload.sub_cmd());
+        mem_response.fields.body_1 = mem_val[0];
+        mem_response.fields.body_2 = mem_val[1];
+        mem_response.fields.body_3 = mem_val[2];
+        mem_response.fields.body_4 = mem_val[3];
+        this->send_device_payload(&mem_response);
+    }
+    else if(payload.sub_cmd() == 1) {
+        if(this->mem_write_state == ADDR_RECV) {
+            this->log->log_info("[FunctionalImpl] Device requested write to address, payload ->");
+            this->log->log_info(payload.print());
+
+            this->mem_write_addr_scratch = payload.fields32.body;
+            this->mem_write_state = VAL_RECV;
+        }
+        else if(this->mem_write_state == VAL_RECV) {
+            this->log->log_info("[FunctionalImpl] Device requested write value to above address, payload ->");
+            this->log->log_info(payload.print());
+
+            char data[4] = { payload.fields.body_1, payload.fields.body_2, payload.fields.body_3, payload.fields.body_4 };
+            this->write_to_device_memory(this->mem_write_addr_scratch, 4, data);
+
+            DevicePayload mem_response;
+            mem_response.id(payload.id());
+            mem_response.type((uint32_t)TYPE::RESPONSE);
+            mem_response.cmd(payload.cmd());
+            mem_response.sub_cmd(payload.sub_cmd());
+            mem_response.fields32.body = 0;
+            this->send_device_payload(&mem_response);
+
+            this->mem_write_state = ADDR_RECV;
+        }
+    }
+}
+
+bool FunctionalImpl::receive_device_payload(void *payload)
+{
+    auto payload_opt = this->received_payloads.pop_front();
+
+    if(payload_opt == std::nullopt)
         return false;
-
-    *payload = msg;
-
+    
+    ((DevicePayload*)payload)->copy(*payload_opt);
+    
     this->log->log_info("[FunctionalImpl] Received device payload ->");
-    this->log->log_info(((DevicePayload*)msg)->print());
+    this->log->log_info(((DevicePayload*)payload)->print());
 
     return true;
 }

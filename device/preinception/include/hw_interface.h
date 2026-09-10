@@ -12,7 +12,7 @@ public:
     void execute_rx();
     void execute_tx();
 
-    void* get_message_from_device();
+    HwMessage get_message_from_device();
     
     std::string module_name() override;
     void execute(uint32_t block_idx) override;

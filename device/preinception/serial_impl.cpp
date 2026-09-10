@@ -23,19 +23,17 @@ void SerialImpl::send_device_payload(void* payload)
     this->log->log_info(sc->print());
 }
 
-bool SerialImpl::receive_device_payload(void **payload)
+bool SerialImpl::receive_device_payload(void *payload)
 {
-    auto sc = this->received_payloads.pop_front();
+    auto payload_opt = this->received_payloads.pop_front();
 
-    if(sc == std::nullopt)
+    if(payload_opt == std::nullopt)
         return false;
     
-    DevicePayload* rval = (DevicePayload*) malloc(sizeof(DevicePayload));
-    *rval = *sc;
-    *payload = rval;
-
+    ((DevicePayload*)payload)->copy(*payload_opt);
+    
     this->log->log_info("[SerialImpl] Received device payload ->");
-    this->log->log_info(rval->print());
+    this->log->log_info(((DevicePayload*)payload)->print());
 
     return true;
 }
@@ -57,7 +55,7 @@ char* SerialImpl::read_from_device_memory(uint32_t address, uint32_t size_in_byt
 
 void SerialImpl::process_mem_request(DevicePayload& payload)
 {
-    if(payload.sub_cmd() == 0) {\
+    if(payload.sub_cmd() == 0) {
         this->log->log_info("[SerialImpl] Device requested read, payload ->");
         this->log->log_info(payload.print());
 
@@ -109,9 +107,8 @@ void SerialImpl::serial_read_process(char data)
     if(this->scratch_ptr == 6) {
         if(this->scratch.cmd() == 0) 
             this->process_mem_request(this->scratch);
-        else {
+        else
             this->received_payloads.push_back(this->scratch);
-        }
 
         this->scratch_ptr = 0;
     }
