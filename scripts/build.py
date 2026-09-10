@@ -77,7 +77,7 @@ def install_ubuntu_packages():
 
     utils._execute('sudo apt-get install iverilog')
 
-    utils._execute('sudo apt-get install autoconf automake autotools-dev \
+    os.system('sudo apt-get install autoconf automake autotools-dev \
                 make lld libffi-dev libfl-dev pkg-config tcl-dev graphviz xdot libeigen3-dev \
                 gzip libftdi1-2 libftdi1-dev libhidapi-hidraw0 libhidapi-dev libudev-dev g++ \
                 curl python3 python3-pip python3-tomli libmpc-dev libmpfr-dev \
@@ -85,7 +85,7 @@ def install_ubuntu_packages():
                 patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake \
                 libglib2.0-dev libslirp-dev libncurses-dev libreadline-dev \
                 libboost-all-dev')
-    utils._execute('pip install apycula cocotb')
+    os.system('pip install apycula cocotb')
 
 def get_or_build_extern_tools(args):
     system_name = platform.system()
