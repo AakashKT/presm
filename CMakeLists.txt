@@ -17,7 +17,7 @@ set(DRIVER "matrix" CACHE STRING "Which driver to use? (default: 'matrix', see d
 set(DEVICE_MEM_SIZE_IN_BYTES 10000000000 CACHE STRING "Device memory size")
 set(BAUD_RATE 9600 CACHE STRING "Host-device communication rate")
 
-set(DRIVER_LIB ${DRIVER}_${DEVICE_TYPE})
+set(DRIVER_LIB ${DRIVER})
 
 # External libraries
 add_subdirectory(extern/nlohmann-json/)

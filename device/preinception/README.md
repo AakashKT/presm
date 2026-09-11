@@ -13,12 +13,12 @@ Why call it a "compute accelerator" and not "ALU"? Three reasons:
 
 The name "Preinception" is so since its a proof-of-concept release using the [PRESM](https://github.com/AakashKT/presm) pre-silicon modelling & testing framework. Its not the "inception", but rather a stepping stone towards it.
 
-The PRESM configuration files are located in ```hw_configs/rpeincpetion/```.
+The PRESM configuration files are located in ```hw_configs/preinception/```.
 
 Three configurations are possible:
 - Functional (```functional.json```): A purely functional implementation, meant to test the driver (C++ API) and define the hardware architecture.
-- FPGA (```serial_fpga_tangnano20k.json```): For end-to-end driver & RTL validation, using the Tang Nano 20k FPGA connected via USB. 
-- Tapeout Chip (```serial_tapeout_tt_ihp26b.json```): Release interface with a tapeout chip, connected via USB.
+- FPGA (```serial_fpga_tangnano20k.json```): For end-to-end driver & RTL validation, using the Tang Nano 20k FPGA connected via serial port. 
+- Tapeout Chip (```serial_tapeout_tt_ihp26b.json```): Release interface with a tapeout chip, connected via serial port.
 
 ## Architecture
 ```
@@ -57,7 +57,18 @@ Three configurations are possible:
 ++--------------------------------------------------+---------------+
 ```
 
-## Testing with FPGA
+## Building
+Functional model:
+```python
+python scripts/build.py --config hw_configs/preinception/functional.json
+```
+
+Hardware emulation with FPGA:
+```python
+python scripts/build.py --config hw_configs/preinception/serial_fpga_tangnano20k.json
+```
+
+## Emulation with FPGA
 Clone [PRESM](https://github.com/AakashKT/presm) and navigate to the cloned directory.
 
 Build the FPGA config for Preinception:

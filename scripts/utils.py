@@ -46,7 +46,7 @@ def get_driver_lib(config):
     
     elif system_name == 'Linux':
         shared_lib_path = os.getcwd() + '/build/driver/' + driver_name
-        lib = f'lib{driver_name}_{device_type}.so'
+        lib = f'lib{driver_name}.so'
 
         if os.path.isfile(f'{shared_lib_path}/{lib}'):
             return shared_lib_path, lib, False
