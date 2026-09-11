@@ -1,11 +1,31 @@
-# PRESM - <b>PRE S</b>ilicon <b>M</b>odelling framework for hardware accelerators
+# PRESM - <b>PRE S</b>ilicon <b>M</b>odelling framework
 
 PRESM is a modular framework to help in research, development and testing of hardware accelerators (think GPUs, NPUs). The core of PRESM is written in C/C++.
 
 #### PRESM is currently under active development!
-This project exists so that one can ultimately do hardware research for photorealistic rendering. As a side effect, this project will also enable general accelerator hardware research.
+This project exists so that one can ultimately do hardware research for real-time physically-based rendering. As a side effect, this project will also enable general accelerator hardware research for compute and ML.
 
-See <a href="https://github.com/AakashKT/presm/blob/main/GOALS.md">GOALS.md</a> for a in-details description on PRESM's goals and the plan for progressive releases. 
+## News
+- **PRESM [v0.3](https://github.com/AakashKT/presm/releases/tag/v0.3) is out!** This release marks a end-to-end proof-of-concept, from functional modelling to tapeout, including driver-device functional verification tests and RTL testbenches.
+  - [Preinception]() device coupled with the [Matrix]() driver, all developed in PRESM.
+  - Submitted for [tapeout](https://github.com/AakashKT/preinception-ihp26b-tapeout) on Tiny Tapeout's [IHP26b](https://app.tinytapeout.com/shuttles/ttihp26b) shuttle (delivery expected Aug. 2027)
+ 
+## Hardware accelerator research & development
+The development of a hardware accelerator has a typical journey:
+- Defining the hardware architecture, it's functionality and host communication protocol
+- Defining & implementing the driver (which runs on the host) and communicates with the accelerator
+- Validating the functional correctness of the driver and the hardware.
+- Implementing the hardware in a Hardware Description Language (HDL)
+- Unit testing of the HDL modules (design verification)
+- Simulating the hardware for functional correctness, driver-device communication validation, performance estimates. This simulation is usually done on a Field Programmable Gate Array (FPGA)
+- Submitting the hardware for tapeout
+
+PRESM assists with each of the above:
+- Hardware is defined as C++ classes which inherit PRESM classes to define hardware modules and connections, all of which is simulated in a multi-threaded fashion
+- Driver can get the underlying device with PRESM helpers that handle the underlying hardware realization, thus allowing hardware-realization independent driver development
+- Verification tests written within the PRESM framework allow for quick, progressive and comprehensive testing
+- PRESM provides common HDL modules and a framework to easily run testbenches on user-defined HDL modules
+- PRESM additionally provides scripts to compose HDL modules and programme commonly available FPGAs
 
 ## Table of Contents  
 - [Device Configurations](#device-configurations)
@@ -33,7 +53,7 @@ git clone --recursive https://github.com/AakashKT/presm.git
 The ```hw_configs/``` directory contains various pre-configured devices with their drivers, including configurations of verification tests.
 
 ### Building for the first time
-The following steps build the ```preinception``` configuration.
+The following steps build the ```preinception``` device in the functional configuration.
 
 First run the following
 ```
