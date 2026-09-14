@@ -57,6 +57,13 @@ module CommandProcessor
 
     reg signed [31:0] op_1, op_2;
 
+`ifdef DEBUG
+    localparam CP_DEBUG_WRITE = 24;
+    localparam CP_DEBUG_STOP = 25;
+
+    reg [31:0] cp_cycle_count;
+`endif
+
     always @(posedge extern_clock or posedge extern_reset)
     begin
         if(extern_reset)
@@ -84,14 +91,29 @@ module CommandProcessor
 
             op_1 <= 0;
             op_2 <= 0;
+
+`ifdef DEBUG
+            cp_cycle_count <= 0;
+`endif
+
         end
         else
         begin
+
+`ifdef DEBUG
+            cp_cycle_count <= cp_cycle_count + 1;
+`endif
+
             case(cp_state)
                 CP_IDLE:
                 begin
                     if(rx_packet_ready == 1)
                     begin
+
+`ifdef DEBUG
+                        cp_cycle_count <= 0;
+`endif
+                        
                         delay_cycles <= 1;
                         delay_counter <= 0;
 
@@ -218,6 +240,39 @@ module CommandProcessor
                     end
                 end
 
+`ifdef DEBUG
+                CP_STOP:
+                begin
+                    tx_packet_ready <= 0;
+                    cp_state <= CP_DEBUG_WRITE;
+                end
+
+                CP_DEBUG_WRITE:
+                begin
+                    tx_packet[3:0] <= 0;
+                    tx_packet[7:4] <= 1;
+                    tx_packet[11:8] <= 0;
+                    tx_packet[15:12] <= 15;
+                    tx_packet[47:16] <= cp_cycle_count;
+                    tx_packet_ready <= 1;
+
+                    wait_restore_state <= CP_DEBUG_STOP;
+                    cp_state <= CP_TX_PACKET_SENT_WAIT;
+                end
+
+                CP_DEBUG_STOP:
+                begin
+                    if(rx_packet_ready == 0)
+                    begin
+                        tx_cmd_id <= 0;
+                        cp_state <= CP_IDLE;
+                    end
+                    else
+                    begin
+                        cp_state <= CP_DEBUG_STOP;
+                    end
+                end
+`else
                 CP_STOP:
                 begin
                     if(rx_packet_ready == 0)
@@ -230,6 +285,7 @@ module CommandProcessor
                         cp_state <= CP_STOP;
                     end
                 end
+`endif
                 
                 CP_MEM_FETCH_PREP:
                 begin

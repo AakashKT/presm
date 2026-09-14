@@ -33,6 +33,7 @@ if __name__ == '__main__':
         tests = config['rtl_testbench']
         sim = config["device"]["rtl_testbench_config"]["simulator"]
         lang = config["device"]["rtl_testbench_config"]["language"]
+        debug_flag = config["device"]["rtl_testbench_config"]["debug"]
 
     except KeyError as e:
         utils.error_exit(f"Error: The key {e} does not exist in the dictionary.")
@@ -57,7 +58,15 @@ if __name__ == '__main__':
         setup(args, device_name, device_type, testbench, execution_dir)
 
         os.chdir(execution_dir)
-        os.system(f'make VERILOG_SOURCES={rtl_src} \
-                        COCOTB_TOPLEVEL={rtl_top_level} \
-                        COCOTB_TEST_MODULES={testbench_src}')
+
+        if debug_flag:
+            os.system(f'make VERILOG_SOURCES={rtl_src} \
+                            COCOTB_TOPLEVEL={rtl_top_level} \
+                            COCOTB_TEST_MODULES={testbench_src} \
+                            COMPILE_DEFS="-DDEBUG=1"')
+        else:
+            os.system(f'make VERILOG_SOURCES={rtl_src} \
+                            COCOTB_TOPLEVEL={rtl_top_level} \
+                            COCOTB_TEST_MODULES={testbench_src}')
+
         os.chdir('../../')

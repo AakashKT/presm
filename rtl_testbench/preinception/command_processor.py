@@ -46,6 +46,7 @@ async def command_processor_add(dut):
     
     dut.extern_reset.value = 1
     dut.rx_packet_ready.value = 0
+    dut.tx_packet_sent.value = 1
     await Timer(clk_ns, unit='ns')
     dut.extern_reset.value = 0
     await Timer(clk_ns, unit='ns')
@@ -82,8 +83,7 @@ async def command_processor_add(dut):
     assert dut.tx_packet_ready.value == 1
     assert dut.tx_packet.value == 13 | 1 << 4 | 2 << 8 | 0 << 12
 
-    dut.tx_packet_sent.value = 1
-    await Timer(2*clk_ns, unit='ns')
+    await Timer(10*clk_ns, unit='ns')
 
     # OP 2
     dut.rx_packet_ready.value = 0
@@ -109,8 +109,7 @@ async def command_processor_add(dut):
     assert dut.tx_packet_ready.value == 1
     assert dut.tx_packet.value == 14 | 1 << 4 | 2 << 8 | 1 << 12
 
-    dut.tx_packet_sent.value = 1
-    await Timer(2*clk_ns, unit='ns')
+    await Timer(10*clk_ns, unit='ns')
 
     # OP 3
     dut.rx_packet_ready.value = 0
@@ -137,11 +136,8 @@ async def command_processor_add(dut):
 
     dut.rx_packet.value = 2 | 1 << 4 | 0 << 8 | 1 << 12
     dut.rx_packet_ready.value = 1
+    dut.tx_packet_sent.value = 0
     await Timer(8*clk_ns, unit='ns')
-
-    dut.tx_packet_sent.value = 1
-    await Timer(2*clk_ns, unit='ns')
 
     assert dut.tx_packet_ready.value == 1
     assert dut.tx_packet.value == 15 | 1 << 4 | 2 << 8 | 2 << 12
-    assert dut.cp_state.value == 6 # CP_STOP

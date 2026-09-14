@@ -8,6 +8,7 @@ def build_presm(args, config):
         device_name = config['device']['name']
         device_type = config['device']['type']
         log_enabled = config['log_enabled']
+        debug_flag = 1 if config['device']['rtl']['compile_flags']['debug'] else 0
         d_mem_sz = int(config['device']['memory_size_in_bytes'])
 
     except KeyError as e:
@@ -36,7 +37,7 @@ def build_presm(args, config):
     else:
         baud = 0
 
-    utils._execute(f'cmake .. -DDRIVER={driver_name} -DDEVICE={device_name} -DDEVICE_TYPE={device_type} -DLOG_ENABLED={log_enabled} -DDEVICE_MEM_SIZE_IN_BYTES=\"{d_mem_sz}\" -DBAUD_RATE=\"{baud}\"')
+    utils._execute(f'cmake .. -DDEVICE_DEBUG={debug_flag} -DDRIVER={driver_name} -DDEVICE={device_name} -DDEVICE_TYPE={device_type} -DLOG_ENABLED={log_enabled} -DDEVICE_MEM_SIZE_IN_BYTES=\"{d_mem_sz}\" -DBAUD_RATE=\"{baud}\"')
 
     utils._execute('cmake --build . --config Release -- -j 4')
     utils._execute('cmake --build . --config Release --target install -- -j 4')
@@ -48,7 +49,10 @@ def build_fpga_toolchain(args):
 
     # Build yosys (Synthesis)
     utils._chdir('extern/yosys')
+    if os.path.exists('build'):
+        shutil.rmtree('build')
     utils._execute('cmake -B build .')
+    utils._execute('cmake --build build --config Release --parallel 4')
 
     # Build nextpnr-himbaechel (place-and-route)
     utils._chdir('../nextpnr')

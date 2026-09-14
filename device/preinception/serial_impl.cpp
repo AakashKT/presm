@@ -53,7 +53,7 @@ char* SerialImpl::read_from_device_memory(uint32_t address, uint32_t size_in_byt
     return this->device_memory->read(address, size_in_bytes);
 }
 
-void SerialImpl::process_mem_request(DevicePayload& payload)
+void SerialImpl::process_device_request(DevicePayload& payload)
 {
     if(payload.sub_cmd() == 0) {
         this->log->log_info("[SerialImpl] Device requested read, payload ->");
@@ -73,14 +73,14 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
         this->send_device_payload(&mem_response);
     }
     else if(payload.sub_cmd() == 1) {
-        if(this->mem_write_state == ADDR_RECV) {
+        if(this->device_packet_recv_state == ADDR_RECV) {
             this->log->log_info("[SerialImpl] Device requested write to address, payload ->");
             this->log->log_info(payload.print());
 
             this->mem_write_addr_scratch = payload.fields32.body;
-            this->mem_write_state = VAL_RECV;
+            this->device_packet_recv_state = VAL_RECV;
         }
-        else if(this->mem_write_state == VAL_RECV) {
+        else if(this->device_packet_recv_state == VAL_RECV) {
             this->log->log_info("[SerialImpl] Device requested write value to above address, payload ->");
             this->log->log_info(payload.print());
 
@@ -95,9 +95,14 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
             mem_response.fields32.body = 0;
             this->send_device_payload(&mem_response);
 
-            this->mem_write_state = ADDR_RECV;
+            this->device_packet_recv_state = ADDR_RECV;
         }
     }
+#if DEVICE_DEBUG == 1
+    else if(payload.sub_cmd() == 15) {
+        this->log->log_info("[SerialImpl] [CP_CYCLES] Command Processor took '" + std::to_string(payload.fields32.body) + "' cycles.");
+    }
+#endif
 }
 
 void SerialImpl::serial_read_process(char data)
@@ -106,7 +111,7 @@ void SerialImpl::serial_read_process(char data)
 
     if(this->scratch_ptr == 6) {
         if(this->scratch.cmd() == 0) 
-            this->process_mem_request(this->scratch);
+            this->process_device_request(this->scratch);
         else
             this->received_payloads.push_back(this->scratch);
 

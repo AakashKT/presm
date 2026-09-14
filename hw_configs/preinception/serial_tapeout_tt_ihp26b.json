@@ -12,12 +12,16 @@
 
         "rtl": {
             "top_module_src": "tangnano20k_serial.v",
-            "top_module": "Tangnano20kUart"
+            "top_module": "Tangnano20kUart",
+            "compile_flags": {
+                "debug": false
+            }
         },
 
         "rtl_testbench_config": {
             "simulator": "icarus",
-            "language": "verilog"
+            "language": "verilog",
+            "debug": false
         },
         
         "serial_config": {
@@ -76,14 +80,14 @@
             "rtl_src": "uart_packet.v",
             "rtl_top_level": "UARTPacket",
             "testbench_src": "uart_packet.py",
-            "enable": false
+            "enable": true
         },
         {
             "name": "Command Processor (CP)",
             "rtl_src": "command_processor.v",
             "rtl_top_level": "CommandProcessor",
             "testbench_src": "command_processor.py",
-            "enable": false
+            "enable": true
         }
     ]
 }

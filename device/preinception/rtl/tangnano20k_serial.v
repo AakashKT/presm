@@ -21,8 +21,8 @@ module Tangnano20kUart
     wire [47:0] rx_packet;
     wire rx_packet_ready;
 
-    wire [47:0] tx_packet;
-    wire tx_packet_ready;
+    reg [47:0] tx_packet;
+    reg tx_packet_ready;
     wire tx_packet_sent;
 
     wire uart_tx_wire;
