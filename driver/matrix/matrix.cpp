@@ -8,6 +8,7 @@ Device* presm_device = nullptr;
 Logger drv_log;
 
 uint8_t global_command_id = 0;
+bool free_called = false;
 
 std::list<DevicePayload> recorded_commands;
 ThreadSafeList<std::pair<DevicePayload, bool>> command_status_readback;
@@ -64,6 +65,9 @@ void mInit()
         [&]() {
             DevicePayload* scratch = (DevicePayload*) malloc(sizeof(DevicePayload));
             while(true) {
+                if(free_called)
+                    break;
+
                 if(presm_device->receive_device_payload((void*)scratch)) {
                     drv_log.log_info("Received packet with ID: " + std::to_string(scratch->id()));
                     command_status_readback.push_back(std::pair(*scratch, false));
@@ -198,8 +202,11 @@ void mSync()
 
 void mFree()
 {
+    free_called = true;
+    
     drv_log.log_info("Driver free called");
     device_payload_receive_thread.detach();
+
     delete presm_device;
 }
 
