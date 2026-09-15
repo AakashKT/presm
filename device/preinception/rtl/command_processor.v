@@ -275,6 +275,8 @@ module CommandProcessor
                     tx_packet[47:16] <= cp_cycle_count;
                     tx_packet_ready <= 1;
 
+                    cp_cycle_count <= 0;
+
                     cp_state <= CP_TX_PACKET_SENT_WAIT;
                 end
 

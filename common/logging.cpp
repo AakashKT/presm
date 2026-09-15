@@ -7,7 +7,6 @@ Logger::Logger()
 Logger::~Logger()
 {
 #if LOG_ENABLED==1
-    this->log_info("Closing log.");
     this->error_file.close();
 #endif
 }

@@ -10,6 +10,10 @@ SerialDevice::~SerialDevice()
 {
     this->log->log_info("[SerialDevice] Destructor called");
 
+    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::high_resolution_clock::now() - this->device_run_time);
+    this->log->log_info("Runtime: " + std::to_string(elapsed.count()) + " ms");
+
     this->serial_port_listen_thread.detach();
     this->serial_port_read_process_thread.detach();
 
@@ -49,6 +53,8 @@ void SerialDevice::device_initialize()
         },
         this
     );
+
+    this->device_run_time = std::chrono::high_resolution_clock::now();
 }
 
 bool SerialDevice::open_serial_port(std::string port_name)

@@ -31,6 +31,8 @@ public:
 private:
     std::thread serial_port_listen_thread;
     std::thread serial_port_read_process_thread;
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> device_run_time;
 };
 
 #endif

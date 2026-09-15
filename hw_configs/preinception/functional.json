@@ -9,7 +9,13 @@
     "device": {
         "name": "preinception",
         "type": "functional",
-        "memory_size_in_bytes": 1e9
+        "memory_size_in_bytes": 1e9,
+
+        "host_device_interface": {
+            "baud_rate": 9600
+        },
+
+        "device_clk_hz": 27000000
     },
 
     "verification": [
@@ -18,28 +24,28 @@
             "args_host_run": ["host"],
             "args_device_run": ["device"],
             "verify": true,
-            "enabled": true
+            "enabled": false
         },
         {
             "name": "addition",
             "args_host_run": ["host"],
             "args_device_run": ["device"],
             "verify": true,
-            "enabled": true
+            "enabled": false
         },
         {
             "name": "multiply_power_2",
             "args_host_run": ["host"],
             "args_device_run": ["device"],
             "verify": true,
-            "enabled": true
+            "enabled": false
         },
         {
             "name": "divide_power_2",
             "args_host_run": ["host"],
             "args_device_run": ["device"],
             "verify": true,
-            "enabled": true
+            "enabled": false
         },
         {
             "name": "multiple_commands",

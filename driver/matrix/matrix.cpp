@@ -200,6 +200,7 @@ void mFree()
 {
     drv_log.log_info("Driver free called");
     device_payload_receive_thread.detach();
+    delete presm_device;
 }
 
 MIntDeviceMemory::MIntDeviceMemory(int32_t source)

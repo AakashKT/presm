@@ -7,6 +7,7 @@ def build_presm(args, config):
         driver_name = config['driver']['name']
         device_name = config['device']['name']
         device_type = config['device']['type']
+        device_clk_hz = config['device']['device_clk_hz']
         log_enabled = config['log_enabled']
         debug_flag = 1 if config['debug'] else 0
         d_mem_sz = int(config['device']['memory_size_in_bytes'])
@@ -29,15 +30,22 @@ def build_presm(args, config):
     else:
         log_enabled = 0
 
-    if device_type == 'serial':
+    if device_type == 'functional':
+        try:
+            baud = config['device']['host_device_interface']['baud_rate']
+        except KeyError as e:
+            utils.error_exit(f"Error: The key {e} does not exist in the configuration for a functional device.")
+
+    elif device_type == 'serial':
         try:
             baud = config['device']['serial_config']['baud_rate']
         except KeyError as e:
             utils.error_exit(f"Error: The key {e} does not exist in the configuration for a serial device.")
+            
     else:
         baud = 0
 
-    utils._execute(f'cmake .. -DDEVICE_DEBUG={debug_flag} -DDRIVER={driver_name} -DDEVICE={device_name} -DDEVICE_TYPE={device_type} -DLOG_ENABLED={log_enabled} -DDEVICE_MEM_SIZE_IN_BYTES=\"{d_mem_sz}\" -DBAUD_RATE=\"{baud}\"')
+    utils._execute(f'cmake .. -DDEVICE_CLK_HZ={device_clk_hz} -DDEVICE_DEBUG={debug_flag} -DDRIVER={driver_name} -DDEVICE={device_name} -DDEVICE_TYPE={device_type} -DLOG_ENABLED={log_enabled} -DDEVICE_MEM_SIZE_IN_BYTES={d_mem_sz} -DBAUD_RATE={baud}')
 
     utils._execute('cmake --build . --config Release -- -j 4')
     utils._execute('cmake --build . --config Release --target install -- -j 4')

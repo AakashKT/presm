@@ -8,18 +8,19 @@ Device* get_device()
 SerialImpl::SerialImpl()
     : SerialDevice()
 {
-    this->device_memory = new HostResidentMemory(std::atoi(HOST_RESIDENT_MEM_SIZE));
+    this->device_memory = new HostResidentMemory(HOST_RESIDENT_MEM_SIZE);
 
 #if DEVICE_DEBUG
     this->stats_log = new Logger();
     this->stats_log->init("device_cp_stats", true);
-    this->stats_log->log_plain("PKT_ID,INSTR,CLK_CYCLES");
+    this->stats_log->log_plain("PKT_ID,INSTR,CLK_CYCLES,DERIVED_RUNTIME_MSEC");
 #endif
 
 }
 
 SerialImpl::~SerialImpl()
 {
+    this->log->log_info("[SerialImpl] Destructor called");
 #if DEVICE_DEBUG
     delete this->stats_log;
 #endif  
@@ -149,7 +150,8 @@ void SerialImpl::process_device_request(DevicePayload& payload)
         this->stats_log->log_plain(
             std::to_string(payload.id()) + "," +
             cmd + "," +
-            std::to_string(payload.fields32.body)
+            std::to_string(payload.fields32.body) + "," +
+            std::to_string(payload.fields32.body / float(DEVICE_CLK_HZ) * 1e6)
         );
     }
 #endif
@@ -184,7 +186,7 @@ void SerialImpl::device_find()
             continue;
         }
 
-        this->configure_serial_port(std::atoi(SERIAL_PORT_BAUD_RATE));
+        this->configure_serial_port(BAUD_RATE);
         tcflush(this->port_fd, TCIOFLUSH);
 
         DevicePayload tx;

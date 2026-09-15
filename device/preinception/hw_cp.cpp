@@ -101,6 +101,8 @@ void HwCp::execute(uint32_t block_idx)
         tx->fields32.body = this->cp_cycle_count;
         this->hw_interface_module->push_message(PKT_FROM_CP, tx);
 
+        this->cp_cycle_count = 0;
+
         this->state = CP_STATE::DEBUG_WRITE_WAIT;
     }
     else if(this->state == CP_STATE::DEBUG_WRITE_RESPONSE) {
@@ -113,6 +115,8 @@ void HwCp::execute(uint32_t block_idx)
         tx->sub_cmd(15);
         tx->fields32.body = this->cp_cycle_count;
         this->hw_interface_module->push_message(PKT_FROM_CP, tx);
+
+        this->cp_cycle_count = 0;
 
         this->state = CP_STATE::DEBUG_WRITE_WAIT;
     }

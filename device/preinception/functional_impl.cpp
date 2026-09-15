@@ -9,7 +9,7 @@ FunctionalImpl::FunctionalImpl()
     : Device()
 {
     this->log->log_info("[FunctionalImpl] 'Preinception Device' constructor called");
-    this->device_memory = new HostResidentMemory(std::atoi(HOST_RESIDENT_MEM_SIZE));
+    this->device_memory = new HostResidentMemory(HOST_RESIDENT_MEM_SIZE);
 
     this->device_receive_thread = std::thread(
         [&](FunctionalImpl* impl) {
@@ -32,7 +32,7 @@ FunctionalImpl::FunctionalImpl()
 #if DEVICE_DEBUG
     this->stats_log = new Logger();
     this->stats_log->init("device_cp_stats", true);
-    this->stats_log->log_plain("PKT_ID,INSTR,CLK_CYCLES");
+    this->stats_log->log_plain("PKT_ID,INSTR,CLK_CYCLES,DERIVED_RUNTIME_MSEC");
 #endif
 
 }
@@ -168,9 +168,14 @@ void FunctionalImpl::process_device_request(DevicePayload& payload)
 #if DEVICE_DEBUG
     else if(payload.sub_cmd() == 15) {
         std::string cmd = "UNKNOWN";
+        uint32_t clk_count = payload.fields32.body;
         
         if(payload.type() == (uint32_t)TYPE::REQUEST) {
             DevicePayload last_pkt = *this->last_request_pkt.pop_front();
+
+            uint32_t num_pkts = 1;
+            float sec_per_payload = sizeof(DevicePayload) * 8 / float(BAUD_RATE);
+            clk_count += uint32_t(sec_per_payload * num_pkts * DEVICE_CLK_HZ);
             
             if(last_pkt.cmd() == (uint32_t)CMD::ADD)
                 cmd = "ADD_ACK";
@@ -181,19 +186,29 @@ void FunctionalImpl::process_device_request(DevicePayload& payload)
         }
         else if(payload.type() == (uint32_t)TYPE::RESPONSE) {
             DevicePayload last_pkt = *this->last_response_pkt.pop_front();
-
+            
+            uint32_t num_pkts = 0;
+            
             if(last_pkt.cmd() == 0) {
-                if(last_pkt.sub_cmd() == 0)
+                if(last_pkt.sub_cmd() == 0) {
                     cmd = "MEM_FETCH";
-                else if(last_pkt.sub_cmd() == 1)
+                    num_pkts = 2;
+                }
+                else if(last_pkt.sub_cmd() == 1) {
                     cmd = "MEM_WRITE";
+                    num_pkts = 3;
+                }
             }
+
+            float sec_per_payload = sizeof(DevicePayload) * 8 / float(BAUD_RATE);
+            clk_count += uint32_t(sec_per_payload * num_pkts * DEVICE_CLK_HZ);
         }
 
         this->stats_log->log_plain(
             std::to_string(payload.id()) + "," +
             cmd + "," +
-            std::to_string(payload.fields32.body)
+            std::to_string(clk_count) + "," +
+            std::to_string(clk_count / float(DEVICE_CLK_HZ) * 1e6)
         );
     }
 #endif

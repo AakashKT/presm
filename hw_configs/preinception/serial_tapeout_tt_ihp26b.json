@@ -23,7 +23,9 @@
         
         "serial_config": {
             "baud_rate": 9600
-        }
+        },
+
+        "device_clk_hz": 27000000
     },
 
     "verification": [

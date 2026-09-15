@@ -21,7 +21,6 @@ else()
 endif()
 
 set(HOST_RESIDENT_MEM_SIZE ${DEVICE_MEM_SIZE_IN_BYTES})
-set(SERIAL_PORT_BAUD_RATE ${BAUD_RATE})
 configure_file(
     "${PROJECT_SOURCE_DIR}/device/preinception/include/config_preinception.h.in" 
     "${PROJECT_SOURCE_DIR}/device/preinception/include/config_preinception.h"
