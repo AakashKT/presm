@@ -22,7 +22,7 @@ public:
     void send_device_payload(void* payload) override;
     bool receive_device_payload(void *payload) override;
 
-    void process_mem_request(DevicePayload& payload);
+    void process_device_request(DevicePayload& payload);
 
     uint32_t allocate_device_memory(uint32_t size_in_bytes) override;
     void write_to_device_memory(uint32_t address, uint32_t size_in_bytes, const char* data) override;
@@ -36,6 +36,12 @@ private:
 
     MemWriteState mem_write_state = ADDR_RECV;
     uint32_t mem_write_addr_scratch;
+
+#if DEVICE_DEBUG
+    Logger *stats_log;
+    ThreadSafeList<DevicePayload> last_request_pkt, last_response_pkt;
+#endif
+
 };
 
 #endif

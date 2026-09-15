@@ -3,6 +3,7 @@
 
 #include "hw_module.h"
 #include "defs.h"
+#include "config_preinception.h"
 
 enum class CP_STATE {
     IDLE = 0,
@@ -27,7 +28,15 @@ enum class CP_STATE {
     MULP2,
     DIVP2,
 
-    CMD_END
+    CMD_END,
+    CMD_END_WAIT,
+
+#if DEVICE_DEBUG
+    DEBUG_WRITE_REQUEST,
+    DEBUG_WRITE_RESPONSE,
+    DEBUG_WRITE_WAIT
+#endif
+
 };
 
 class HwCp : public HwModule<DevicePayload> {
@@ -51,6 +60,12 @@ private:
 
     CP_STATE state = CP_STATE::IDLE;
     CP_STATE mem_op_restore_state = CP_STATE::IDLE;
+    CP_STATE wait_restore_state = CP_STATE::IDLE;
+
+#if DEVICE_DEBUG
+    uint32_t cp_cycle_count = 0;
+#endif
+
 };
 
 #endif

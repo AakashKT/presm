@@ -1,6 +1,6 @@
 {
     "log_enabled": true,
-    "debug": false,
+    "debug": true,
     
     "driver": {
         "name": "matrix"
