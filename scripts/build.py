@@ -8,7 +8,7 @@ def build_presm(args, config):
         device_name = config['device']['name']
         device_type = config['device']['type']
         log_enabled = config['log_enabled']
-        debug_flag = 1 if config['device']['rtl']['compile_flags']['debug'] else 0
+        debug_flag = 1 if config['debug'] else 0
         d_mem_sz = int(config['device']['memory_size_in_bytes'])
 
     except KeyError as e:

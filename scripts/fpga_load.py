@@ -33,7 +33,7 @@ if __name__ == '__main__':
         fpga_name = config['device']['fpga']['name']
         top_module = config['device']['rtl']['top_module']
         top_module_src = config['device']['rtl']['top_module_src']
-        debug_flag = 1 if config['device']['rtl']['compile_flags']['debug'] else 0
+        debug_flag = 1 if config['debug'] else 0
 
     except KeyError as e:
         utils.error_exit(f"Error: The key {e} does not exist in the configuration.")

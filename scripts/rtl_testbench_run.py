@@ -33,7 +33,7 @@ if __name__ == '__main__':
         tests = config['rtl_testbench']
         sim = config["device"]["rtl_testbench_config"]["simulator"]
         lang = config["device"]["rtl_testbench_config"]["language"]
-        debug_flag = config["device"]["rtl_testbench_config"]["debug"]
+        debug_flag = config["debug"]
 
     except KeyError as e:
         utils.error_exit(f"Error: The key {e} does not exist in the dictionary.")

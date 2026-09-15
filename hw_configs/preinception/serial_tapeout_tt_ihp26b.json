@@ -1,5 +1,6 @@
 {
     "log_enabled": false,
+    "debug": false,
     
     "driver": {
         "name": "matrix"
@@ -12,16 +13,12 @@
 
         "rtl": {
             "top_module_src": "tangnano20k_serial.v",
-            "top_module": "Tangnano20kUart",
-            "compile_flags": {
-                "debug": false
-            }
+            "top_module": "Tangnano20kUart"
         },
 
         "rtl_testbench_config": {
             "simulator": "icarus",
-            "language": "verilog",
-            "debug": false
+            "language": "verilog"
         },
         
         "serial_config": {
