@@ -58,10 +58,12 @@ module CommandProcessor
     reg signed [31:0] op_1, op_2;
 
 `ifdef DEBUG
-    localparam CP_DEBUG_WRITE = 24;
-    localparam CP_DEBUG_STOP = 25;
+    localparam CP_DEBUG_WRITE_WAIT_PREP = 24;
+    localparam CP_DEBUG_WRITE_WAIT = 25;
+    localparam CP_STOP_MODIFIED = 26;
 
     reg [31:0] cp_cycle_count;
+    reg [3:0] debug_pkt_type;
 `endif
 
     always @(posedge extern_clock or posedge extern_reset)
@@ -94,6 +96,7 @@ module CommandProcessor
 
 `ifdef DEBUG
             cp_cycle_count <= 0;
+            debug_pkt_type <= 0;
 `endif
 
         end
@@ -112,6 +115,7 @@ module CommandProcessor
 
 `ifdef DEBUG
                         cp_cycle_count <= 0;
+                        debug_pkt_type <= 0;
 `endif
                         
                         delay_cycles <= 1;
@@ -122,7 +126,6 @@ module CommandProcessor
                         delay_restore_state <= CP_IDLE;
 
                         pkt_id <= rx_packet[3:0];
-                        // pkt_type <= rx_packet[7:4];
                         pkt_cmd <= rx_packet[11:8];
                         pkt_sub_cmd <= rx_packet[15:12];
                         
@@ -212,7 +215,12 @@ module CommandProcessor
                     tx_packet[47:32] <= 0;
                     tx_packet_ready <= 1;
 
+`ifdef DEBUG
+                    wait_restore_state <= CP_STOP_MODIFIED;
+`else
                     wait_restore_state <= CP_STOP;
+`endif
+
                     cp_state <= CP_TX_PACKET_SENT_WAIT;
                 end
 
@@ -244,23 +252,33 @@ module CommandProcessor
                 CP_STOP:
                 begin
                     tx_packet_ready <= 0;
-                    cp_state <= CP_DEBUG_WRITE;
+                    debug_pkt_type <= 0;
+
+                    wait_restore_state <= CP_STOP_MODIFIED;
+                    cp_state <= CP_DEBUG_WRITE_WAIT;
                 end
 
-                CP_DEBUG_WRITE:
+                CP_DEBUG_WRITE_WAIT_PREP:
                 begin
-                    tx_packet[3:0] <= 0;
-                    tx_packet[7:4] <= 1;
+                    tx_packet_ready <= 0;
+                    debug_pkt_type <= 1;
+
+                    cp_state <= CP_DEBUG_WRITE_WAIT;
+                end
+
+                CP_DEBUG_WRITE_WAIT:
+                begin
+                    tx_packet[3:0] <= pkt_id;
+                    tx_packet[7:4] <= debug_pkt_type;
                     tx_packet[11:8] <= 0;
                     tx_packet[15:12] <= 15;
                     tx_packet[47:16] <= cp_cycle_count;
                     tx_packet_ready <= 1;
 
-                    wait_restore_state <= CP_DEBUG_STOP;
                     cp_state <= CP_TX_PACKET_SENT_WAIT;
                 end
 
-                CP_DEBUG_STOP:
+                CP_STOP_MODIFIED:
                 begin
                     if(rx_packet_ready == 0)
                     begin
@@ -269,7 +287,7 @@ module CommandProcessor
                     end
                     else
                     begin
-                        cp_state <= CP_DEBUG_STOP;
+                        cp_state <= CP_STOP_MODIFIED;
                     end
                 end
 `else
@@ -319,7 +337,14 @@ module CommandProcessor
                             && rx_packet[11:8] == 0 && rx_packet[15:12] == 0)
                         begin
                             mem_val <= $signed(rx_packet[47:16]);
+
+`ifdef DEBUG
+                            wait_restore_state <= mem_op_restore_state;
+                            cp_state <= CP_DEBUG_WRITE_WAIT_PREP;
+`else
                             cp_state <= mem_op_restore_state;
+`endif
+
                         end
                         else
                         begin
@@ -393,7 +418,14 @@ module CommandProcessor
                         if(rx_packet[3:0] == tx_cmd_id && rx_packet[7:4] == 1 
                             && rx_packet[11:8] == 0 && rx_packet[15:12] == 1)
                         begin
+
+`ifdef DEBUG
+                            wait_restore_state <= mem_op_restore_state;
+                            cp_state <= CP_DEBUG_WRITE_WAIT_PREP;
+`else
                             cp_state <= mem_op_restore_state;
+`endif
+
                         end
                     end
                     else

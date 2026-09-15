@@ -14,6 +14,7 @@ enum DevicePacketRecvState {
 class SerialImpl : public SerialDevice {
 public:
     SerialImpl();
+    ~SerialImpl();
 
     void process_device_request(DevicePayload& payload);
 
@@ -34,6 +35,12 @@ private:
 
     DevicePacketRecvState device_packet_recv_state = ADDR_RECV;
     uint32_t mem_write_addr_scratch;
+
+#if DEVICE_DEBUG
+    Logger *stats_log;
+    ThreadSafeList<DevicePayload> last_request_pkt, last_response_pkt;
+#endif
+
 };
 
 #endif
