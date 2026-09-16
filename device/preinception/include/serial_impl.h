@@ -6,7 +6,7 @@
 #include "defs.h"
 #include "config_preinception.h"
 
-enum MemWriteState {
+enum DevicePacketRecvState {
     ADDR_RECV = 0,
     VAL_RECV
 };
@@ -14,8 +14,9 @@ enum MemWriteState {
 class SerialImpl : public SerialDevice {
 public:
     SerialImpl();
+    ~SerialImpl();
 
-    void process_mem_request(DevicePayload& payload);
+    void process_device_request(DevicePayload& payload);
 
     void serial_read_process(char data) override;
     void device_find() override;
@@ -32,8 +33,14 @@ private:
     DevicePayload scratch;
     uint32_t scratch_ptr = 0;
 
-    MemWriteState mem_write_state = ADDR_RECV;
+    DevicePacketRecvState device_packet_recv_state = ADDR_RECV;
     uint32_t mem_write_addr_scratch;
+
+#if DEVICE_DEBUG
+    Logger *stats_log;
+    ThreadSafeList<DevicePayload> last_request_pkt, last_response_pkt;
+#endif
+
 };
 
 #endif

@@ -8,7 +8,22 @@ Device* get_device()
 SerialImpl::SerialImpl()
     : SerialDevice()
 {
-    this->device_memory = new HostResidentMemory(std::atoi(HOST_RESIDENT_MEM_SIZE));
+    this->device_memory = new HostResidentMemory(HOST_RESIDENT_MEM_SIZE);
+
+#if DEVICE_DEBUG
+    this->stats_log = new Logger();
+    this->stats_log->init("device_cp_stats", true);
+    this->stats_log->log_plain("PKT_ID,INSTR,CLK_CYCLES,DERIVED_RUNTIME_MSEC");
+#endif
+
+}
+
+SerialImpl::~SerialImpl()
+{
+    this->log->log_info("[SerialImpl] Destructor called");
+#if DEVICE_DEBUG
+    delete this->stats_log;
+#endif  
 }
 
 void SerialImpl::send_device_payload(void* payload)
@@ -21,6 +36,14 @@ void SerialImpl::send_device_payload(void* payload)
 
     this->log->log_info("[SerialImpl] Sent device payload ->");
     this->log->log_info(sc->print());
+
+#if DEVICE_DEBUG
+    if(sc->type() == (uint32_t)TYPE::REQUEST)
+        this->last_request_pkt.push_back(*sc);
+    else if(sc->type() == (uint32_t)TYPE::RESPONSE)
+        this->last_response_pkt.push_back(*sc);
+#endif
+
 }
 
 bool SerialImpl::receive_device_payload(void *payload)
@@ -53,7 +76,7 @@ char* SerialImpl::read_from_device_memory(uint32_t address, uint32_t size_in_byt
     return this->device_memory->read(address, size_in_bytes);
 }
 
-void SerialImpl::process_mem_request(DevicePayload& payload)
+void SerialImpl::process_device_request(DevicePayload& payload)
 {
     if(payload.sub_cmd() == 0) {
         this->log->log_info("[SerialImpl] Device requested read, payload ->");
@@ -73,14 +96,14 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
         this->send_device_payload(&mem_response);
     }
     else if(payload.sub_cmd() == 1) {
-        if(this->mem_write_state == ADDR_RECV) {
+        if(this->device_packet_recv_state == ADDR_RECV) {
             this->log->log_info("[SerialImpl] Device requested write to address, payload ->");
             this->log->log_info(payload.print());
 
             this->mem_write_addr_scratch = payload.fields32.body;
-            this->mem_write_state = VAL_RECV;
+            this->device_packet_recv_state = VAL_RECV;
         }
-        else if(this->mem_write_state == VAL_RECV) {
+        else if(this->device_packet_recv_state == VAL_RECV) {
             this->log->log_info("[SerialImpl] Device requested write value to above address, payload ->");
             this->log->log_info(payload.print());
 
@@ -95,9 +118,44 @@ void SerialImpl::process_mem_request(DevicePayload& payload)
             mem_response.fields32.body = 0;
             this->send_device_payload(&mem_response);
 
-            this->mem_write_state = ADDR_RECV;
+            this->device_packet_recv_state = ADDR_RECV;
         }
     }
+
+#if DEVICE_DEBUG
+    else if(payload.sub_cmd() == 15) {
+        std::string cmd = "UNKNOWN";
+        
+        if(payload.type() == (uint32_t)TYPE::REQUEST) {
+            DevicePayload last_pkt = *this->last_request_pkt.pop_front();
+            
+            if(last_pkt.cmd() == (uint32_t)CMD::ADD)
+                cmd = "ADD_ACK";
+            else if(last_pkt.cmd() == (uint32_t)CMD::MULP2)
+                cmd = "MULP2_ACK";
+            else if(last_pkt.cmd() == (uint32_t)CMD::DIVP2)
+                cmd = "DIVP2_ACK";
+        }
+        else if(payload.type() == (uint32_t)TYPE::RESPONSE) {
+            DevicePayload last_pkt = *this->last_response_pkt.pop_front();
+
+            if(last_pkt.cmd() == 0) {
+                if(last_pkt.sub_cmd() == 0)
+                    cmd = "MEM_FETCH";
+                else if(last_pkt.sub_cmd() == 1)
+                    cmd = "MEM_WRITE";
+            }
+        }
+
+        this->stats_log->log_plain(
+            std::to_string(payload.id()) + "," +
+            cmd + "," +
+            std::to_string(payload.fields32.body) + "," +
+            std::to_string(payload.fields32.body / float(DEVICE_CLK_HZ) * 1e6)
+        );
+    }
+#endif
+
 }
 
 void SerialImpl::serial_read_process(char data)
@@ -106,7 +164,7 @@ void SerialImpl::serial_read_process(char data)
 
     if(this->scratch_ptr == 6) {
         if(this->scratch.cmd() == 0) 
-            this->process_mem_request(this->scratch);
+            this->process_device_request(this->scratch);
         else
             this->received_payloads.push_back(this->scratch);
 
@@ -128,7 +186,7 @@ void SerialImpl::device_find()
             continue;
         }
 
-        this->configure_serial_port(std::atoi(SERIAL_PORT_BAUD_RATE));
+        this->configure_serial_port(BAUD_RATE);
         tcflush(this->port_fd, TCIOFLUSH);
 
         DevicePayload tx;
@@ -138,6 +196,10 @@ void SerialImpl::device_find()
         tx.sub_cmd((uint32_t)HANDSHAKE::OP);
         tx.fields32.body = 0;
         this->send_device_payload(&tx);
+    
+#if DEVICE_DEBUG
+        this->last_request_pkt.pop_front();
+#endif
 
         DevicePayload rx;
         auto begin_time = std::chrono::high_resolution_clock::now();

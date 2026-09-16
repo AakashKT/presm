@@ -6,15 +6,7 @@ add_executable(verification
 
 target_include_directories(verification PUBLIC include/)
 
-if(${DRIVER} MATCHES "cuda")
-    message(STATUS "PRESM: Using CUDA verification tests")
-
-    add_subdirectory(cuda/)
-elseif(${DRIVER} MATCHES "c_accel")
-    message(STATUS "PRESM: Using COMPUTE ACCELERATOR verification tests")
-
-    add_subdirectory(c_accel/)
-elseif(${DRIVER} MATCHES "matrix")
+if(${DRIVER} MATCHES "matrix")
     message(STATUS "PRESM: Using MATRIX verification tests")
 
     add_subdirectory(matrix/)

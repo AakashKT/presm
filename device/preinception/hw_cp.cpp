@@ -17,6 +17,10 @@ std::string HwCp::module_name()
 
 void HwCp::execute(uint32_t block_idx)
 {
+#if DEVICE_DEBUG
+    this->cp_cycle_count += 1;
+#endif
+
     if(this->state == CP_STATE::IDLE) {
         auto msg = this->get_message(PKT_TO_CP);
         if(msg.data != nullptr && msg.ack == false) {
@@ -27,6 +31,10 @@ void HwCp::execute(uint32_t block_idx)
             this->pkt_cmd = payload->cmd();
             this->pkt_sub_cmd = payload->sub_cmd();
             this->pkt_body = payload->fields32.body;
+
+#if DEVICE_DEBUG
+            this->cp_cycle_count = 0;
+#endif
 
             this->state = CP_STATE::DECODE;
         }
@@ -81,6 +89,44 @@ void HwCp::execute(uint32_t block_idx)
         this->state = CP_STATE::IDLE;
     }
 
+#if DEVICE_DEBUG
+    else if(this->state == CP_STATE::DEBUG_WRITE_REQUEST) {
+        this->log->log_info("[HwCp] Writing debug payload (request).");
+
+        auto tx = std::make_shared<DevicePayload>();
+        tx->id(this->pkt_id);
+        tx->type(0);
+        tx->cmd(0);
+        tx->sub_cmd(15);
+        tx->fields32.body = this->cp_cycle_count;
+        this->hw_interface_module->push_message(PKT_FROM_CP, tx);
+
+        this->cp_cycle_count = 0;
+
+        this->state = CP_STATE::DEBUG_WRITE_WAIT;
+    }
+    else if(this->state == CP_STATE::DEBUG_WRITE_RESPONSE) {
+        this->log->log_info("[HwCp] Writing debug payload (response).");
+
+        auto tx = std::make_shared<DevicePayload>();
+        tx->id(this->pkt_id);
+        tx->type(1);
+        tx->cmd(0);
+        tx->sub_cmd(15);
+        tx->fields32.body = this->cp_cycle_count;
+        this->hw_interface_module->push_message(PKT_FROM_CP, tx);
+
+        this->cp_cycle_count = 0;
+
+        this->state = CP_STATE::DEBUG_WRITE_WAIT;
+    }
+    else if(this->state == CP_STATE::DEBUG_WRITE_WAIT) {
+        if(this->hw_interface_module->get_message_ack(PKT_FROM_CP)) {
+            this->state = this->wait_restore_state;
+        }
+    }
+#endif
+
     else if(this->state == CP_STATE::MEM_FETCH) {
         this->log->log_info("[HwCp] Sending MEM_FETCH request");
 
@@ -103,7 +149,13 @@ void HwCp::execute(uint32_t block_idx)
 
             if(payload->id() == this->tx_cmd_id && payload->type() == 1u && payload->cmd() == 0u && payload->sub_cmd() == 0u) {
                 this->mem_val = payload->fields32.body;
+
+#if DEVICE_DEBUG
+                this->wait_restore_state = this->mem_op_restore_state;
+                this->state = CP_STATE::DEBUG_WRITE_RESPONSE;
+#else
                 this->state = this->mem_op_restore_state;
+#endif
 
                 this->log->log_info("[HwCp] Received MEM_FETCH response -> Value is " + std::bitset<32>(this->mem_val).to_string());
             }
@@ -152,7 +204,14 @@ void HwCp::execute(uint32_t block_idx)
 
             if(payload->id() == this->tx_cmd_id && payload->type() == 1u && payload->cmd() == 0u && payload->sub_cmd() == 1u) {
                 this->log->log_info("[HwCp] Received MEM_WRITE response");
+
+#if DEVICE_DEBUG
+                this->wait_restore_state = this->mem_op_restore_state;
+                this->state = CP_STATE::DEBUG_WRITE_RESPONSE;
+#else
                 this->state = this->mem_op_restore_state;
+#endif
+
             }
         }
     }
@@ -229,7 +288,19 @@ void HwCp::execute(uint32_t block_idx)
         tx->fields32.body = 0;
         this->hw_interface_module->push_message(PKT_FROM_CP, tx);
 
-        this->state = CP_STATE::IDLE;
+        this->state = CP_STATE::CMD_END_WAIT;
+    }
+    else if(this->state == CP_STATE::CMD_END_WAIT) {
+        if(this->hw_interface_module->get_message_ack(PKT_FROM_CP)) {
+
+#if DEVICE_DEBUG
+            this->wait_restore_state = CP_STATE::IDLE;
+            this->state = CP_STATE::DEBUG_WRITE_REQUEST;
+#else
+            this->state = CP_STATE::IDLE;
+#endif
+
+        }
     }
 
     else {

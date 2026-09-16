@@ -7,3 +7,8 @@ Device::Device()
 
     this->log->log_info("[Device] Constructor called");
 }
+
+Device::~Device()
+{
+    delete this->log;
+}

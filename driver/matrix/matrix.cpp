@@ -8,13 +8,11 @@ Device* presm_device = nullptr;
 Logger drv_log;
 
 uint8_t global_command_id = 0;
+bool free_called = false;
 
 std::list<DevicePayload> recorded_commands;
-
-ThreadSafeList<DevicePayload> command_buffer;
 ThreadSafeList<std::pair<DevicePayload, bool>> command_status_readback;
 
-std::thread command_process_thread;
 std::thread device_payload_receive_thread;
 
 std::string intToHex(const int& num) 
@@ -63,25 +61,13 @@ void mInit()
     presm_device = get_device();
     presm_device->device_initialize();
 
-    command_process_thread = std::thread(
-        [&]() {
-            while(true) {
-                auto payload_opt = command_buffer.pop_front();
-
-                if(payload_opt != std::nullopt) {
-                    DevicePayload payload = *payload_opt;
-                    drv_log.log_info("Sending packet with ID: " + std::to_string(payload.id()));
-
-                    presm_device->send_device_payload(&payload);
-                }
-            }
-        }
-    );
-
     device_payload_receive_thread = std::thread(
         [&]() {
             DevicePayload* scratch = (DevicePayload*) malloc(sizeof(DevicePayload));
             while(true) {
+                if(free_called)
+                    break;
+
                 if(presm_device->receive_device_payload((void*)scratch)) {
                     drv_log.log_info("Received packet with ID: " + std::to_string(scratch->id()));
                     command_status_readback.push_back(std::pair(*scratch, false));
@@ -202,8 +188,10 @@ void mSync()
             break;
 
         auto payload = recorded_commands.front();
+        
+        drv_log.log_info("Sending packet with ID: " + std::to_string(payload.id()));
+        presm_device->send_device_payload(&payload);
 
-        command_buffer.push_back(payload);
         cmdSync(payload.id());
 
         recorded_commands.pop_front();
@@ -214,10 +202,12 @@ void mSync()
 
 void mFree()
 {
+    free_called = true;
+    
     drv_log.log_info("Driver free called");
-
-    command_process_thread.detach();
     device_payload_receive_thread.detach();
+
+    delete presm_device;
 }
 
 MIntDeviceMemory::MIntDeviceMemory(int32_t source)

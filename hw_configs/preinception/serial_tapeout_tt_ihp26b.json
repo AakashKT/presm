@@ -1,5 +1,6 @@
 {
     "log_enabled": false,
+    "debug": false,
     
     "driver": {
         "name": "matrix"
@@ -22,7 +23,9 @@
         
         "serial_config": {
             "baud_rate": 9600
-        }
+        },
+
+        "device_clk_hz": 27000000
     },
 
     "verification": [
@@ -76,14 +79,14 @@
             "rtl_src": "uart_packet.v",
             "rtl_top_level": "UARTPacket",
             "testbench_src": "uart_packet.py",
-            "enable": false
+            "enable": true
         },
         {
             "name": "Command Processor (CP)",
             "rtl_src": "command_processor.v",
             "rtl_top_level": "CommandProcessor",
             "testbench_src": "command_processor.py",
-            "enable": false
+            "enable": true
         }
     ]
 }

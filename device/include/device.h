@@ -9,7 +9,7 @@
 class Device {
 public:
     Device();
-    virtual ~Device() {};
+    ~Device();
     
     std::string get_name() { return std::string(DEVICE_NAME); };
 

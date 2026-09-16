@@ -1,6 +1,8 @@
 TOP_MODULE_SRC=none.v
 TOP_MODULE=none
 
+DEBUG=0
+
 YOSYS_EXEC=none
 NEXTPNR_EXEC=none
 OPENFPGALOADER_EXEC=none
@@ -26,6 +28,11 @@ $(TOP_MODULE)_PNR.json: $(TOP_MODULE)_SYNTH.json
 
 $(TOP_MODULE)_SYNTH.json: 
 	@echo "Synthesizing: $(TOP_MODULE)_SYNTH.json"
-	$(YOSYS_EXEC) -p "read_verilog $(VERILOG_SRC_DIR)/$(TOP_MODULE_SRC); synth_gowin -top $(TOP_MODULE) -json $(TOP_MODULE)_SYNTH.json"
+
+	@if [ "$(DEBUG)" = "1" ]; then \
+		$(YOSYS_EXEC) -p "read_verilog -DDEBUG=$(DEBUG) $(VERILOG_SRC_DIR)/$(TOP_MODULE_SRC); synth_gowin -top $(TOP_MODULE) -json $(TOP_MODULE)_SYNTH.json"; \
+	else \
+		$(YOSYS_EXEC) -p "read_verilog $(VERILOG_SRC_DIR)/$(TOP_MODULE_SRC); synth_gowin -top $(TOP_MODULE) -json $(TOP_MODULE)_SYNTH.json"; \
+	fi
 
 # .INTERMEDIATE: $(TOP_MODULE).fs $(TOP_MODULE)_PNR.json $(TOP_MODULE)_SYNTH.json

@@ -72,6 +72,8 @@ async def handshake_test(dut):
         0b1000000100, 0b1000000010, 0b1000000000, 0b1000000000
     ]
     await assert_packet(dut, bit_hold, packet)
+
+    await Timer(64*bit_hold, unit='ns')
     
 @cocotb.test()
 async def op1_test(dut):
@@ -103,6 +105,8 @@ async def op1_test(dut):
     ]
     await assert_packet(dut, bit_hold, packet)
 
+    await Timer(64*bit_hold, unit='ns')
+
 @cocotb.test()
 async def op2_test(dut):
     bit_hold = init(dut)
@@ -132,6 +136,8 @@ async def op2_test(dut):
         0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
     ]
     await assert_packet(dut, bit_hold, packet)
+
+    await Timer(64*bit_hold, unit='ns')
 
 @cocotb.test()
 async def add_cmd_test(dut):
@@ -164,6 +170,8 @@ async def add_cmd_test(dut):
     ]
     await assert_packet(dut, bit_hold, packet)
 
+    await Timer(64*bit_hold, unit='ns')
+
     ######################
     # OP 2
     ######################
@@ -188,6 +196,8 @@ async def add_cmd_test(dut):
         0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
     ]
     await assert_packet(dut, bit_hold, packet)
+
+    await Timer(64*bit_hold, unit='ns')
 
     ######################
     # OP 3
@@ -220,6 +230,8 @@ async def add_cmd_test(dut):
     ]
     await assert_packet(dut, bit_hold, packet)
 
+    await Timer(64*bit_hold, unit='ns')
+
 @cocotb.test()
 async def mulp2_cmd_test(dut):
     bit_hold = init(dut)
@@ -251,6 +263,8 @@ async def mulp2_cmd_test(dut):
     ]
     await assert_packet(dut, bit_hold, packet)
 
+    await Timer(64*bit_hold, unit='ns')
+
     ######################
     # OP 2
     ######################
@@ -275,6 +289,8 @@ async def mulp2_cmd_test(dut):
         0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
     ]
     await assert_packet(dut, bit_hold, packet)
+
+    await Timer(64*bit_hold, unit='ns')
 
     ######################
     # OP 3
@@ -307,6 +323,8 @@ async def mulp2_cmd_test(dut):
     ]
     await assert_packet(dut, bit_hold, packet)
 
+    await Timer(64*bit_hold, unit='ns')
+
 @cocotb.test()
 async def divp2_cmd_test(dut):
     bit_hold = init(dut)
@@ -338,6 +356,8 @@ async def divp2_cmd_test(dut):
     ]
     await assert_packet(dut, bit_hold, packet)
 
+    await Timer(64*bit_hold, unit='ns')
+
     ######################
     # OP 2
     ######################
@@ -362,6 +382,8 @@ async def divp2_cmd_test(dut):
         0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
     ]
     await assert_packet(dut, bit_hold, packet)
+
+    await Timer(64*bit_hold, unit='ns')
 
     ######################
     # OP 3
@@ -393,4 +415,6 @@ async def divp2_cmd_test(dut):
         0b1000000000, 0b1000000000, 0b1000000000, 0b1000000000
     ]
     await assert_packet(dut, bit_hold, packet)
+
+    await Timer(64*bit_hold, unit='ns')
     

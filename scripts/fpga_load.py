@@ -33,6 +33,7 @@ if __name__ == '__main__':
         fpga_name = config['device']['fpga']['name']
         top_module = config['device']['rtl']['top_module']
         top_module_src = config['device']['rtl']['top_module_src']
+        debug_flag = 1 if config['debug'] else 0
 
     except KeyError as e:
         utils.error_exit(f"Error: The key {e} does not exist in the configuration.")
@@ -44,7 +45,7 @@ if __name__ == '__main__':
 
     setup(args, device_name, fpga_name, execution_dir)
 
-    yosys_exec = f'{os.getcwd()}/extern/yosys/yosys'
+    yosys_exec = f'{os.getcwd()}/extern/yosys/build/yosys'
     nextpnr_exec = f'{os.getcwd()}/extern/nextpnr/build/nextpnr-himbaechel'
     openfpgaloader_exec = f'{os.getcwd()}/extern/openFPGALoader/build/openFPGALoader'
 
@@ -53,4 +54,5 @@ if __name__ == '__main__':
                     TOP_MODULE_SRC={top_module_src} \
                     YOSYS_EXEC={yosys_exec} \
                     NEXTPNR_EXEC={nextpnr_exec} \
-                    OPENFPGALOADER_EXEC={openfpgaloader_exec}')
+                    OPENFPGALOADER_EXEC={openfpgaloader_exec} \
+                    DEBUG={debug_flag}')
