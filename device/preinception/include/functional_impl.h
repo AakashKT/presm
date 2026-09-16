@@ -17,7 +17,8 @@ public:
     FunctionalImpl();
     ~FunctionalImpl();
 
-    void device_initialize();
+    void device_initialize() override;
+    void device_deinitialize() override {};
 
     void send_device_payload(void* payload) override;
     bool receive_device_payload(void *payload) override;

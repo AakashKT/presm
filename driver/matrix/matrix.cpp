@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include "device.h"
+#include "config_preinception.h"
 #include "logging.h"
 
 #include "defs.h"
@@ -206,6 +207,12 @@ void mFree()
     
     drv_log.log_info("Driver free called");
     device_payload_receive_thread.detach();
+
+    presm_device->device_deinitialize();
+
+#if DEVICE_DEBUG
+    usleep(1e6);
+#endif
 
     delete presm_device;
 }

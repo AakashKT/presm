@@ -18,6 +18,7 @@ public:
     virtual void device_find() = 0;
 
     void device_initialize() override;
+    void device_deinitialize() override;
 
     bool open_serial_port(std::string port_name);
     void configure_serial_port(uint32_t baud_rate = 115200);

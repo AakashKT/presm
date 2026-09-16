@@ -15,9 +15,9 @@ void Logger::init(std::string name, bool is_csv)
 {
 #if LOG_ENABLED==1
     if(is_csv)
-        this->error_file.open(name + "_log.csv");
+        this->error_file.open(name + "_log.csv", std::ofstream::out | std::ofstream::app);
     else
-        this->error_file.open(name + "_log.txt");
+        this->error_file.open(name + "_log.txt", std::ofstream::out | std::ofstream::app);
 #endif
 }
 

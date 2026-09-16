@@ -36,14 +36,14 @@ if __name__ == '__main__':
 
     except KeyError as e:
         utils.error_exit(f"Error: No verification apps found.")
-    
-    execution_dir = 'verify_runs'
-    execution_dir = utils.make_numbered_execution_dir(execution_dir)
-
-    executable, driver_lib = setup(args, config, execution_dir)
 
     for app in verification_apps:
         if app['enabled']:
+            execution_dir = 'verify_runs'
+            execution_dir = utils.make_numbered_execution_dir(execution_dir)
+
+            executable, driver_lib = setup(args, config, execution_dir)
+
             app_args = [app['name']] + app['args_device_run']
             source = utils.presm_execute(execution_dir, executable, driver_lib, \
                                 app_args, config['driver']['name'])

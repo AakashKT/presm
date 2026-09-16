@@ -9,11 +9,12 @@
 class Device {
 public:
     Device();
-    ~Device();
+    virtual ~Device() {};
     
     std::string get_name() { return std::string(DEVICE_NAME); };
 
     virtual void device_initialize() = 0;
+    virtual void device_deinitialize() = 0;
 
     virtual void send_device_payload(void* payload) = 0;
     virtual bool receive_device_payload(void *payload) = 0;

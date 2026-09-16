@@ -61,9 +61,11 @@ module CommandProcessor
     localparam CP_DEBUG_WRITE_WAIT_PREP = 24;
     localparam CP_DEBUG_WRITE_WAIT = 25;
     localparam CP_STOP_MODIFIED = 26;
+    localparam CP_DEBUG_WRITE_RESTORE = 27;
 
     reg [31:0] cp_cycle_count;
     reg [3:0] debug_pkt_type;
+    reg [5:0] debug_restore_state;
 `endif
 
     always @(posedge extern_clock or posedge extern_reset)
@@ -254,7 +256,7 @@ module CommandProcessor
                     tx_packet_ready <= 0;
                     debug_pkt_type <= 0;
 
-                    wait_restore_state <= CP_STOP_MODIFIED;
+                    debug_restore_state <= CP_STOP_MODIFIED;
                     cp_state <= CP_DEBUG_WRITE_WAIT;
                 end
 
@@ -275,9 +277,14 @@ module CommandProcessor
                     tx_packet[47:16] <= cp_cycle_count;
                     tx_packet_ready <= 1;
 
-                    cp_cycle_count <= 0;
-
+                    wait_restore_state <= CP_DEBUG_WRITE_RESTORE;
                     cp_state <= CP_TX_PACKET_SENT_WAIT;
+                end
+
+                CP_DEBUG_WRITE_RESTORE:
+                begin
+                    cp_cycle_count <= 0;
+                    cp_state <= debug_restore_state;
                 end
 
                 CP_STOP_MODIFIED:
@@ -341,7 +348,7 @@ module CommandProcessor
                             mem_val <= $signed(rx_packet[47:16]);
 
 `ifdef DEBUG
-                            wait_restore_state <= mem_op_restore_state;
+                            debug_restore_state <= mem_op_restore_state;
                             cp_state <= CP_DEBUG_WRITE_WAIT_PREP;
 `else
                             cp_state <= mem_op_restore_state;
@@ -422,7 +429,7 @@ module CommandProcessor
                         begin
 
 `ifdef DEBUG
-                            wait_restore_state <= mem_op_restore_state;
+                            debug_restore_state <= mem_op_restore_state;
                             cp_state <= CP_DEBUG_WRITE_WAIT_PREP;
 `else
                             cp_state <= mem_op_restore_state;

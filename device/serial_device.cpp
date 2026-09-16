@@ -10,10 +10,6 @@ SerialDevice::~SerialDevice()
 {
     this->log->log_info("[SerialDevice] Destructor called");
 
-    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::high_resolution_clock::now() - this->device_run_time);
-    this->log->log_info("Runtime: " + std::to_string(elapsed.count()) + " ms");
-
     this->serial_port_listen_thread.detach();
     this->serial_port_read_process_thread.detach();
 
@@ -21,6 +17,13 @@ SerialDevice::~SerialDevice()
 
     tcflush(this->port_fd, TCIOFLUSH);
     close(this->port_fd);
+}
+
+void SerialDevice::device_deinitialize()
+{
+    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::high_resolution_clock::now() - this->device_run_time);
+    this->log->log_info("Runtime: " + std::to_string(elapsed.count()) + " ms");
 }
 
 void SerialDevice::device_initialize()
