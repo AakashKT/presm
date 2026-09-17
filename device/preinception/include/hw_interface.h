@@ -2,12 +2,13 @@
 #define HW_INTERFACE_H
 
 #include "hw_module.h"
+#include "hw_clock.h"
 #include "hw_cp.h"
 #include "defs.h"
 
 class HwInterface : public HwModule<DevicePayload> {
 public:
-    HwInterface();
+    HwInterface(HwClock& clk);
 
     void execute_rx();
     void execute_tx();

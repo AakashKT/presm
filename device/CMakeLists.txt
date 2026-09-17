@@ -5,6 +5,7 @@ add_library(device OBJECT
             serial_device.cpp
             device_memory.cpp
             host_resident_device_memory.cpp
+            hw_clock.cpp
         )
 target_include_directories(device PUBLIC include/)
 target_link_libraries(device

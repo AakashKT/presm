@@ -1,7 +1,7 @@
 #include "hw_cp.h"
 
-HwCp::HwCp(HwModule* hw_interface_module)
-    : HwModule<DevicePayload>(1),
+HwCp::HwCp(HwModule* hw_interface_module, HwClock& clk)
+    : HwModule<DevicePayload>(1, clk),
       hw_interface_module(hw_interface_module)
 {
     this->log = new Logger();

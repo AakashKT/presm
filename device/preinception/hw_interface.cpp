@@ -1,8 +1,8 @@
 #include "hw_interface.h"
 
-HwInterface::HwInterface()
-    : HwModule<DevicePayload>(2),
-      cp(this)
+HwInterface::HwInterface(HwClock& clk)
+    : HwModule<DevicePayload>(2, clk),
+      cp(this, clk)
 {
     this->log = new Logger();
     this->log->init("hw_interface");
