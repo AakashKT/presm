@@ -4,6 +4,7 @@
 #include "device.h"
 #include "host_resident_device_memory.h"
 #include "hw_interface.h"
+#include "hw_clock.h"
 #include "defs.h"
 #include "config_preinception.h"
 
@@ -30,6 +31,7 @@ public:
     char* read_from_device_memory(uint32_t address, uint32_t size_in_bytes) override;
 
 private:
+    HwClock hw_clock;
     HwInterface hw_interface;
 
     ThreadSafeList<DevicePayload> received_payloads;

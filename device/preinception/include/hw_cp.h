@@ -2,6 +2,7 @@
 #define HW_CP_H
 
 #include "hw_module.h"
+#include "hw_clock.h"
 #include "defs.h"
 #include "config_preinception.h"
 
@@ -41,7 +42,7 @@ enum class CP_STATE {
 
 class HwCp : public HwModule<DevicePayload> {
 public:
-    HwCp(HwModule* hw_interface_module);
+    HwCp(HwModule* hw_interface_module, HwClock& clk);
     
     std::string module_name() override;
     void execute(uint32_t block_idx) override;

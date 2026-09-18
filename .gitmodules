@@ -10,3 +10,6 @@
 [submodule "extern/nlohmann-json"]
 	path = extern/nlohmann-json
 	url = https://github.com/nlohmann/json.git
+[submodule "extern/ramulator2"]
+	path = extern/ramulator2
+	url = git@github.com:CMU-SAFARI/ramulator2.git

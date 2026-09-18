@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "logging.h"
+#include "hw_clock.h"
 
 template <typename T>
 struct HwMessage {
@@ -13,7 +14,7 @@ struct HwMessage {
 template <typename T>
 class HwModule {
 public:
-    HwModule(uint32_t num_parallel_blocks);
+    HwModule(uint32_t num_parallel_blocks, HwClock& clk);
     ~HwModule();
 
     void push_message(std::string module_name, std::shared_ptr<T> payload);
@@ -34,17 +35,18 @@ private:
 };
 
 template <typename T>
-HwModule<T>::HwModule(uint32_t num_parallel_blocks)
+HwModule<T>::HwModule(uint32_t num_parallel_blocks, HwClock& clk)
 {
     for(auto i=0; i<num_parallel_blocks; i++)
         this->execute_thread_list.emplace_back(
             std::thread(
-                [](HwModule *hw_module, uint32_t block_idx) {
+                [](HwModule *hw_module, uint32_t block_idx, HwClock* clk) {
                     while(true) {
+                        clk->wait_for_tick();
                         hw_module->execute(block_idx);
                     }
                 },
-                this, i
+                this, i, &clk
             )
         );
 }

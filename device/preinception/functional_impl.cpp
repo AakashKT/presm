@@ -6,7 +6,9 @@ Device* get_device()
 }
 
 FunctionalImpl::FunctionalImpl()
-    : Device()
+    : Device(),
+      hw_clock("master"),
+      hw_interface(hw_clock)
 {
     this->log->log_info("[FunctionalImpl] 'Preinception Device' constructor called");
     this->device_memory = new HostResidentMemory(HOST_RESIDENT_MEM_SIZE);
