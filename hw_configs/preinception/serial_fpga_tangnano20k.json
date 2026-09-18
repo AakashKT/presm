@@ -45,28 +45,28 @@
             "args_host_run": ["host"],
             "args_device_run": ["device"],
             "verify": true,
-            "enabled": false
+            "enabled": true
         },
         {
             "name": "multiply_power_2",
             "args_host_run": ["host"],
             "args_device_run": ["device"],
             "verify": true,
-            "enabled": false
+            "enabled": true
         },
         {
             "name": "divide_power_2",
             "args_host_run": ["host"],
             "args_device_run": ["device"],
             "verify": true,
-            "enabled": false
+            "enabled": true
         },
         {
             "name": "multiple_commands",
             "args_host_run": ["host"],
             "args_device_run": ["device"],
             "verify": true,
-            "enabled": false
+            "enabled": true
         }
     ],
 

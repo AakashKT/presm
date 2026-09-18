@@ -253,19 +253,25 @@ module CommandProcessor
 `ifdef DEBUG
                 CP_STOP:
                 begin
-                    tx_packet_ready <= 0;
-                    debug_pkt_type <= 0;
+                    if(tx_packet_sent == 1)
+                    begin
+                        tx_packet_ready <= 0;
+                        debug_pkt_type <= 0;
 
-                    debug_restore_state <= CP_STOP_MODIFIED;
-                    cp_state <= CP_DEBUG_WRITE_WAIT;
+                        debug_restore_state <= CP_STOP_MODIFIED;
+                        cp_state <= CP_DEBUG_WRITE_WAIT;
+                    end
                 end
 
                 CP_DEBUG_WRITE_WAIT_PREP:
                 begin
-                    tx_packet_ready <= 0;
-                    debug_pkt_type <= 1;
+                    if(tx_packet_sent == 1)
+                    begin
+                        tx_packet_ready <= 0;
+                        debug_pkt_type <= 1;
 
-                    cp_state <= CP_DEBUG_WRITE_WAIT;
+                        cp_state <= CP_DEBUG_WRITE_WAIT;
+                    end
                 end
 
                 CP_DEBUG_WRITE_WAIT:
