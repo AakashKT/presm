@@ -1,0 +1,30 @@
+{
+    "log_enabled": true,
+    "debug": true,
+    
+    "driver": {
+        "name": "mlpin"
+    },
+
+    "device": {
+        "name": "mlpin",
+        "type": "functional",
+        "memory_size_in_bytes": 0,
+
+        "host_device_interface": {
+            "baud_rate": 9600
+        },
+
+        "device_clk_hz": 27000000
+    },
+
+    "verification": [
+        {
+            "name": "sanity",
+            "args_host_run": ["host"],
+            "args_device_run": ["device"],
+            "verify": true,
+            "enabled": true
+        }
+    ]
+}

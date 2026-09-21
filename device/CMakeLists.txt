@@ -25,6 +25,11 @@ configure_file(
 if(${DEVICE} STREQUAL "preinception")
     message(STATUS "PRESM: Building device 'preinception'")
     add_subdirectory(preinception/)
+
+elseif(${DEVICE} STREQUAL "mlpin")
+    message(STATUS "PRESM: Building device 'mlpin'")
+    add_subdirectory(mlpin/)
+
 else()
     message(FATAL_ERROR "PRESM: Device '${DEVICE}' not found!")
     return()

@@ -45,6 +45,11 @@ endif()
 if(${DRIVER} STREQUAL "matrix")
     message(STATUS "PRESM: Compiling with MATRIX driver")
     add_subdirectory(driver/matrix)
+
+elseif(${DRIVER} STREQUAL "mlpin")
+    message(STATUS "PRESM: Compiling with MLP Inference (mlpin) driver")
+    add_subdirectory(driver/mlpin)
+
 else()
     message(FATAL_ERROR "PRESM: Driver named '${DRIVER}' not found!")
     return()
