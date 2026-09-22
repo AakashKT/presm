@@ -6,7 +6,7 @@
 #include "hw_interface.h"
 #include "hw_clock.h"
 #include "defs.h"
-#include "config_preinception.h"
+#include "g_config_preinception.h"
 
 enum MemWriteState {
     ADDR_RECV = 0,

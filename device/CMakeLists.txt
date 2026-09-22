@@ -19,7 +19,7 @@ endif()
 set(DEVICE_NAME ${DEVICE}) 
 configure_file(
     "${PROJECT_SOURCE_DIR}/device/include/config_device.h.in" 
-    "${PROJECT_SOURCE_DIR}/device/include/config_device.h"
+    "${PROJECT_SOURCE_DIR}/device/include/g_config_device.h"
 )
 
 if(${DEVICE} STREQUAL "preinception")

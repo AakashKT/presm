@@ -3,4 +3,4 @@ build*/
 .vscode/
 packages/
 *_runs/
-config_*.h
+g_*.h
