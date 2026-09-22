@@ -4,7 +4,7 @@
 #include "hw_module.h"
 #include "hw_clock.h"
 #include "defs.h"
-#include "config_preinception.h"
+#include "g_config_preinception.h"
 
 enum class CP_STATE {
     IDLE = 0,

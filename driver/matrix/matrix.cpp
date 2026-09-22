@@ -1,6 +1,6 @@
 #include "matrix.h"
 #include "device.h"
-#include "config_preinception.h"
+#include "g_config_preinception.h"
 #include "logging.h"
 
 #include "defs.h"

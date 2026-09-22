@@ -23,7 +23,7 @@ endif()
 set(HOST_RESIDENT_MEM_SIZE ${DEVICE_MEM_SIZE_IN_BYTES})
 configure_file(
     "${PROJECT_SOURCE_DIR}/device/preinception/include/config_preinception.h.in" 
-    "${PROJECT_SOURCE_DIR}/device/preinception/include/config_preinception.h"
+    "${PROJECT_SOURCE_DIR}/device/preinception/include/g_config_preinception.h"
 )
 
 target_sources(device PUBLIC

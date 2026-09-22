@@ -4,7 +4,7 @@
 #include "serial_device.h"
 #include "host_resident_device_memory.h"
 #include "defs.h"
-#include "config_preinception.h"
+#include "g_config_preinception.h"
 
 enum DevicePacketRecvState {
     ADDR_RECV = 0,
