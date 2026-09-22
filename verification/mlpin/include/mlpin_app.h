@@ -9,9 +9,5 @@ public:
 };
 
 void run_sanity(std::vector<std::string> args);
-void run_addition(std::vector<std::string> args);
-void run_mulp2(std::vector<std::string> args);
-void run_divp2(std::vector<std::string> args);
-void run_multiple(std::vector<std::string> args);
 
 #endif

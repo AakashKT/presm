@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.15...4.0)
 
 SET(VERIFICATION_SOURCES
     mlpin_app.cpp
+
+    sanity/sanity.cpp
 )
 
 target_sources(verification PUBLIC

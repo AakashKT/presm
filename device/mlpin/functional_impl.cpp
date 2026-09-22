@@ -16,8 +16,8 @@ FunctionalImpl::~FunctionalImpl()
 }
 
 void FunctionalImpl::device_initialize()
-{
-    
+{  
+    this->log->log_info("Size of DeviceInfoResponse: " + std::to_string(sizeof(DeviceInfoResponse)));
 }
 
 uint32_t FunctionalImpl::allocate_device_memory(uint32_t size_in_bytes)
