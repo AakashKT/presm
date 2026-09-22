@@ -2,7 +2,7 @@
 #define FUNCTIONAL_H
 
 #include "device.h"
-#include "config_mlpin.h"
+#include "g_config_mlpin.h"
 #include "defs.h"
 
 class FunctionalImpl : public Device {

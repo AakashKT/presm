@@ -1,7 +1,7 @@
 #include "mlpin.h"
 #include "device.h"
 #include "logging.h"
-#include "config_mlpin.h"
+#include "g_config_mlpin.h"
 
 Device* device = nullptr;
 Logger drv_log;

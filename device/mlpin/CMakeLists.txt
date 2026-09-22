@@ -21,7 +21,7 @@ endif()
 set(HOST_RESIDENT_MEM_SIZE ${DEVICE_MEM_SIZE_IN_BYTES})
 configure_file(
     "${PROJECT_SOURCE_DIR}/device/mlpin/include/config_mlpin.h.in" 
-    "${PROJECT_SOURCE_DIR}/device/mlpin/include/config_mlpin.h"
+    "${PROJECT_SOURCE_DIR}/device/mlpin/include/g_config_mlpin.h"
 )
 
 target_sources(device PUBLIC
